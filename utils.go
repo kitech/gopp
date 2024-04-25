@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -105,6 +106,8 @@ func Assert(v interface{}, info string, args ...interface{}) {
 
 // 俩工具
 // 直接忽略掉变量未使用编译提示
+func GOUSED(vars ...interface{})   {}
+func GOUNUSED(vars ...interface{}) {}
 func G_USED(vars ...interface{})   {}
 func G_UNUSED(vars ...interface{}) {}
 func G_FATAL(err error) {
@@ -188,4 +191,15 @@ func Value2Iface(vals []reflect.Value) []interface{} {
 		rets = append(rets, val.Interface())
 	}
 	return rets
+}
+
+func PackArgs(args ...any) string {
+	sb := strings.Builder{}
+	for i, arg := range args {
+		if i > 0 {
+			sb.WriteString(" ")
+		}
+		sb.WriteString(fmt.Sprintf("%v", arg))
+	}
+	return sb.String()
 }

@@ -20,7 +20,6 @@ type xchan struct {
 	// 使用标识的话，就怕在不同goroutine使用时有问题。
 }
 
-//
 func NewXChan(c int) *xchan {
 	uchan := make(chan interface{}, c)
 	pdchan := make(chan struct{}, 1)
@@ -89,6 +88,11 @@ func SafeTrySend(c interface{}, v interface{}) (err error) {
 		err = errors.New("will block")
 	}
 	return
+}
+
+// 安全地寫入channel，避免panic，避免阻塞x
+func ChanTrySend(c any, v any) error {
+	return SafeTrySend(c, v)
 }
 
 // 帶超時的寫入channel

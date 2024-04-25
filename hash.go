@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"hash"
+	"hash/crc64"
 	"io"
 	"io/ioutil"
 	"os"
@@ -108,4 +109,15 @@ func Sha1File_dep(p string) string {
 		return ""
 	}
 	return Sha1AsStr(bcc)
+}
+
+var crc64htiso *crc64.Table // = crc64.MakeTable(crc64.ISO)
+func getcrc64ht() *crc64.Table {
+	if crc64htiso == nil {
+		crc64htiso = crc64.MakeTable(crc64.ISO)
+	}
+	return crc64htiso
+}
+func Crc64Str(s string) uint64 {
+	return crc64.Checksum([]byte(s), getcrc64ht())
 }

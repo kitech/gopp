@@ -13,6 +13,8 @@ func TimeToFmt1Now() string         { return time.Now().Format(CleanDateFmt) }
 func TimeFromFmt1(s string) (time.Time, error) {
 	return time.Parse(CleanDateFmt, s)
 }
+func TimeRfc3389ms(t time.Time) string { return t.Format(Rfc3339DatemsFmtStr) }
+func TimeRfc7231(t time.Time) string   { return t.Format(Rfc7231DateFmtStr) }
 
 // rounded float point part
 // origin 8h38m46.115296675s
@@ -23,8 +25,12 @@ func Duround(d time.Duration) string {
 
 const CleanDateFmt = "2006-01-02 15:04:05"
 const HttpDateFmt = "Mon, 02 Jan 2006 15:04:05 GMT" // "Sat, 30 Sep 2017 00:10:59 GMT"
+const Rfc7231DateFmtStr = HttpDateFmt
+const Rfc3339DatemsFmtStr = "2006-01-02T15:04:05.999Z"
+const Rfc3339DateFmtStr = "2006-01-02T15:04:05Z"
 
 var StartTime = time.Now()
+var ZeroTime time.Time
 
 func Dur2hum(d time.Duration) string {
 	unitMeasures := []time.Duration{365 * 24 * time.Hour, 12 * 24 * time.Hour, 24 * time.Hour, time.Hour, time.Minute, time.Second, time.Millisecond, time.Microsecond, time.Nanosecond}

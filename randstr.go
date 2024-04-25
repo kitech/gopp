@@ -1,9 +1,13 @@
 package gopp
 
 import (
+	"crypto/md5"
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // TODO improve performance with https://github.com/kpbird/golang_random_string/blob/master/main.go
@@ -113,4 +117,18 @@ func RandNumsNodup(min, max int, n int) (rets []int) {
 	}
 
 	return
+}
+
+func RandUuid() string {
+	if true {
+		id, err := uuid.NewRandom()
+		ErrPrint(err) // cannot be error?
+		if err == nil {
+			return id.String()
+		}
+	}
+	var v = rand.Float64()
+	var s = fmt.Sprintf("x%v", v)
+	var b = md5.Sum([]byte(s))
+	return string(b[:])
 }

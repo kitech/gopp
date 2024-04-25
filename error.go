@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"reflect"
 	"runtime"
 	"runtime/debug"
@@ -111,6 +112,13 @@ func ErrFatal(err error, args ...interface{}) {
 	}
 }
 
+func ErrPanic(err error, args ...any) {
+	if err != nil {
+		log.Output(2, printq(err, args...))
+		log.Panicln(err)
+	}
+}
+
 func ErrHave(err error, s string) bool {
 	return err != nil && strings.Contains(err.Error(), s)
 }
@@ -138,14 +146,14 @@ func ErrHumanShort(err error) string {
 
 func FalsePrint(ok bool, args ...interface{}) bool {
 	if !ok {
-		log.Output(2, printq("", args...))
+		log.Output(2, printq("CondFalse", args...))
 	}
 	return ok
 }
 
 func TruePrint(ok bool, args ...interface{}) bool {
 	if ok {
-		log.Output(2, printq("", args...))
+		log.Output(2, printq("CondTrue", args...))
 	}
 	return ok
 }
@@ -153,20 +161,20 @@ func TruePrint(ok bool, args ...interface{}) bool {
 // BUG: panic: reflect: call of reflect.Value.IsNil on uint64 Value
 func NilPrint(v interface{}, args ...interface{}) interface{} {
 	if v == nil {
-		log.Output(2, printq("", args...))
+		log.Output(2, printq("CondNil", args...))
 	}
 	return v
 }
 
 func NilFatal(v interface{}, args ...interface{}) {
 	if v == nil {
-		log.Fatalln(printq("", args...))
+		log.Fatalln(printq("CondNil", args...))
 	}
 }
 
 func ZeroPrint(v interface{}, args ...interface{}) interface{} {
 	if reflect.Zero(reflect.TypeOf(v)).Interface() == v {
-		log.Output(2, printq("", args))
+		log.Output(2, printq("CondZero", args))
 	}
 	return v
 }
@@ -230,4 +238,25 @@ func Panicp2(err interface{}) {
 		bs := debug.Stack()
 		log.Println("error:", err, ", stack:", string(bs))
 	}
+}
+
+// 一般 GetCallerInfo(2)
+// return ` funcName, fileName, lineNo`
+// funcName like pkg1/barfun
+// fileName only basename
+func GetCallerInfo(skip int) (info string) {
+	pc, file, lineNo, ok := runtime.Caller(skip)
+	if !ok {
+		info = "runtime.Caller() failed"
+		return
+	}
+	funcName := runtime.FuncForPC(pc).Name()
+	if strings.Count(funcName, "/") > 2 {
+		pos := strings.LastIndex(funcName, "/")
+		pos = strings.LastIndex(funcName[:pos], "/")
+		funcName = funcName[pos+1:]
+	}
+	fileName := path.Base(file) // The Base function returns the last element of the path
+	// FuncName,FileLine
+	return fmt.Sprintf("%s, %s:%d ", funcName, fileName, lineNo)
 }

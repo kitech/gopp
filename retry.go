@@ -191,7 +191,7 @@ func (this *Retryer) NextWaitOnly() time.Duration {
 	return nwait
 }
 
-///
+// /
 func NewRetryFn(f func(ntimes int) error) *Retryer {
 	this := NewRetry()
 	this.mode = RETRY_FN_WITH_NO
@@ -237,7 +237,6 @@ func (this *Retryer) do(withno bool, unit time.Duration, ntimes ...int) (err err
 	return
 }
 
-//
 func DoTimes(n int, f func(n int)) {
 	for i := 0; i < n; i++ {
 		f(i)
@@ -250,7 +249,7 @@ func DoTimesOnly(n int, f func()) {
 	}
 }
 
-/// only calc next time, not do run
+// / only calc next time, not do run
 // avoid retry times
 type Retryer2 struct {
 	minwait  time.Duration
@@ -295,3 +294,9 @@ func (this *Retryer2) Next() time.Duration {
 
 func (this *Retryer2) SleepNext()    { time.Sleep(this.Next()) }
 func (this *Retryer2) TryCount() int { return this.bkoff.Count() }
+
+func Forever() {
+	for {
+		time.Sleep(1 * time.Second)
+	}
+}
