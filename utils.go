@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 	"syscall"
+	"testing"
 	"time"
 )
 
@@ -75,6 +76,9 @@ func Assertf(v interface{}, format string, args ...interface{}) {
 	Assert(v, fmt.Sprintf(format, args...))
 }
 
+/*
+v express of bool, string, pointer
+*/
 func Assert(v interface{}, info string, args ...interface{}) {
 	fmtv := fmt.Sprintf("%+v, %+v", v, info)
 	for _, arg := range args {
@@ -85,9 +89,6 @@ func Assert(v interface{}, info string, args ...interface{}) {
 	}
 
 	tv := reflect.TypeOf(v)
-	if tv.Kind() == reflect.Bool && v.(bool) == false {
-		panic(fmtv)
-	}
 
 	vv := reflect.ValueOf(v)
 	switch tv.Kind() {
@@ -101,7 +102,15 @@ func Assert(v interface{}, info string, args ...interface{}) {
 		if v.(string) == "" {
 			panic(fmtv)
 		}
+	case reflect.Bool:
+		if v.(bool) == false {
+			panic(fmtv)
+		}
 	}
+}
+
+func AssertR() {
+
 }
 
 // 俩工具
@@ -203,3 +212,5 @@ func PackArgs(args ...any) string {
 	}
 	return sb.String()
 }
+
+func InTest() bool { return testing.Short() }

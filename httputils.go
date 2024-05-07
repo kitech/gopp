@@ -1,6 +1,7 @@
 package gopp
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -16,15 +17,16 @@ const (
 	HttpContentTypeText     = "text/plain; charset=utf-8"
 	HttpContentTypeStream   = "application/octet-stream"
 	HttpContentTypeFormData = "form/data"
+	HttpBasicAuthHeaderTmpl = "Authorization: Basic %s" // %s=base64encode(user:pass)
 
 	HttpContentTypeXWWWUrlEncoded = "application/x-www-form-urlencoded"
 
-	HttpUserAgentFF       = "Firefox 123"
-	HttpUserAgentChrome   = "Chrome 456"
-	HttpUserAgentChromium = "Chromium/86.0"
 	HttpUserAgentCurl     = "curl/8.6.0"
-
-	// HttpBasicAuthHeader = "Basic %s"
+	HttpUserAgentFirefox  = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1"
+	HttpUserAgentChrome   = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36"
+	HttpUserAgentChromium = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chromium/28.0.1500.52 Safari/537.36"
+	HttpUserAgentAndroid  = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+	HttpUserAgentMacos    = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9"
 
 	HttpDateFmtStr = HttpDateFmt
 )
@@ -33,8 +35,20 @@ const (
 	HtmlNewline = "<br/>\n"
 )
 
-func _HttpBasicAuthHeader(key string) string {
-	return ""
+func HttpBasicAuthHeader(user, pass string) string {
+	val := fmt.Sprintf("%s:%s", user, pass)
+	encval := base64.StdEncoding.EncodeToString([]byte(val))
+	return fmt.Sprintf(HttpBasicAuthHeaderTmpl, encval)
+}
+func HttpBasicAuthHeader2(user, pass string) string {
+	val := fmt.Sprintf("%s:%s", user, pass)
+	encval := base64.StdEncoding.EncodeToString([]byte(val))
+	return fmt.Sprintf("Basic %s", encval)
+}
+func HttpBasicAuthHeader3(user, pass string) (string, string) {
+	val := fmt.Sprintf("%s:%s", user, pass)
+	encval := base64.StdEncoding.EncodeToString([]byte(val))
+	return "Authorization", fmt.Sprintf("Basic %s", encval)
 }
 
 func HttpRespText(w http.ResponseWriter, code int, v string, cctype string) {

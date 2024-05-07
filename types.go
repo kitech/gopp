@@ -66,6 +66,9 @@ func (this Any) Iterable() bool {
 	return false
 }
 func (this Any) CanMKey() bool {
+	if true {
+		return !this.Iterable()
+	}
 	return true // 是否能作为map的key
 }
 func (this Any) AsStr() string { return fmt.Sprintf("%v", this.I) }
@@ -74,6 +77,9 @@ func (this Any) AsJson() []byte {
 	ErrPrint(err)
 	return bcc
 }
+
+// for json
+func (this Any) String() string { return fmt.Sprintf("%v", this.I) }
 
 // maybe can use Once for lazy
 var vInt8Ty int8

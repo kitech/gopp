@@ -54,3 +54,20 @@ func (this *Array) Contains(i interface{}) bool {
 func (this *Array) Length() int {
 	return 0
 }
+
+func MapFirst(m any) any {
+	refval := reflect.ValueOf(m)
+	iter := refval.MapRange()
+	for iter.Next() {
+		val := iter.Value()
+		return val
+	}
+	return nil
+}
+func MapFirstStr(m any) string {
+	val := MapFirst(m)
+	if val != nil {
+		return val.(string)
+	}
+	return ""
+}

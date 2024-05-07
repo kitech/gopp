@@ -1,6 +1,7 @@
 package gopp
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -97,6 +98,21 @@ func ChanTrySend(c any, v any) error {
 
 // 帶超時的寫入channel
 func SendChanTimeouted(c interface{}, v interface{}, d ...time.Duration) (err error) {
+	return
+}
+
+// 帶超時的寫入channel
+func RecvChanWithctx(c interface{}, v interface{}, ctx ...context.Context) (err error) {
+	return
+}
+
+// 帶超時的寫入channel
+func RecvChanTimeouted(c interface{}, v interface{}, d ...time.Duration) (err error) {
+	return
+}
+
+// 帶超時的寫入channel
+func SendChanWithctx(c interface{}, v interface{}, ctx ...context.Context) (err error) {
 	return
 }
 
