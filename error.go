@@ -19,9 +19,9 @@ import (
 var (
 	// 这可以导出包里的私有变量
 
-	//go:linkname ErrTimeout [net.errTimeout]
+	//go:linkname ErrTimeout net.errTimeout
 	ErrTimeout error
-	//go:linkname CanceledError [net.canceledError]
+	//go:linkname CanceledError net.canceledError
 	CanceledError error
 )
 
