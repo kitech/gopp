@@ -208,9 +208,18 @@ func PackArgs(args ...any) string {
 		if i > 0 {
 			sb.WriteString(" ")
 		}
-		sb.WriteString(fmt.Sprintf("%v", arg))
+		sb.WriteString(fmt.Sprintf("%+v", arg))
 	}
 	return sb.String()
 }
 
-func InTest() bool { return testing.Short() }
+func InTest() bool {
+	exepath, err := os.Executable()
+	if err != nil {
+		// wtf
+	}
+	if strings.HasSuffix(exepath, ".test") {
+		// seem good
+	}
+	return testing.Short()
+}

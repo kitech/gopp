@@ -92,17 +92,61 @@ func (this Error) Display() {
 	this.PrintStack()
 }
 
+// /////// some conditional print utils
+var justprinterrfd = int(os.Stderr.Fd()) // stderr/stdout
+var justprintoutfd = int(os.Stdout.Fd())
+
+func init() {
+	Assert(justprintoutfd == 1, "why os.Stdout not 1", justprintoutfd)
+	Assert(justprinterrfd == 2, "why os.Stderr not 2", justprinterrfd)
+}
+
+var justprintoutfn func(s string)
+var justprintoutfnasync bool = false
+
+func SetLogPrintFunc(async bool, fn func(string)) (oldasync bool, oldfn func(string)) {
+	oldasync = justprintoutfnasync
+	oldfn = justprintoutfn
+
+	if oldfn != nil {
+		// wttodo
+	}
+	justprintoutfn = fn
+	justprintoutfnasync = async
+	return
+}
+func UnsetLogPrintFunc() (oldasync bool, oldfn func(string)) {
+	oldasync = justprintoutfnasync
+	oldfn = justprintoutfn
+
+	justprintoutfn = nil
+	justprintoutfnasync = false
+	return
+}
+
+// =PackArg?
 func printq(v interface{}, args ...interface{}) string {
 	msg := fmt.Sprintf("%+v", v)
-	for _, arg := range args {
-		msg += fmt.Sprintf(" %+v", arg)
+	for i, arg := range args {
+		msg += IfElseStr(i > 0, " ", "")
+		msg += fmt.Sprintf("%+v", arg)
 	}
 	return msg
 }
 
+// ErrPrint 用的最多，其次是 NilPrint, ZeroPrint, TruePrint, FalsePrint
 func ErrPrint(err error, args ...interface{}) error {
 	if err != nil {
-		log.Output(2, printq(err, args...))
+		s := printq(err, args...)
+		log.Output(2, s)
+		if justprintoutfn != nil {
+			if justprintoutfnasync {
+				go justprintoutfn(s)
+			} else {
+				justprintoutfn(s)
+			}
+
+		}
 	}
 	return err
 }
@@ -157,14 +201,32 @@ func ErrHumanShort(err error) string {
 
 func FalsePrint(ok bool, args ...interface{}) bool {
 	if !ok {
-		log.Output(2, printq("CondFalse", args...))
+		s := printq("CondFalse", args...)
+		log.Output(2, s)
+		if justprintoutfn != nil {
+			if justprintoutfnasync {
+				go justprintoutfn(s)
+			} else {
+				justprintoutfn(s)
+			}
+
+		}
 	}
 	return ok
 }
 
 func TruePrint(ok bool, args ...interface{}) bool {
 	if ok {
-		log.Output(2, printq("CondTrue", args...))
+		s := printq("CondTrue", args...)
+		log.Output(2, s)
+		if justprintoutfn != nil {
+			if justprintoutfnasync {
+				go justprintoutfn(s)
+			} else {
+				justprintoutfn(s)
+			}
+
+		}
 	}
 	return ok
 }
@@ -172,7 +234,15 @@ func TruePrint(ok bool, args ...interface{}) bool {
 // BUG: panic: reflect: call of reflect.Value.IsNil on uint64 Value
 func NilPrint(v interface{}, args ...interface{}) interface{} {
 	if v == nil {
-		log.Output(2, printq("CondNil", args...))
+		s := printq("CondNil", args...)
+		log.Output(2, s)
+		if justprintoutfn != nil {
+			if justprintoutfnasync {
+				go justprintoutfn(s)
+			} else {
+				justprintoutfn(s)
+			}
+		}
 	}
 	return v
 }
@@ -185,7 +255,15 @@ func NilFatal(v interface{}, args ...interface{}) {
 
 func ZeroPrint(v interface{}, args ...interface{}) interface{} {
 	if reflect.Zero(reflect.TypeOf(v)).Interface() == v {
-		log.Output(2, printq("CondZero", args))
+		s := printq("CondZero", args...)
+		log.Output(2, s)
+		if justprintoutfn != nil {
+			if justprintoutfnasync {
+				go justprintoutfn(s)
+			} else {
+				justprintoutfn(s)
+			}
+		}
 	}
 	return v
 }

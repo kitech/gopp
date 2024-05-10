@@ -2,6 +2,8 @@ package gopp
 
 import (
 	"fmt"
+	"log"
+	"reflect"
 	"strconv"
 )
 
@@ -35,4 +37,27 @@ func ToStrs(args ...interface{}) (rets []string) {
 		rets = append(rets, ToStr(arg))
 	}
 	return
+}
+
+// support bool, string, *int*, uintptr, unsafe.Pointer, float*
+func Toint(vx any) int {
+	var rv int
+	switch v := vx.(type) {
+	case bool:
+		if v {
+			rv = 1
+		} else {
+			rv = 0
+		}
+
+	default:
+		rvty := reflect.TypeOf(rv)
+		vv := reflect.ValueOf(vx)
+		if vv.CanConvert(rvty) {
+			rv = (vv.Convert(rvty).Interface()).(int)
+		} else {
+			log.Println("not support", reflect.TypeOf(vx), vx)
+		}
+	}
+	return rv
 }
