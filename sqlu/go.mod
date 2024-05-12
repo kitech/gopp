@@ -1,4 +1,4 @@
-module sqlu
+module github.com/kitech/gopp/sqlu
 
 go 1.22.1
 
