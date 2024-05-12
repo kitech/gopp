@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"strings"
 
-	gopp "github.com/kitech/goplusplus"
+	"github.com/kitech/gopp"
 
 	spjson "github.com/bitly/go-simplejson"
 )
