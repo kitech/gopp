@@ -19,9 +19,10 @@ func NewPair(key, val interface{}, extra ...interface{}) *Pair {
 	return p
 }
 
+// 可以n=>n, n=>n+,n=>n-，具有reduce功能，所以不需要单独的reduce
 // 支持可以迭代的类型：结构体，slice，数组，字符串，map
-func Domap(ins interface{}, f func(interface{}) interface{}) (outs []interface{}) {
-	outs = make([]interface{}, 0)
+func Domap(ins any, f func(any) any) (outs []any) {
+	outs = make([]any, 0)
 
 	tmpty := reflect.TypeOf(ins)
 	// the same as DomapTypeField
@@ -46,7 +47,7 @@ func Domap(ins interface{}, f func(interface{}) interface{}) (outs []interface{}
 			outs = append(outs, &Pair{vk.Interface(), out, nil})
 		}
 	} else {
-		insRanger := ins.([]interface{})
+		insRanger := ins.([]any)
 		for _, in := range insRanger {
 			out := f(in)
 			outs = append(outs, out)
@@ -68,8 +69,7 @@ func DomapTypeField(ty reflect.Type, f func(reflect.StructField) interface{}) (o
 	return
 }
 
-func Doreduce(ins interface{}, v interface{},
-	f func(v, i interface{}) interface{}) interface{} {
+func Doreduce(ins any, v any, f func(v, i any) any) any {
 	tmpty := reflect.TypeOf(ins)
 	// the same as DomapTypeField
 	if tmpty.Kind() == reflect.Ptr && tmpty.String() == "*reflect.rtype" {
@@ -131,7 +131,7 @@ func IV2Ints(items []interface{}) []int {
 	return rets
 }
 
-func Strs2IV(items []string) []interface{} {
+func Strs2IV(items []string) []any {
 	if items == nil {
 		return nil
 	}

@@ -74,6 +74,8 @@ func xchan_wait() {
 	gwg.Wait()
 }
 
+//////
+
 // 安全地寫入channel，避免panic，避免阻塞
 func SafeTrySend(c interface{}, v interface{}) (err error) {
 	cv := reflect.ValueOf(c)
@@ -82,6 +84,7 @@ func SafeTrySend(c interface{}, v interface{}) (err error) {
 		if x := recover(); x != nil {
 			// runtime.plainError
 			err = errors.New(fmt.Sprintf("%v", x))
+
 		}
 	}()
 	ok := cv.TrySend(vv)
@@ -96,23 +99,50 @@ func ChanTrySend(c any, v any) error {
 	return SafeTrySend(c, v)
 }
 
+func _chanTrySend1[T any](c chan T, v T) error {
+	var c1 = make(chan int)
+	return _chanTrySend1(c1, 8)
+}
+
 // 帶超時的寫入channel
-func SendChanTimeouted(c interface{}, v interface{}, d ...time.Duration) (err error) {
+func ChanSendTimeo[T any](c chan T, v T, d time.Duration) (err error) {
+	select {
+	case c <- v:
+	case <-time.After(d):
+		err = ErrTimeout
+	}
+
 	return
 }
 
 // 帶超時的寫入channel
-func RecvChanWithctx(c interface{}, v interface{}, ctx ...context.Context) (err error) {
+func ChanSendCtx[T any](c chan T, v T, ctx context.Context) (err error) {
+	select {
+	case c <- v:
+	case <-ctx.Done():
+		err = CanceledError
+	}
 	return
 }
 
 // 帶超時的寫入channel
-func RecvChanTimeouted(c interface{}, v interface{}, d ...time.Duration) (err error) {
+func ChanRecvCtx[T any](c chan T, ctx context.Context) (v T, err error) {
+	select {
+	case v = <-c:
+	case <-ctx.Done():
+		err = CanceledError
+	}
+
 	return
 }
 
 // 帶超時的寫入channel
-func SendChanWithctx(c interface{}, v interface{}, ctx ...context.Context) (err error) {
+func ChanRecvTimeo[T any](c chan T, d time.Duration) (v T, err error) {
+	select {
+	case v = <-c:
+	case <-time.After(d):
+		err = ErrTimeout
+	}
 	return
 }
 

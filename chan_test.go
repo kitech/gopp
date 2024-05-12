@@ -16,6 +16,8 @@ func TestChannel1(t *testing.T) {
 	sendok := true
 	sendval := true
 
+	GOUSED(sendok)
+
 	defer func() {
 		if x := recover(); x != nil {
 			sendok = false

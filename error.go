@@ -23,6 +23,13 @@ var (
 	ErrTimeout error
 	//go:linkname CanceledError net.canceledError
 	CanceledError error
+
+	//go:linkname ErrClosed os.ErrClosed
+	ErrClosed error
+
+	// is type
+	// go:linkname PlainError runtime.plainError
+	// PlainError error
 )
 
 // Error with errno and stack info
@@ -93,6 +100,7 @@ func (this Error) Display() {
 }
 
 // /////// some conditional print utils
+var justprintinfd = int(os.Stdin.Fd())
 var justprinterrfd = int(os.Stderr.Fd()) // stderr/stdout
 var justprintoutfd = int(os.Stdout.Fd())
 
@@ -127,9 +135,8 @@ func UnsetLogPrintFunc() (oldasync bool, oldfn func(string)) {
 // =PackArg?
 func printq(v interface{}, args ...interface{}) string {
 	msg := fmt.Sprintf("%+v", v)
-	for i, arg := range args {
-		msg += IfElseStr(i > 0, " ", "")
-		msg += fmt.Sprintf("%+v", arg)
+	for _, arg := range args {
+		msg += fmt.Sprintf(" %+v", arg)
 	}
 	return msg
 }
@@ -186,6 +193,13 @@ func ErrPrefix(err error, s string) bool {
 func ErrSuffix(err error, s string) bool {
 	return err != nil && strings.HasSuffix(err.Error(), s)
 }
+func ErrBegin(err error, s string) bool {
+	return ErrPrefix(err, s)
+}
+func ErrEnd(err error, s string) bool {
+	return ErrSuffix(err, s)
+}
+
 func ErrHuman(err error) string {
 	if err == nil {
 		return "OK"

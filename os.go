@@ -11,6 +11,12 @@ import (
 	"strings"
 )
 
+const (
+	Stdinfd  = 0
+	Stdoutfd = 1
+	Stderrfd = 2
+)
+
 func PathExist(p string) bool {
 	if _, err := os.Stat(p); os.IsNotExist(err) {
 		return false

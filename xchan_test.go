@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-/////
+// ///
 // go test ./...
 func TestXChan(t *testing.T) {
 	fmt.Println("abc")
@@ -41,4 +41,14 @@ func TestAbc2(t *testing.T) {
 	fmt.Println("abc")
 	xchan_wait()
 
+}
+
+func TestChanTrySend(t *testing.T) {
+	var c = make(chan int)
+	close(c)
+	err := ChanTrySend(c, 123)
+	if err != nil && err.Error() == "send on closed channel" {
+	} else {
+		t.Error(err)
+	}
 }

@@ -24,6 +24,7 @@ func Duround(d time.Duration) string {
 }
 
 const CleanDateFmt = "2006-01-02 15:04:05"
+const CleanDatemsFmt = "2006-01-02 15:04:05.999"
 const HttpDateFmt = "Mon, 02 Jan 2006 15:04:05 GMT" // "Sat, 30 Sep 2017 00:10:59 GMT"
 const DavDateFmt = HttpDateFmt
 const Rfc7231DateFmtStr = HttpDateFmt

@@ -33,6 +33,8 @@ const (
 	HttpUserAgentAndroid  = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
 	HttpUserAgentMacos    = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9"
 
+	XmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+
 	HttpDateFmtStr = HttpDateFmt
 )
 
@@ -116,4 +118,9 @@ func HttpRangeParse(v string) (int64, int64, error) {
 func HttpRangeParseMust(v string) (int64, int64) {
 
 	return -1, -1
+}
+
+func Httpcodetoerr(code int) error {
+	err := fmt.Errorf("%v %v", code, http.StatusText(code))
+	return err
 }
