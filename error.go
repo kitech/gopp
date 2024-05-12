@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	// 这可以导出包里的私有变量
+	// 这可以导出包里的私有变量,函数
 
 	//go:linkname ErrTimeout net.errTimeout
 	ErrTimeout error

@@ -1,8 +1,10 @@
 package gopp
 
 import (
+	"fmt"
 	"log"
 	"reflect"
+	"strings"
 )
 
 type Pair struct {
@@ -11,7 +13,7 @@ type Pair struct {
 	Extra interface{}
 }
 
-func NewPair(key, val interface{}, extra ...interface{}) *Pair {
+func PairNew(key, val interface{}, extra ...interface{}) *Pair {
 	p := &Pair{key, val, nil}
 	if len(extra) > 0 {
 		p.Extra = extra[0]
@@ -19,9 +21,12 @@ func NewPair(key, val interface{}, extra ...interface{}) *Pair {
 	return p
 }
 
+// redeclare
+// func Domap[T any](ins []T) {}
+
 // 可以n=>n, n=>n+,n=>n-，具有reduce功能，所以不需要单独的reduce
 // 支持可以迭代的类型：结构体，slice，数组，字符串，map
-func Domap(ins any, f func(any) any) (outs []any) {
+func _Domap(ins any, f func(any) any) (outs []any) {
 	outs = make([]any, 0)
 
 	tmpty := reflect.TypeOf(ins)
@@ -57,6 +62,155 @@ func Domap(ins any, f func(any) any) (outs []any) {
 	return
 }
 
+// 这个函数没法写成范型了吧
+// 返回 array/slice
+// f proto: func(any) any
+// f proto: func(any) []any
+// f proto: func(int,any) any
+// f proto: func(int,any) []any
+// f proto: func(int,any,any) any // map only
+// f proto: func(int,any,any) []any // map only
+// 返回 maps/hashtable
+// f proto: func(any) (any,any)
+// f proto: func(int,any) (any,any)
+// f proto: func(int,any,any) (any,any)
+// f proto: func(any) map[any]any
+// f proto: func(int,any) map[any]any
+// f proto: func(int,any,any) map[any]any
+// 可以n=>n, n=>n+,n=>n-，具有reduce功能，所以不需要单独的reduce
+// 支持可以迭代的类型：结构体，slice，数组，字符串，map
+func Mapdo(ins any, fx any) (out any) {
+	infxty := reflect.TypeOf(fx)
+
+	outmap := make(map[any]any, 0)
+	outarr := make([]any, 0)
+	retmap := false
+	ff := func(idx int, key any, val any) bool {
+		switch f := fx.(type) {
+		case func(any) (any, any):
+			v0, v1 := f(val)
+			outmap[v0] = v1
+			retmap = true
+		case func(any) map[any]any:
+			vm := f(val)
+			for k, v := range vm {
+				outmap[k] = v
+			}
+			retmap = true
+		case func(int, any) (any, any):
+			v0, v1 := f(idx, val)
+			outmap[v0] = v1
+		case func(int, any) map[any]any:
+			vm := f(idx, val)
+			for k, v := range vm {
+				outmap[k] = v
+			}
+			retmap = true
+		case func(int, any, any) (any, any):
+			v0, v1 := f(idx, key, val)
+			outmap[v0] = v1
+			retmap = true
+		case func(int, any, any) map[any]any:
+			vm := f(idx, key, val)
+			for k, v := range vm {
+				outmap[k] = v
+			}
+			retmap = true
+
+		case func(any) []any:
+			out := f(val)
+			outarr = append(outarr, out...)
+		case func(any) any:
+			out := f(val)
+			outarr = append(outarr, out)
+
+		case func(int, any) []any:
+			out := f(idx, val)
+			outarr = append(outarr, out...)
+		case func(int, any) any:
+			out := f(idx, val)
+			outarr = append(outarr, out)
+
+		case func(int, any, any) []any:
+			out := f(idx, key, val)
+			outarr = append(outarr, out...)
+		case func(int, any, any) any:
+			out := f(idx, key, val)
+			outarr = append(outarr, out)
+
+		default:
+			log.Println("invalid fxcb", idx, key, infxty)
+			return false
+		}
+		return true
+	}
+
+	tmpty := reflect.TypeOf(ins)
+	switch tmpty.Kind() {
+	case reflect.Map:
+		tmpv := reflect.ValueOf(ins)
+		for idx, vk := range tmpv.MapKeys() {
+			vv := tmpv.MapIndex(vk).Interface()
+			if !ff(idx, vk.Interface(), vv) {
+				break
+			}
+		}
+	case reflect.Slice, reflect.Array:
+		tmpv := reflect.ValueOf(ins)
+		for idx := 0; idx < tmpv.Len(); idx++ {
+			e := tmpv.Index(idx).Interface()
+			if !ff(idx, nil, e) {
+				break
+			}
+		}
+	case reflect.String:
+		for idx, uc := range ins.(string) {
+			if !ff(idx, nil, uc) {
+				break
+			}
+		}
+	case reflect.Struct:
+		tmpv := reflect.ValueOf(ins)
+		for idx := 0; idx < tmpv.NumField(); idx++ {
+			key := tmpty.Field(idx).Name
+			val := tmpv.Field(idx).Interface()
+			if !ff(idx, key, val) {
+				break
+			}
+		}
+	case reflect.Interface:
+		tmpv := reflect.ValueOf(ins)
+		for idx := 0; idx < tmpv.NumMethod(); idx++ {
+			key := tmpty.Method(idx).Name
+			val := tmpty.Method(idx).Type.String()
+			if !ff(idx, key, val) {
+				break
+			}
+		}
+	default:
+		// the same as DomapTypeField
+		if tmpty.Kind() == reflect.Ptr && tmpty.String() == "*reflect.rtype" {
+			insty := ins.(reflect.Type)
+			for idx := 0; idx < insty.NumField(); idx++ {
+				field := insty.Field(idx)
+				if !ff(idx, nil, field) {
+					break
+				}
+			}
+		} else { // possible crash here if not match
+			insRanger := ins.([]any)
+			for idx, in := range insRanger {
+				if !ff(idx, nil, in) {
+					break
+				}
+			}
+		}
+	}
+
+	out = IfElse(retmap, outmap, outarr)
+	return
+}
+
 func DomapTypeField(ty reflect.Type, f func(reflect.StructField) interface{}) (outs []interface{}) {
 	outs = make([]interface{}, 0)
 
@@ -69,78 +223,134 @@ func DomapTypeField(ty reflect.Type, f func(reflect.StructField) interface{}) (o
 	return
 }
 
-func Doreduce(ins any, v any, f func(v, i any) any) any {
-	tmpty := reflect.TypeOf(ins)
-	// the same as DomapTypeField
-	if tmpty.Kind() == reflect.Ptr && tmpty.String() == "*reflect.rtype" {
-		insty := ins.(reflect.Type)
+// ///// todo more...
+var vecmapconvfns = map[string]func(any) any{
+	"any2string": func(vx any) any { return ToStr(vx) },
 
-		for idx := 0; idx < insty.NumField(); idx++ {
-			field := insty.Field(idx)
-			v = f(v, field)
+	"string2int": func(vx any) any {
+		s := vx.(string)
+		if IsNumberic(s) {
+			if strings.Contains(s, ".") {
+				v := MustFloat64(s)
+				return int(v)
+			} else {
+				v := MustInt(s)
+				return int(v)
+			}
 		}
-	} else if tmpty.Kind() == reflect.Slice || tmpty.Kind() == reflect.Array {
-		tmpv := reflect.ValueOf(ins)
-		for i := 0; i < tmpv.Len(); i++ {
-			v = f(v, tmpv.Index(i).Interface())
+		return -1
+	},
+	"string2uint": func(vx any) any {
+		s := vx.(string)
+		if IsNumberic(s) {
+			if strings.Contains(s, ".") {
+				v := MustFloat64(s)
+				return uint(v)
+			} else {
+				v := MustInt(s)
+				return uint(v)
+			}
 		}
-	} else if tmpty.Kind() == reflect.Map {
-		tmpv := reflect.ValueOf(ins)
-		for _, vk := range tmpv.MapKeys() {
-			v = f(v, tmpv.MapIndex(vk).Interface())
-		}
+		return -1
+	},
+
+	"string2real": func(vx any) any {
+		v := MustFloat64(vx.(string))
+		return v
+	},
+	"string2float64": func(vx any) any {
+		v := MustFloat64(vx.(string))
+		return v
+	},
+	"string2float32": func(vx any) any {
+		v := MustFloat32(vx.(string))
+		return v
+	},
+}
+
+func vecmapconvertvalue(vx any, ety, toty reflect.Type) (any, bool) {
+	var rvx any
+
+	if reflect.DeepEqual(ety, toty) {
+		rvx = vx
+	} else if ety.ConvertibleTo(toty) || ety.AssignableTo(toty) {
+		rvx = reflect.ValueOf(vx).Convert(toty).Interface()
 	} else {
-		insRanger := ins.([]interface{})
-		for _, in := range insRanger {
-			v = f(v, in)
+		fnname := fmt.Sprintf("%s2%s", ety.String(), toty.String())
+		if toty.Kind() == reflect.String {
+			fnname = fmt.Sprintf("any2%s", toty.String())
+		}
+		if fn, ok := vecmapconvfns[fnname]; ok {
+			rvx = fn(vx)
+		} else {
+			log.Println("IVConvert failed", fnname)
+			return rvx, false
 		}
 	}
+	return rvx, true
+}
 
-	return v
+func MapConvert[KT comparable, VT any](items map[any]any) (outs map[KT]VT) {
+	if items == nil {
+		return nil
+	}
+	outs = make(map[KT]VT, 0)
+	if len(items) == 0 {
+		return
+	}
+
+	kety := reflect.TypeOf(items).Key()
+	vety := reflect.TypeOf(items).Elem()
+
+	ktoty := reflect.TypeOf(outs).Key()
+	vtoty := reflect.TypeOf(outs).Elem()
+
+	for kx, vx := range items {
+		tokeyx, keyconvok := vecmapconvertvalue(kx, kety, ktoty)
+		tovalx, valconvok := vecmapconvertvalue(vx, vety, vtoty)
+		if !keyconvok || !valconvok {
+			break
+		}
+		outs[tokeyx.(KT)] = tovalx.(VT)
+	}
+
+	return
+}
+
+// 转换成显式类型
+func IVConvert[T any](items []any) (outs []T) {
+	if items == nil {
+		return nil
+	}
+	outs = make([]T, 0)
+	if len(items) == 0 {
+		return outs
+	}
+
+	ety := reflect.TypeOf(items[0])
+	toty := reflect.TypeOf(outs).Elem()
+
+	for _, vx := range items {
+		rvx, ok := vecmapconvertvalue(vx, ety, toty)
+		if !ok {
+			break
+		}
+		outs = append(outs, rvx.(T))
+	}
+
+	return
 }
 
 // interface vector to strings
-func IV2Strings(items []interface{}) []string {
-	if items == nil {
-		return nil
-	}
-
-	rets := make([]string, 0)
-	for idx := 0; idx < len(items); idx++ {
-		rets = append(rets, items[idx].(string))
-	}
-	return rets
+func IV2Strings(items []any) []string {
+	return IVConvert[string](items)
 }
-
-func IV2Ints(items []interface{}) []int {
-	if items == nil {
-		return nil
-	}
-
-	rets := make([]int, 0)
-	for idx := 0; idx < len(items); idx++ {
-		switch rv := items[idx].(type) {
-		case int:
-			rets = append(rets, rv)
-		case float64: // JSON
-			rets = append(rets, int(rv))
-		default:
-			log.Panicln(reflect.TypeOf(items[idx]))
-		}
-	}
-	return rets
+func IV2Ints(items []any) []int {
+	return IVConvert[int](items)
 }
-
 func Strs2IV(items []string) []any {
-	if items == nil {
-		return nil
-	}
-
-	rets := make([]interface{}, 0)
-	for idx := 0; idx < len(items); idx++ {
-		rets = append(rets, items[idx])
-	}
-	return rets
+	outx := Mapdo(items, func(s any) any { return s })
+	return outx.([]any)
 }
 
 // enumerate类似功能

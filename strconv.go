@@ -31,6 +31,17 @@ func MustInt64(s string) int64 {
 	return n
 }
 
+func MustFloat64(s string) float64 {
+	v, err := strconv.ParseFloat(s, 64)
+	ErrPrint(err, s)
+	return v
+}
+func MustFloat32(s string) float32 {
+	v, err := strconv.ParseFloat(s, 32)
+	ErrPrint(err, s)
+	return float32(v)
+}
+
 func ToStr(v interface{}) string { return fmt.Sprintf("%v", v) }
 func ToStrs(args ...interface{}) (rets []string) {
 	for _, arg := range args {
