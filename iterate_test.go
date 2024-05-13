@@ -2,8 +2,58 @@ package gopp
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
+
+func TestMapdo1(t *testing.T) {
+	{
+		// map 1=>1
+		var vec = []string{"http://x1.com", "http://x2.com", "http://x3.com"}
+		var epval = []any{"x1.com", "x2.com", "x3.com"}
+		var rv = Mapdo(vec, func(vx any) any {
+			var v = vx.(string)
+			return v[7:]
+		})
+		if !reflect.DeepEqual(epval, rv) {
+			t.Error("not equal", rv, epval)
+		}
+		// log.Println(rv)
+	}
+	{
+		// map 1=>n
+		var vec = []string{"http://x1.com", "http://x2.com", "http://x3.com"}
+		var epval = []any{"x1", "com", "x2", "com", "x3", "com"}
+		var rv = Mapdo(vec, func(vx any) []any {
+			var v = vx.(string)
+			v = v[7:]
+			arr := strings.Split(v, ".")
+			return []any{arr[0], arr[1]}
+		})
+		if !reflect.DeepEqual(epval, rv) {
+			t.Error("not equal", rv, epval)
+		}
+		// log.Println(rv)
+	}
+	{
+		// reduce 1
+		var vec = []string{"http://x1.com", "http://x2.com", "http://x3.com"}
+		var epval = []any{"x1.com", "x3.com"}
+		var rv = Mapdo(vec, func(vx any) []any {
+			var v = vx.(string)
+			v = v[7:]
+			if v == "x2.com" {
+				return nil
+			}
+			return []any{v}
+		})
+		if !reflect.DeepEqual(epval, rv) {
+			t.Error("not equal", rv, epval)
+		}
+		// log.Println(rv)
+	}
+
+}
 
 func TestIV2Str(t *testing.T) {
 	{
