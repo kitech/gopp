@@ -62,21 +62,34 @@ func _Domap(ins any, f func(any) any) (outs []any) {
 	return
 }
 
+// 可以写成这个样子，但是挺麻烦的
+func mapdo2[FT func(int, any, any) map[any]any |
+	func(int, any, any) []any |
+	func(int, any, any) any](ins any, fx FT) {
+}
+
+// 该函数没有办法终止，必须完全循环完成。。。
 // 这个函数没法写成范型了吧
+// 模板参数无法表达固定长度数组
 // 返回 array/slice
-// f proto: func(any) any
-// f proto: func(any) []any
-// f proto: func(int,any) any
-// f proto: func(int,any) []any
-// f proto: func(int,any,any) any // map only
-// f proto: func(int,any,any) []any // map only
+// f proto:
+//
+//	func(any) any
+//	func(any) []any
+//	func(int,any) any
+//	func(int,any) []any
+//	func(int,any,any) any // map only
+//	func(int,any,any) []any // map only
+//
 // 返回 maps/hashtable
-// f proto: func(any) (any,any)
-// f proto: func(int,any) (any,any)
-// f proto: func(int,any,any) (any,any)
-// f proto: func(any) map[any]any
-// f proto: func(int,any) map[any]any
-// f proto: func(int,any,any) map[any]any
+//
+//	func(any) (any,any)
+//	func(int,any) (any,any)
+//	func(int,any,any) (any,any)
+//	func(any) map[any]any
+//	func(int,any) map[any]any
+//	func(int,any,any) map[any]any
+//
 // 可以n=>n, n=>n+,n=>n-，具有reduce功能，所以不需要单独的reduce
 // 支持可以迭代的类型：结构体，slice，数组，字符串，map
 func Mapdo(ins any, fx any) (out any) {

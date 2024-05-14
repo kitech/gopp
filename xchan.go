@@ -98,6 +98,14 @@ func SafeTrySend(c interface{}, v interface{}) (err error) {
 func ChanTrySend(c any, v any) error {
 	return SafeTrySend(c, v)
 }
+func ChanSendTry[T any](c chan T, v T) bool {
+	select {
+	default:
+		return false
+	case c <- v:
+		return true
+	}
+}
 
 func _chanTrySend1[T any](c chan T, v T) error {
 	var c1 = make(chan int)
@@ -121,6 +129,14 @@ func ChanSendCtx[T any](c chan T, v T, ctx context.Context) (err error) {
 	case c <- v:
 	case <-ctx.Done():
 		err = CanceledError
+	}
+	return
+}
+
+func ChanRecvTry[T any](c chan T) (v T, ok bool) {
+	select {
+	default:
+	case v, ok = <-c:
 	}
 	return
 }
