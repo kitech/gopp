@@ -29,44 +29,6 @@ func PairNewStr[VT any](key string, val VT) *Pair[string, VT] {
 // redeclare
 // func Domap[T any](ins []T) {}
 
-// 可以n=>n, n=>n+,n=>n-，具有reduce功能，所以不需要单独的reduce
-// 支持可以迭代的类型：结构体，slice，数组，字符串，map
-func _Domap(ins any, f func(any) any) (outs []any) {
-	outs = make([]any, 0)
-
-	tmpty := reflect.TypeOf(ins)
-	// the same as DomapTypeField
-	if tmpty.Kind() == reflect.Ptr && tmpty.String() == "*reflect.rtype" {
-		insty := ins.(reflect.Type)
-
-		for idx := 0; idx < insty.NumField(); idx++ {
-			field := insty.Field(idx)
-			out := f(field)
-			outs = append(outs, out)
-		}
-	} else if tmpty.Kind() == reflect.Slice || tmpty.Kind() == reflect.Array {
-		tmpv := reflect.ValueOf(ins)
-		for i := 0; i < tmpv.Len(); i++ {
-			out := f(tmpv.Index(i).Interface())
-			outs = append(outs, out)
-		}
-	} else if tmpty.Kind() == reflect.Map {
-		tmpv := reflect.ValueOf(ins)
-		for _, vk := range tmpv.MapKeys() {
-			out := f(tmpv.MapIndex(vk).Interface())
-			outs = append(outs, &Pair{vk.Interface(), out, nil})
-		}
-	} else {
-		insRanger := ins.([]any)
-		for _, in := range insRanger {
-			out := f(in)
-			outs = append(outs, out)
-		}
-	}
-
-	return
-}
-
 // 可以写成这个样子，但是挺麻烦的
 func mapdo2[FT func(int, any, any) map[any]any |
 	func(int, any, any) []any |
