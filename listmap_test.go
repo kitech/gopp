@@ -84,6 +84,7 @@ func TestListMap0(t *testing.T) {
 		}
 	}
 	//
+	// log.Println("=======")
 	{
 		lm := ListMapNewr[int, string]()
 
@@ -104,6 +105,13 @@ func TestListMap0(t *testing.T) {
 		}
 		if lm.Has(1) {
 			t.Error("must has not key=1 now, after delete")
+		}
+
+		if key, ok := lm.Getr("s222"); !ok || key != 2 {
+			t.Error("must has and val=2", ok, key)
+		}
+		if key, ok := lm.Getr("s999"); ok {
+			t.Error("must not has", ok, key)
 		}
 	}
 }
