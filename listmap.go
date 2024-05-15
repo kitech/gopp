@@ -7,6 +7,9 @@ import (
 	"sync"
 )
 
+// hash 任意类型，来自go内部实现
+// https://github.com/dolthub/maphash
+
 const LISTMAP_SHARD_COUNT = 32
 
 // ordered map, thread safe
@@ -17,7 +20,7 @@ type ListMap[KT comparable, VT comparable] struct {
 	mr  map[VT]KT   //
 	mr2 map[VT][]KT //
 
-	reverse bool
+	reversemap bool
 }
 
 type Stringer interface {
@@ -36,7 +39,7 @@ func ListMapNewStr[VT comparable]() *ListMap[string, VT] {
 }
 func ListMapNewr[KT comparable, VT comparable]() *ListMap[KT, VT] {
 	me := ListMapNew[KT, VT]()
-	me.reverse = true
+	me.reversemap = true
 
 	return me
 }
@@ -72,6 +75,10 @@ func (me *ListMap[KT, VT]) putnolock(key KT, val VT) {
 	}
 	me.m[key] = val
 	me.a = append(me.a, key)
+
+	if me.reversemap {
+		me.mr[val] = key
+	}
 
 	return
 }
@@ -130,6 +137,10 @@ func (me *ListMap[KT, VT]) PutTry(key KT, val VT) bool {
 	if !exist {
 		me.m[key] = val
 		me.a = append(me.a, key)
+
+		if me.reversemap {
+			me.mr[val] = key
+		}
 	}
 	putok = !exist
 	me.mu.Unlock()
@@ -141,8 +152,8 @@ func (me *ListMap[KT, VT]) PutTry(key KT, val VT) bool {
 func (me *ListMap[KT, VT]) snapshotOrder() (keys []KT, vals []VT) {
 	me.mu.RLock()
 	if len(me.a) > 0 {
-		keys = make([]KT, len(me.a))
-		vals = make([]VT, len(me.a))
+		keys = make([]KT, len(me.a), len(me.a))
+		vals = make([]VT, len(me.a), len(me.a))
 		for i, key := range me.a {
 			keys[i] = key
 			vals[i] = me.m[key]
@@ -224,6 +235,10 @@ func (me *ListMap[KT, VT]) DelIndexN(idx int, n int) (rv *ListMap[KT, VT]) {
 		val := me.m[key]
 		delete(me.m, key)
 		rv.Put(key, val)
+
+		if me.reversemap {
+			delete(me.mr, val)
+		}
 	}
 	me.a = slices.Delete(me.a, idx, eidx)
 	me.mu.Unlock()
@@ -242,7 +257,12 @@ func (me *ListMap[KT, VT]) DelIndexN2(idx int, n int) {
 	eidx = IfElse2(eidx > len(me.a)-1, len(me.a)-1, eidx)
 	for i := idx; i < eidx; i++ {
 		key := me.a[i]
+		val := me.m[key]
 		delete(me.m, key)
+
+		if me.reversemap {
+			delete(me.mr, val)
+		}
 	}
 	me.a = slices.Delete(me.a, idx, eidx)
 	me.mu.Unlock()
@@ -378,7 +398,7 @@ func (me *ListMap[KT, VT]) Mid(idx int, n int) (rv *ListMap[KT, VT]) {
 func (me *ListMap[KT, VT]) KeysOrder() (keys []KT) {
 	me.mu.RLock()
 	if len(me.a) > 0 {
-		keys = make([]KT, len(me.a))
+		keys = make([]KT, len(me.a), len(me.a))
 		for i, key := range me.a {
 			keys[i] = key
 		}
@@ -390,7 +410,7 @@ func (me *ListMap[KT, VT]) KeysOrder() (keys []KT) {
 func (me *ListMap[KT, VT]) ValuesOrder() (vals []VT) {
 	me.mu.RLock()
 	if len(me.a) > 0 {
-		vals = make([]VT, len(me.a))
+		vals = make([]VT, len(me.a), len(me.a))
 		for i, key := range me.a {
 			val := me.m[key]
 			vals[i] = val
@@ -406,7 +426,7 @@ func (me *ListMap[KT, VT]) ValuesOrder() (vals []VT) {
 func (me *ListMap[KT, VT]) Keys() (keys []KT) {
 	me.mu.RLock()
 	if len(me.a) > 0 {
-		keys = make([]KT, len(me.a))
+		keys = make([]KT, 0, len(me.a))
 		for key, _ := range me.m {
 			keys = append(keys, key)
 		}
@@ -418,7 +438,7 @@ func (me *ListMap[KT, VT]) Keys() (keys []KT) {
 func (me *ListMap[KT, VT]) Values() (vals []VT) {
 	me.mu.RLock()
 	if len(me.a) > 0 {
-		vals = make([]VT, len(me.a))
+		vals = make([]VT, 0, len(me.a))
 		for _, val := range me.m {
 			vals = append(vals, val)
 		}
@@ -485,7 +505,12 @@ func (me *ListMap[KT, VT]) delnolock(key KT) (exist bool) {
 	if exist {
 		idx := slices.Index(me.a, key)
 		me.a = slices.Delete(me.a, idx, idx+1)
+		val := me.m[key]
 		delete(me.m, key)
+
+		if me.reversemap {
+			delete(me.mr, val)
+		}
 	}
 
 	return
@@ -508,6 +533,23 @@ func (me *ListMap[KT, VT]) Getr(val VT) (key KT, exist bool) {
 	me.mu.RUnlock()
 	return
 }
+func (me *ListMap[KT, VT]) Hasr(val VT) (exist bool) {
+	me.mu.RLock()
+	_, exist = me.mr[val]
+	me.mu.RUnlock()
+	return
+}
+func (me *ListMap[KT, VT]) Delr(val VT) (exist bool) {
+	me.mu.RLock()
+	key, exist := me.mr[val]
+	if exist {
+		me.delnolock(key)
+	}
+	me.mu.RUnlock()
+	return
+}
+
+////////
 
 // //// other
 

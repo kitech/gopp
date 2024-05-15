@@ -77,5 +77,33 @@ func TestListMap0(t *testing.T) {
 			t.Error("now First must eq Last", lm.FirstMust(), lm.LastMust())
 		}
 
+		// log.Println(lm.Keys(), lm.Count()) //
+		// left key=1 now
+		if lm.Hasr("s111") {
+			t.Error("must has not s111 now") // not set reverse map
+		}
+	}
+	//
+	{
+		lm := ListMapNewr[int, string]()
+
+		lm.Put(3, "s333")
+		lm.Put(1, "s111")
+		lm.Put(2, "s222")
+
+		if !lm.Hasr("s111") {
+			t.Error("must has s111 now")
+		}
+
+		if !lm.Delr("s111") {
+			t.Error("must del s111")
+		}
+
+		if lm.Hasr("s111") {
+			t.Error("must has not s111 now, after delete")
+		}
+		if lm.Has(1) {
+			t.Error("must has not key=1 now, after delete")
+		}
 	}
 }
