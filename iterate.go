@@ -7,18 +7,23 @@ import (
 	"strings"
 )
 
-type Pair struct {
-	Key   interface{}
-	Val   interface{}
-	Extra interface{}
+type Pair[KT any, VT any] struct {
+	Key KT
+	Val VT
 }
 
-func PairNew(key, val interface{}, extra ...interface{}) *Pair {
-	p := &Pair{key, val, nil}
-	if len(extra) > 0 {
-		p.Extra = extra[0]
-	}
+func PairNew[KT any, VT any](key KT, val VT /*, extra ...interface{}*/) *Pair[KT, VT] {
+	p := &Pair[KT, VT]{key, val}
 	return p
+}
+func PairNewInt[VT any](key int, val VT) *Pair[int, VT] {
+	return PairNew(key, val)
+}
+func PairNewU64[VT any](key uint64, val VT) *Pair[uint64, VT] {
+	return PairNew(key, val)
+}
+func PairNewStr[VT any](key string, val VT) *Pair[string, VT] {
+	return PairNew(key, val)
 }
 
 // redeclare
