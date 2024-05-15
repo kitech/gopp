@@ -21,14 +21,28 @@ func IfElse(q bool, tv interface{}, fv interface{}) interface{} {
 	}
 }
 
+func IfElse2[T any](q bool, tv T, fv T) T {
+	if q == true {
+		return tv
+	} else {
+		return fv
+	}
+}
+
 func IfElseInt(q bool, tv int, fv int) int {
-	return IfElse(q, tv, fv).(int)
+	return IfElse2(q, tv, fv)
 }
 
 func IfElseStr(q bool, tv string, fv string) string {
-	return IfElse(q, tv, fv).(string)
+	return IfElse2(q, tv, fv)
 }
 
+func IfThen2[T any](q bool, thens ...T) (v T) {
+	if len(thens) > 0 {
+		return thens[0]
+	}
+	return
+}
 func IfThen(q bool, thens ...interface{}) interface{} {
 	if len(thens) > 0 {
 		return thens[0]
