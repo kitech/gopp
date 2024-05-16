@@ -14,31 +14,31 @@ const (
 	HtmlNewline = " <br/>\n"
 )
 const (
-	HttpContentTypeHtml     = "text/html; charset=utf-8"
-	HttpContentTypeJson     = "application/json; charset=utf-8"
-	HttpContentTypeAppXml   = "application/xml; charset=utf-8"
-	HttpContentTypeXml      = "text/xml; charset=utf-8"
-	HttpContentTypeText     = "text/plain; charset=utf-8"
-	HttpContentTypeStream   = "application/octet-stream"
-	HttpContentTypeFormData = "form/data"
-	HttpBasicAuthTmpl       = "Authorization: Basic %s"  // %s=base64encode(user:pass)
-	HttpBearerAuthTmpl      = "Authorization: Bearer %s" // %s=base64encode(user:pass)
+	HttpCTHtml         = "text/html; charset=utf-8"
+	HttpCTJson         = "application/json; charset=utf-8"
+	HttpCTAppXml       = "application/xml; charset=utf-8"
+	HttpCTXml          = "text/xml; charset=utf-8"
+	HttpCTText         = "text/plain; charset=utf-8"
+	HttpCTStream       = "application/octet-stream"
+	HttpCTFormData     = "form/data"
+	HttpBasicAuthTmpl  = "Authorization: Basic %s"  // %s=base64encode(user:pass)
+	HttpBearerAuthTmpl = "Authorization: Bearer %s" // %s=base64encode(user:pass)
 
-	HttpContentTypeXWWWUrlEncoded = "application/x-www-form-urlencoded"
+	HttpCTXWWWUrlEncoded = "application/x-www-form-urlencoded"
 
-	HttpUserAgentCurl     = "curl/8.6.0"
-	HttpUserAgentFirefox  = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1"
-	HttpUserAgentChrome   = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36"
-	HttpUserAgentChromium = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chromium/28.0.1500.52 Safari/537.36"
-	HttpUserAgentAndroid  = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-	HttpUserAgentMacos    = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9"
+	HttpUACurl     = "curl/8.6.0"
+	HttpUAFirefox  = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1"
+	HttpUAChrome   = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36"
+	HttpUAChromium = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chromium/28.0.1500.52 Safari/537.36"
+	HttpUAAndroid  = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+	HttpUAMacos    = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9"
 
 	XmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
 
 	HttpDateFmtStr = HttpDateFmt
 )
 
-var HttpUserAgents = []string{HttpUserAgentCurl, HttpUserAgentFirefox, HttpUserAgentChrome, HttpUserAgentChromium, HttpUserAgentAndroid, HttpUserAgentMacos}
+var HttpUserAgents = []string{HttpUACurl, HttpUAFirefox, HttpUAChrome, HttpUAChromium, HttpUAAndroid, HttpUAMacos}
 
 func HttpBasicAuthVal(user, pass string) string {
 	val := fmt.Sprintf("%s:%s", user, pass)
@@ -98,14 +98,14 @@ func HttpRespJson(w http.ResponseWriter, code int, v any, headers map[string]str
 	wn, err := w.Write(jdata)
 	ErrPrint(err, wn, code, reflect.TypeOf(v), len(jdata), SubStr(string(jdata), 64))
 
-	return HttpRespRaw(w, code, jdata, HttpContentTypeJson, headers)
+	return HttpRespRaw(w, code, jdata, HttpCTJson, headers)
 }
 
 func HttpRespXml(w http.ResponseWriter, code int, data any, headers map[string]string) error {
 	var bdata, err = xml.Marshal(data)
 	ErrPrint(err)
 	if err == nil {
-		err = HttpRespRaw(w, code, bdata, HttpContentTypeText, headers)
+		err = HttpRespRaw(w, code, bdata, HttpCTText, headers)
 	}
 	return err
 }
