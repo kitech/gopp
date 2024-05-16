@@ -40,6 +40,7 @@ func main() {
 	defer func() { log.Println("Used", time.Since(gopp.StartTime)) }()
 	flag.BoolVar(&verbose, "v", true, "verbose")
 	flag.BoolVar(&showhelp, "h", false, "help")
+	flagset := flag.NewFlagSet("gomc get", flag.ExitOnError)
 	flag.Parse()
 
 	subcmd := flag.Arg(0)
@@ -48,22 +49,37 @@ func main() {
 	// flag.PrintDefaults()
 
 	if showhelp || subcmd == "" {
+		log.Println("go module cache offline tool")
 		flag.Usage()
+		flagset.Usage()
+		log.Println("    subcmds: get, list, listcache, search, delete")
 		return
 	}
 
 	switch subcmd {
 	case "get", "ge", "g":
+		if len(curpkg) == 0 {
+			log.Println("must supply getpkg")
+			break
+		}
 		mcget(curpkg)
 	case "list", "lst", "l", "li":
 		mclist(curpkg)
 	case "listcache", "lc":
 		mclistcache()
 	case "search", "se":
+		if len(curpkg) == 0 {
+			log.Println("must supply word")
+			break
+		}
 		mcsearch(curpkg)
 	case "update", "up":
 	case "updateall", "upall", "upa":
 	case "delete", "del":
+		if len(curpkg) == 0 {
+			log.Println("must supply getpkg")
+			break
+		}
 		mcdelete(curpkg)
 	default:
 		log.Println("subcmd not found", subcmd)
@@ -207,6 +223,7 @@ func mclistcache() {
 }
 
 func mclistcacheall(word string) (pkgvers map[string]map[string]string) {
+	log.Println("walking", moddldir, "...")
 	var zipdirs []string
 	filepath.WalkDir(moddldir, func(path string, d fs.DirEntry, err error) error {
 		// log.Println(path)
