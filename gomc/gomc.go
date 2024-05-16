@@ -35,6 +35,7 @@ var showhelp bool
 // list regexp, // only current workdir go.mod
 // search regexp // in cachedir, downloaded
 func main() {
+	log.SetFlags(log.Flags() ^ log.Ldate ^ log.Ltime)
 	defer func() { log.Println("Used", time.Since(gopp.StartTime)) }()
 	flag.BoolVar(&verbose, "v", true, "verbose")
 	flag.BoolVar(&showhelp, "h", false, "help")
@@ -42,7 +43,7 @@ func main() {
 
 	subcmd := flag.Arg(0)
 	curpkg := flag.Arg(1)
-	log.Println(subcmd, curpkg)
+	log.Println("try run", subcmd, curpkg, "...")
 	// flag.PrintDefaults()
 
 	if showhelp || subcmd == "" {
@@ -57,16 +58,47 @@ func main() {
 	case "listcache", "lc":
 		mclistcache()
 	case "search", "se":
+		mcsearch(curpkg)
 	case "update", "up":
 	case "updateall", "upall", "upa":
 	case "delete", "del":
+	default:
+		log.Println("subcmd not found", subcmd)
 	}
 }
 
+func mcsearch(word string) {
+	pkgverhashs := mclistcacheall(word)
+	res := map[string]map[string]string{}
+	gopp.Mapdo(pkgverhashs, func(idx int, kx, vx any) []any {
+		if !strings.Contains(kx.(string), word) {
+			return nil
+		}
+		res[kx.(string)] = vx.(map[string]string)
+		return nil
+	})
+	gopp.Mapdo(res, func(idx int, kx, vx any) []any {
+		log.Printf("%d/%d vc.%d %v %v\n", idx, len(res), gopp.Lenof(vx), kx, vx)
+		return nil
+	})
+}
 func mclistcache() {
+	res := mclistcacheall("")
+	gopp.Mapdo(res, func(idx int, kx, vx any) []any {
+		log.Printf("%d/%d vc.%d %v %v\n", idx, len(res), gopp.Lenof(vx), kx, vx)
+		return nil
+	})
+}
+
+func mclistcacheall(word string) (pkgvers map[string]map[string]string) {
 	var zipdirs []string
 	filepath.WalkDir(moddldir, func(path string, d fs.DirEntry, err error) error {
 		// log.Println(path)
+		tpath := path[len(moddldir):]
+		if len(word) > 0 && !gopp.StrHaveNocase(tpath, word) {
+			return nil
+		}
+
 		ets, err := os.ReadDir(path)
 		if gopp.ErrHave(err, "not a directory") {
 			// wtf,
@@ -92,29 +124,38 @@ func mclistcache() {
 		return nil
 	})
 
-	modvers := map[string][]string{}
+	modvers := map[string]map[string]string{}
 	//log.Println(len(zipdirs), zipdirs)
 	gopp.Mapdo(zipdirs, func(idx int, vx any) []any {
 		if idx%2 == 1 {
 			return nil
 		}
 		fpath, modverx := zipdirs[idx], zipdirs[idx+1]
+		bcc, err := os.ReadFile(fpath + "/" + modverx)
+		gopp.ErrPrint(err, fpath, modverx)
 		// log.Println(fpath, modverx)
 		mpath := fpath[len(moddldir)+1 : len(fpath)-3] // sfx: /@v
 		modver := modverx[:len(modverx)-8]             // sfx: .ziphash
 		// log.Println(idx/2, mpath, modver)
 		if _, ok := modvers[mpath]; ok {
-			modvers[mpath] = append(modvers[mpath], modver)
+			modvers[mpath][modver] = string(bcc)
 		} else {
-			modvers[mpath] = []string{modver}
+			modvers[mpath] = map[string]string{modver: string(bcc)}
 		}
 		return nil
 	})
 
+	pkgvers = modvers
+
+	if true {
+		return
+	}
 	gopp.Mapdo(modvers, func(idx int, kx any, vx any) []any {
 		log.Printf("%d/%d vc.%d %v %v\n", idx, len(modvers), gopp.Lenof(vx), kx, vx)
 		return nil
 	})
+
+	return
 }
 
 func mclist(wkdir string) {

@@ -235,3 +235,16 @@ func JsonEncode(v interface{}) (js string, err error) {
 	js = string(w.Bytes())
 	return
 }
+
+func StrHaveNocase(s string, substr string) bool {
+	return strings.Contains(strings.ToLower(s), strings.ToLower(substr))
+}
+func StrsHaveNocase(ss []string, s string) bool {
+	es := strings.ToLower(s)
+	for _, v := range ss {
+		if strings.ToLower(v) == es {
+			return true
+		}
+	}
+	return false
+}
