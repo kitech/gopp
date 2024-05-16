@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -53,6 +54,7 @@ func main() {
 
 	switch subcmd {
 	case "get", "ge", "g":
+		mcget(curpkg)
 	case "list", "lst", "l", "li":
 		mclist(curpkg)
 	case "listcache", "lc":
@@ -64,6 +66,59 @@ func main() {
 	case "delete", "del":
 	default:
 		log.Println("subcmd not found", subcmd)
+	}
+}
+
+// will write file go.mod, go.sum
+func mcget(pkgpath string) {
+	res := mclistcacheall(pkgpath)
+	if len(res) == 0 {
+		// todo, string similarity
+		// https://github.com/adrg/strutil
+		log.Println("package not found in cache", pkgpath)
+		return
+	} else if len(res) > 1 {
+		log.Println("too many packages found in cache", res)
+		return
+	}
+	gopp.Mapdo(res, func(idx int, kx, vx any) []any {
+		log.Printf("%d/%d vc.%d %v %v\n", idx, len(res), gopp.Lenof(vx), kx, vx)
+		return nil
+	})
+
+	bcc, err := os.ReadFile("go.mod")
+	gopp.ErrPrint(err)
+	mfo, err := modfile.Parse("", bcc, nil)
+	gopp.ErrPrint(err)
+
+	for modpath, modvers := range res {
+		keys := gopp.MapKeys(modvers)
+		slices.Sort(keys)
+		modver := gopp.Lastof(keys).Str()
+		err := mfo.AddRequire(modpath, modver)
+		gopp.ErrPrint(err)
+
+		{
+			bcc, err := mfo.Format()
+			gopp.ErrPrint(err)
+			err = gopp.SafeWriteFile("go.mod", bcc, 0755)
+			gopp.ErrPrint(err)
+		}
+
+		bcc, err := os.ReadFile("go.sum")
+		gopp.ErrPrint(err)
+
+		lines := strings.Split(string(bcc), "\n")
+		newline := fmt.Sprintf("%s %s %s", modpath, modver, modvers[modver])
+		if !slices.Contains(lines, newline) {
+			lines = append(lines, newline)
+
+			scc := strings.Join(lines, "\n")
+			err = gopp.SafeWriteFile("go.sum", []byte(scc), 0755)
+			gopp.ErrPrint(err)
+		}
+
+		break
 	}
 }
 

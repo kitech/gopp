@@ -196,3 +196,35 @@ func Capof(vx any) int {
 	// return len(vx)
 	return -1
 }
+
+// 还是喜欢这种写法的！
+// Lastof(vx).Str()
+func Lastof(vx any) (rv Any) {
+	if Lenof(vx) <= 0 {
+		return
+	}
+	tv := reflect.ValueOf(vx)
+	ty := tv.Type()
+
+	switch ty.Kind() {
+	case reflect.Slice, reflect.Array:
+		ev := tv.Index(tv.Len() - 1)
+		rv = ToAny(ev.Interface())
+
+	case reflect.String:
+		ev := tv.Index(tv.Len() - 1)
+		rv = ToAny(ev.Interface())
+
+	case reflect.Map:
+		ek := tv.MapKeys()[0]
+		ev := tv.MapIndex(ek)
+		rv = ToAny(ev.Interface())
+	}
+	return
+}
+
+// LastofG[string](vx)
+func LastofG[VT any, T map[any]VT | []VT | string](vx T) (rv VT) {
+	// var s string = LastofG([]string{}) // cannot infer VT
+	return
+}
