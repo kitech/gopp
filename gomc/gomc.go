@@ -64,9 +64,70 @@ func main() {
 	case "update", "up":
 	case "updateall", "upall", "upa":
 	case "delete", "del":
+		mcdelete(curpkg)
 	default:
 		log.Println("subcmd not found", subcmd)
 	}
+}
+
+func mcdelete(pkgpath string) {
+	res := mclistcacheall(pkgpath)
+	if len(res) == 0 {
+		// todo, string similarity
+		// https://github.com/adrg/strutil
+		log.Println("package not found in cache", pkgpath)
+		return
+	} else if len(res) > 1 {
+		log.Println("too many packages found in cache", res)
+		return
+	}
+	gopp.Mapdo(res, func(idx int, kx, vx any) []any {
+		log.Printf("found %d/%d vc.%d %v %v\n", idx, len(res), gopp.Lenof(vx), kx, vx)
+		return nil
+	})
+
+	bcc, err := os.ReadFile("go.mod")
+	gopp.ErrPrint(err)
+	mfo, err := modfile.Parse("", bcc, nil)
+	gopp.ErrPrint(err)
+
+	for modpath, modvers := range res {
+		keys := gopp.MapKeys(modvers)
+		slices.Sort(keys)
+		modver := gopp.Lastof(keys).Str()
+
+		err := mfo.DropRequire(modpath)
+		gopp.ErrPrint(err)
+
+		{
+			bcc2, err := mfo.Format()
+			gopp.ErrPrint(err)
+			if string(bcc2) == string(bcc2) {
+				log.Println("no change", "go.mod not have", modpath)
+			} else {
+				err = gopp.SafeWriteFile("go.mod", bcc, 0755)
+				gopp.ErrPrint(err)
+			}
+		}
+
+		bcc, err := os.ReadFile("go.sum")
+		gopp.ErrPrint(err)
+
+		lines := strings.Split(string(bcc), "\n")
+		newline := fmt.Sprintf("%s %s %s", modpath, modver, modvers[modver])
+		if idx := slices.Index(lines, newline); idx >= 0 {
+			lines = slices.Delete(lines, idx, idx+1)
+
+			scc := strings.Join(lines, "\n")
+			err = gopp.SafeWriteFile("go.sum", []byte(scc), 0755)
+			gopp.ErrPrint(err)
+		} else {
+			log.Println("no change", "go.sum not have", newline)
+		}
+
+		break
+	}
+
 }
 
 // will write file go.mod, go.sum
@@ -82,7 +143,7 @@ func mcget(pkgpath string) {
 		return
 	}
 	gopp.Mapdo(res, func(idx int, kx, vx any) []any {
-		log.Printf("%d/%d vc.%d %v %v\n", idx, len(res), gopp.Lenof(vx), kx, vx)
+		log.Printf("found %d/%d vc.%d %v %v\n", idx, len(res), gopp.Lenof(vx), kx, vx)
 		return nil
 	})
 

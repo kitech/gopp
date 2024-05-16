@@ -19,4 +19,5 @@ require (
 	github.com/huandu/xstrings v1.4.0 // indirect
 	github.com/lytics/base62 v0.0.0-20180808010106-0ee4de5a5d6d // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+
 )
