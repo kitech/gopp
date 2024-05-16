@@ -175,3 +175,24 @@ func IsStruct(v interface{}) bool {
 func IsPtr(v interface{}) bool {
 	return reflect.TypeOf(v).Kind() == reflect.Ptr
 }
+
+func Lenof(vx any) int {
+	ty := reflect.TypeOf(vx)
+	vv := reflect.ValueOf(vx)
+	switch ty.Kind() {
+	case reflect.String, reflect.Slice, reflect.Map, reflect.Array:
+		return vv.Len()
+	}
+	// return len(vx)
+	return -1
+}
+func Capof(vx any) int {
+	ty := reflect.TypeOf(vx)
+	vv := reflect.ValueOf(vx)
+	switch ty.Kind() {
+	case reflect.String, reflect.Slice, reflect.Map, reflect.Array:
+		return vv.Cap()
+	}
+	// return len(vx)
+	return -1
+}
