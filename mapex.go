@@ -5,8 +5,21 @@ import (
 	"reflect"
 )
 
+// gopp.MapSS // 这个还是更简短些
+// map[string]string
+type MapSS = map[string]string // 应该这个用的最多吧
+type MapSA = map[string]any
+type MapIA = map[int]any
+type MapSI = map[string]int
+type MapIS = map[int]string
+type MapSL = map[string]int64 // means LongLong
+type MapLS = map[int64]string
+
 // map的更多的操作
 
+func Keysof[KT comparable, VT any](m map[KT]VT) []KT {
+	return MapKeys(m)
+}
 func MapKeys[KT comparable, VT any](m map[KT]VT) []KT {
 	mt := reflect.ValueOf(m)
 	if mt.Kind() != reflect.Map {
@@ -23,6 +36,9 @@ func MapKeys[KT comparable, VT any](m map[KT]VT) []KT {
 	return outs
 }
 
+func Valuesof[KT comparable, VT any](m map[KT]VT) []VT {
+	return MapValues(m)
+}
 func MapValues[KT comparable, VT any](m map[KT]VT) []VT {
 	mt := reflect.ValueOf(m)
 	if mt.Kind() != reflect.Map {
@@ -39,6 +55,7 @@ func MapValues[KT comparable, VT any](m map[KT]VT) []VT {
 	return outs
 }
 
+// 这个可以用 Mapdo 实现，不过这个是带类型的，好点
 func MapFlat[KT comparable, VT any](m map[KT]VT) []any {
 	mt := reflect.ValueOf(m)
 	if mt.Kind() != reflect.Map {
@@ -57,22 +74,22 @@ func MapFlat[KT comparable, VT any](m map[KT]VT) []any {
 }
 
 type Map struct {
-	m interface{}
+	m any
 }
 
-func NewMap(m interface{}) *Map { return &Map{m} }
+func NewMap(m any) *Map { return &Map{m} }
 
 type Array struct {
 	a Any
 }
 
-func NewArray(a interface{}) *Array {
+func NewArray(a any) *Array {
 	this := &Array{}
 	this.a = ToAny(a)
 	return this
 }
 
-func (this *Array) Contains(i interface{}) bool {
+func (this *Array) Contains(i any) bool {
 	return false
 }
 

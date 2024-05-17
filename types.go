@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	mrand "math/rand"
 	"reflect"
 	"strconv"
 	"unsafe"
@@ -272,4 +273,29 @@ func Lastof(vx any) (rv Any) {
 func LastofG[VT any, T map[any]VT | []VT | string](vx T) (rv VT) {
 	// var s string = LastofG([]string{}) // cannot infer VT
 	return
+}
+
+func Randof(vx any) (rv Any) {
+	if Lenof(vx) <= 0 {
+		return
+	}
+	tv := reflect.ValueOf(vx)
+	ty := tv.Type()
+
+	switch ty.Kind() {
+	case reflect.Slice, reflect.Array:
+		ev := tv.Index(mrand.Int() % tv.Len())
+		rv = ToAny(ev.Interface())
+
+	case reflect.String:
+		ev := tv.Index(mrand.Int() % tv.Len())
+		rv = ToAny(ev.Interface())
+
+	case reflect.Map:
+		ek := tv.MapKeys()[mrand.Int()%tv.Len()]
+		ev := tv.MapIndex(ek)
+		rv = ToAny(ev.Interface())
+	}
+	return
+
 }
