@@ -3,6 +3,7 @@ package gopp
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"reflect"
 	"strconv"
 	"unsafe"
@@ -34,18 +35,27 @@ func (this *Any) Hehe() {
 */
 
 type Any struct {
-	I interface{}
+	I any
+	// v T
 	// v *reflect.Value
 }
 
-func ToAny(i interface{}) Any {
+func AnyNew(i any) Any {
+	// v := reflect.ValueOf(i)
+	return Any{i}
+}
+func AnyOf(i any) Any {
+	// v := reflect.ValueOf(i)
+	return Any{i}
+}
+func ToAny(i any) Any {
 	// v := reflect.ValueOf(i)
 	return Any{i}
 }
 func (this Any) Raw() interface{} { return this.I }
 func (this Any) IsNil() bool      { return this.I == nil }
-func (this Any) I0() int          { return this.I.(int) }
-func (this Any) U0() uint         { return this.I.(uint) }
+func (this Any) Int() int         { return this.I.(int) }
+func (this Any) Uint() uint       { return this.I.(uint) }
 func (this Any) I8() int8         { return this.I.(int8) }
 func (this Any) U8() uint8        { return this.I.(uint8) }
 func (this Any) I16() int16       { return this.I.(int16) }
@@ -57,6 +67,8 @@ func (this Any) U64() uint64      { return this.I.(uint64) }
 func (this Any) F32() float32     { return this.I.(float32) }
 func (this Any) F64() float64     { return this.I.(float64) }
 func (this Any) Str() string      { return this.I.(string) }
+func (this Any) Array() []any     { return this.I.([]any) }
+func (this Any) Map() map[any]any { return this.I.(map[any]any) }
 func (this Any) Iterable() bool {
 	switch reflect.TypeOf(this.I).Kind() {
 	case reflect.Slice, reflect.Array, reflect.Map,
@@ -71,15 +83,47 @@ func (this Any) CanMKey() bool {
 	}
 	return true // 是否能作为map的key
 }
-func (this Any) AsStr() string { return fmt.Sprintf("%v", this.I) }
+
+// todo any => Any
+func (this Any) Mapdo(fx any) (out any) {
+	out = Mapdo(this.I, fx)
+	return
+}
+
+// /// as means type convert if need
+func (this Any) AsStr() string  { return fmt.Sprintf("%v", this.I) }
+func (this Any) AsStrp() string { return fmt.Sprintf("+%v", this.I) }
 func (this Any) AsJson() []byte {
 	bcc, err := json.Marshal(this.I)
 	ErrPrint(err)
 	return bcc
 }
+func (this Any) AsJsons() string { return string(this.AsJson()) }
 
 // for json
 func (this Any) String() string { return fmt.Sprintf("%v", this.I) }
+
+func AnyAsg[T any](this Any) (rv T) {
+	ety := reflect.TypeOf(this.I)
+	toty := reflect.TypeOf(rv)
+
+	rvx, ok := vecmapconvertvalue(this.I, ety, toty)
+	if !ok {
+		log.Println("cannot", ety.String(), "=>", toty.String())
+		return
+	}
+	rv = rvx.(T)
+	return
+}
+
+func (this Any) AsInt() (rv int)     { return AnyAsg[int](this) }
+func (this Any) AsUint() (rv uint)   { return AnyAsg[uint](this) }
+func (this Any) AsI64() (rv int64)   { return AnyAsg[int64](this) }
+func (this Any) AsU64() (rv uint64)  { return AnyAsg[uint64](this) }
+func (this Any) AsF64() (rv float64) { return AnyAsg[float64](this) }
+func (this Any) AsF32() (rv float32) { return AnyAsg[float32](this) }
+
+//////////////
 
 // maybe can use Once for lazy
 var vInt8Ty int8
@@ -180,7 +224,7 @@ func Lenof(vx any) int {
 	ty := reflect.TypeOf(vx)
 	vv := reflect.ValueOf(vx)
 	switch ty.Kind() {
-	case reflect.String, reflect.Slice, reflect.Map, reflect.Array:
+	case reflect.String, reflect.Slice, reflect.Map, reflect.Array, reflect.Chan:
 		return vv.Len()
 	}
 	// return len(vx)
@@ -190,7 +234,7 @@ func Capof(vx any) int {
 	ty := reflect.TypeOf(vx)
 	vv := reflect.ValueOf(vx)
 	switch ty.Kind() {
-	case reflect.String, reflect.Slice, reflect.Map, reflect.Array:
+	case reflect.String, reflect.Slice, reflect.Map, reflect.Array, reflect.Chan:
 		return vv.Cap()
 	}
 	// return len(vx)
@@ -223,6 +267,7 @@ func Lastof(vx any) (rv Any) {
 	return
 }
 
+// todo
 // LastofG[string](vx)
 func LastofG[VT any, T map[any]VT | []VT | string](vx T) (rv VT) {
 	// var s string = LastofG([]string{}) // cannot infer VT
