@@ -248,6 +248,20 @@ var vecmapconvfns = map[string]func(any) any{
 	},
 }
 
+// primity type
+// vecmapconvertvalueg[int](1.23)
+func vecmapconvertvalueg[T any](vx any) (rv T, ok bool) {
+	ety := reflect.TypeOf(vx)
+	toty := reflect.TypeFor[T]()
+
+	rvx, okx := vecmapconvertvalue(vx, ety, toty)
+	ok = okx
+	rv = rvx.(T)
+	return
+}
+
+// primity type
+// vecmapconvertvalue(1.23).(int)
 func vecmapconvertvalue(vx any, ety, toty reflect.Type) (any, bool) {
 	var rvx any
 
@@ -358,8 +372,8 @@ func RangeC(n int) <-chan int {
 
 // TODO
 type Iterable interface {
-	Iter() interface{}
-	Next() interface{}
+	Iter() any
+	Next() any
 }
 
 // string/map/slice/struct or implementation Iterable

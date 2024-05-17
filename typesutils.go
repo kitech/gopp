@@ -6,6 +6,7 @@ import (
 	"unicode"
 )
 
+// see unicode.IsNumber()
 func Isnumtype(ty reflect.Type) bool {
 	switch ty.Kind() {
 	case reflect.Uintptr, reflect.Int, reflect.Uint, reflect.Int64, reflect.Uint64,
@@ -16,13 +17,13 @@ func Isnumtype(ty reflect.Type) bool {
 	return false
 }
 
-func Calcmemlen(v interface{}) int {
+func CalcMemlen(v any) int {
 	refval := reflect.ValueOf(v)
 	refty := refval.Type()
 
 	switch refty.Kind() {
 	case reflect.Ptr:
-		return Calcmemlen(refval.Elem().Interface())
+		return CalcMemlen(refval.Elem().Interface())
 	case reflect.Struct:
 		len1 := int(refty.Size())
 		for i := 0; i < refty.NumField(); i++ {
@@ -31,7 +32,7 @@ func Calcmemlen(v interface{}) int {
 			if Isnumtype(fldty) {
 			} else {
 				if unicode.IsUpper(rune(fldname[0])) {
-					len1 += Calcmemlen(refval.Field(i).Interface())
+					len1 += CalcMemlen(refval.Field(i).Interface())
 				} else {
 					log.Printf("unexport %s.%s %s\n", refty.Name(), fldname, fldty.String())
 				}
@@ -41,19 +42,19 @@ func Calcmemlen(v interface{}) int {
 	case reflect.Slice:
 		len1 := 0
 		for i := 0; i < refval.Len(); i++ {
-			len1 += Calcmemlen(refval.Index(i).Interface())
+			len1 += CalcMemlen(refval.Index(i).Interface())
 		}
 		return len1
 	case reflect.Map:
 		len1 := 0
 		for _, kval := range refval.MapKeys() {
-			len1 += Calcmemlen(kval.Interface())
-			len1 += Calcmemlen(refval.MapIndex(kval).Interface())
+			len1 += CalcMemlen(kval.Interface())
+			len1 += CalcMemlen(refval.MapIndex(kval).Interface())
 		}
 		return len1
 	case reflect.Chan:
 		len1 := 0
-		len1 = refval.Cap() * Calcmemlen(refval.Elem().Interface())
+		len1 = refval.Cap() * CalcMemlen(refval.Elem().Interface())
 		return len1
 	case reflect.UnsafePointer:
 		log.Println("oh raw UnsafePointer")
@@ -78,7 +79,7 @@ func calcmemlen_test() {
 	m := &Message{}
 	m.Msg = ""
 	m.Links = []string{"abc", "efg"}
-	rv := Calcmemlen(m)
+	rv := CalcMemlen(m)
 	log.Println(rv)
-	log.Println(Calcmemlen(567.890))
+	log.Println(CalcMemlen(567.890))
 }

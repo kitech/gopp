@@ -105,6 +105,8 @@ func ArrayRand[T any](a []T) T {
 	var i = (int(rand.Uint32()) + len(a)) % len(a)
 	return a[i]
 }
+
+// see Lastof
 func ArrayLast[T any](a []T) T {
 	if len(a) == 0 {
 		var v T
@@ -114,6 +116,7 @@ func ArrayLast[T any](a []T) T {
 	return a[i]
 }
 
+// see Randof
 func MapRand[KT comparable, VT any](m map[KT]VT) (KT, VT) {
 	refval := reflect.ValueOf(m)
 	iter := refval.MapRange()

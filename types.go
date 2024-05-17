@@ -27,7 +27,8 @@ type u128 = [16]byte
 type vptr = unsafe.Pointer // void pointer
 
 // TODO how add methods for Any type
-type IAny interface{}
+// TODO how add methods for primity string type
+type IAny any
 
 /*
 invalid receiver type *Any (Any is an interface type)
@@ -53,23 +54,21 @@ func ToAny(i any) Any {
 	// v := reflect.ValueOf(i)
 	return Any{i}
 }
-func (this Any) Raw() interface{} { return this.I }
-func (this Any) IsNil() bool      { return this.I == nil }
-func (this Any) Int() int         { return this.I.(int) }
-func (this Any) Uint() uint       { return this.I.(uint) }
-func (this Any) I8() int8         { return this.I.(int8) }
-func (this Any) U8() uint8        { return this.I.(uint8) }
-func (this Any) I16() int16       { return this.I.(int16) }
-func (this Any) U16() uint16      { return this.I.(uint16) }
-func (this Any) I32() int32       { return this.I.(int32) }
-func (this Any) U32() uint32      { return this.I.(uint32) }
-func (this Any) I64() int64       { return this.I.(int64) }
-func (this Any) U64() uint64      { return this.I.(uint64) }
-func (this Any) F32() float32     { return this.I.(float32) }
-func (this Any) F64() float64     { return this.I.(float64) }
-func (this Any) Str() string      { return this.I.(string) }
-func (this Any) Array() []any     { return this.I.([]any) }
-func (this Any) Map() map[any]any { return this.I.(map[any]any) }
+func (this Any) Raw() any     { return this.I }
+func (this Any) IsNil() bool  { return this.I == nil }
+func (this Any) Int() int     { return this.I.(int) }
+func (this Any) Uint() uint   { return this.I.(uint) }
+func (this Any) I8() int8     { return this.I.(int8) }
+func (this Any) U8() uint8    { return this.I.(uint8) }
+func (this Any) I16() int16   { return this.I.(int16) }
+func (this Any) U16() uint16  { return this.I.(uint16) }
+func (this Any) I32() int32   { return this.I.(int32) }
+func (this Any) U32() uint32  { return this.I.(uint32) }
+func (this Any) I64() int64   { return this.I.(int64) }
+func (this Any) U64() uint64  { return this.I.(uint64) }
+func (this Any) F32() float32 { return this.I.(float32) }
+func (this Any) F64() float64 { return this.I.(float64) }
+func (this Any) Str() string  { return this.I.(string) }
 func (this Any) Iterable() bool {
 	switch reflect.TypeOf(this.I).Kind() {
 	case reflect.Slice, reflect.Array, reflect.Map,
