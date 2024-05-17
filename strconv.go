@@ -8,7 +8,7 @@ import (
 )
 
 func MustInt(s string) int {
-	if s == "" {
+	if len(s) == 0 {
 		return 0
 	}
 	n, err := strconv.Atoi(s)
@@ -17,7 +17,7 @@ func MustInt(s string) int {
 }
 
 func MustUint32(s string) uint32 {
-	if s == "" {
+	if len(s) == 0 {
 		return 0
 	}
 	n, err := strconv.Atoi(s)
@@ -26,17 +26,26 @@ func MustUint32(s string) uint32 {
 }
 
 func MustInt64(s string) int64 {
+	if len(s) == 0 {
+		return 0
+	}
 	n, err := strconv.ParseInt(s, 10, 64)
 	ErrPrint(err, s)
 	return n
 }
 
 func MustFloat64(s string) float64 {
+	if len(s) == 0 {
+		return 0
+	}
 	v, err := strconv.ParseFloat(s, 64)
 	ErrPrint(err, s)
 	return v
 }
 func MustFloat32(s string) float32 {
+	if len(s) == 0 {
+		return 0
+	}
 	v, err := strconv.ParseFloat(s, 32)
 	ErrPrint(err, s)
 	return float32(v)
