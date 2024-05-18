@@ -245,6 +245,59 @@ func TruePrint(ok bool, args ...interface{}) bool {
 	return ok
 }
 
+func LevelPrint(lvl string, args ...interface{}) {
+	s := printq(lvl, args...)
+	log.Output(2, s)
+	if justprintoutfn != nil {
+		if justprintoutfnasync {
+			go justprintoutfn(s)
+		} else {
+			justprintoutfn(s)
+		}
+
+	}
+	return
+}
+func Infop(args ...interface{}) {
+	s := printq("Info", args...)
+	log.Output(2, s)
+	if justprintoutfn != nil {
+		if justprintoutfnasync {
+			go justprintoutfn(s)
+		} else {
+			justprintoutfn(s)
+		}
+
+	}
+	return
+}
+func Warnp(args ...interface{}) {
+	s := printq("Warn", args...)
+	log.Output(2, s)
+	if justprintoutfn != nil {
+		if justprintoutfnasync {
+			go justprintoutfn(s)
+		} else {
+			justprintoutfn(s)
+		}
+
+	}
+	return
+}
+func Debugp(args ...interface{}) {
+	s := printq("Debug", args...)
+	log.Output(2, s)
+	if justprintoutfn != nil {
+		if justprintoutfnasync {
+			go justprintoutfn(s)
+		} else {
+			justprintoutfn(s)
+		}
+
+	}
+	return
+}
+
 // BUG: panic: reflect: call of reflect.Value.IsNil on uint64 Value
 func NilPrint(v interface{}, args ...interface{}) interface{} {
 	if v == nil {

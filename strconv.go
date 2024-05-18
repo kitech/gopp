@@ -2,7 +2,6 @@ package gopp
 
 import (
 	"fmt"
-	"log"
 	"reflect"
 	"strconv"
 )
@@ -69,6 +68,8 @@ func Toint(vx any) int {
 		} else {
 			rv = 0
 		}
+	case string:
+		rv = MustInt(v)
 
 	default:
 		rvty := reflect.TypeOf(rv)
@@ -76,7 +77,7 @@ func Toint(vx any) int {
 		if vv.CanConvert(rvty) {
 			rv = (vv.Convert(rvty).Interface()).(int)
 		} else {
-			log.Println("not support", reflect.TypeOf(vx), vx)
+			Infop("not support", reflect.TypeOf(vx), vx)
 		}
 	}
 	return rv

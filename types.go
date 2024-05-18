@@ -69,6 +69,7 @@ func (this Any) U64() uint64  { return this.I.(uint64) }
 func (this Any) F32() float32 { return this.I.(float32) }
 func (this Any) F64() float64 { return this.I.(float64) }
 func (this Any) Str() string  { return this.I.(string) }
+func (this Any) Bool() bool   { return this.I.(bool) }
 func (this Any) Iterable() bool {
 	switch reflect.TypeOf(this.I).Kind() {
 	case reflect.Slice, reflect.Array, reflect.Map,

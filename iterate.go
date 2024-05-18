@@ -2,8 +2,8 @@ package gopp
 
 import (
 	"fmt"
-	"log"
 	"reflect"
+	"slices"
 	"strings"
 )
 
@@ -119,7 +119,7 @@ func Mapdo(ins any, fx any) (out any) {
 			outarr = append(outarr, out)
 
 		default:
-			log.Println("invalid fxcb", idx, key, infxty)
+			Infop("invalid fxcb", idx, key, infxty)
 			return false
 		}
 		return true
@@ -206,29 +206,19 @@ func DomapTypeField(ty reflect.Type, f func(reflect.StructField) interface{}) (o
 // ///// todo more...
 var vecmapconvfns = map[string]func(any) any{
 	"any2string": func(vx any) any { return ToStr(vx) },
+	// "any2bool":
+	"bool2int":   func(vx any) any { return IfElse2(vx.(bool), 1, 0) },
+	"bool2int64": func(vx any) any { return IfElse2(vx.(bool), int64(1), int64(0)) },
 
-	"string2int": func(vx any) any {
+	"string2int64": func(vx any) any {
 		s := vx.(string)
 		if IsNumberic(s) {
 			if strings.Contains(s, ".") {
 				v := MustFloat64(s)
-				return int(v)
+				return int64(v)
 			} else {
-				v := MustInt(s)
-				return int(v)
-			}
-		}
-		return -1
-	},
-	"string2uint": func(vx any) any {
-		s := vx.(string)
-		if IsNumberic(s) {
-			if strings.Contains(s, ".") {
-				v := MustFloat64(s)
-				return uint(v)
-			} else {
-				v := MustInt(s)
-				return uint(v)
+				v := MustInt64(s)
+				return v
 			}
 		}
 		return -1
@@ -246,6 +236,28 @@ var vecmapconvfns = map[string]func(any) any{
 		v := MustFloat32(vx.(string))
 		return v
 	},
+}
+
+func init() {
+	var str2i64fn = vecmapconvfns["string2int64"]
+	vecmapconvfns["string2int"] = func(vx any) any {
+		return int(str2i64fn(vx).(int64))
+	}
+	vecmapconvfns["string2uint"] = func(vx any) any {
+		return uint(str2i64fn(vx).(int64))
+	}
+	vecmapconvfns["string2uint64"] = func(vx any) any {
+		return uint64(str2i64fn(vx).(int64))
+	}
+	vecmapconvfns["string2int32"] = func(vx any) any {
+		return int32(str2i64fn(vx).(int64))
+	}
+	vecmapconvfns["string2uint32"] = func(vx any) any {
+		return uint32(str2i64fn(vx).(int64))
+	}
+	vecmapconvfns["string2uintptr"] = func(vx any) any {
+		return uintptr(str2i64fn(vx).(int64))
+	}
 }
 
 // primity type
@@ -277,7 +289,7 @@ func vecmapconvertvalue(vx any, ety, toty reflect.Type) (any, bool) {
 		if fn, ok := vecmapconvfns[fnname]; ok {
 			rvx = fn(vx)
 		} else {
-			log.Println("IVConvert failed", fnname)
+			Infop("IVConvert failed", fnname)
 			return rvx, false
 		}
 	}
@@ -350,7 +362,8 @@ func Strs2IV(items []string) []any {
 // enumerate类似功能
 // 第一种方式，采用数组,可能用内存比较多
 // usage: for i := range gopp.Range(5){}
-func RangeA(n int) (rg []int) {
+// 88.88 ns/op
+func _RangeA(n int) (rg []int) {
 	rg = make([]int, n)
 	for i := 0; i < n; i++ {
 		rg[i] = i
@@ -358,7 +371,31 @@ func RangeA(n int) (rg []int) {
 	return
 }
 
+var rangeaunderarr = make([]int, 0, 3)
+var rangeaunderfillpos = 0
+
+// 25.55 ns/op 不新分配内存就是快
+// 但是最好不要太大的n，内存一直在
+func RangeA[T int | float64](nx T) (rg []int) {
+	n := int(nx)
+	growed := false
+	if n > cap(rangeaunderarr) {
+		growed = true
+		rangeaunderarr = slices.Grow(rangeaunderarr, n)
+	}
+	// rg = make([]int, n)
+	rg = rangeaunderarr[:n]
+	if growed || n > rangeaunderfillpos {
+		rangeaunderfillpos = n - 1
+		for i := 0; i < n; i++ {
+			rg[i] = i
+		}
+	}
+	return
+}
+
 // 第二种方式，采用channel。由于用到一个goroutine，可能效率慢
+// 果然这个速度慢，不要使用，8290 ns/op
 func RangeC(n int) <-chan int {
 	ch := make(chan int)
 	go func() {

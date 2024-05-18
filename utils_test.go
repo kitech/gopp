@@ -34,7 +34,7 @@ func TestLazyIfElse(t *testing.T) {
 		return 2
 	}
 
-	IfElseInt(true, Any{f1()}.I0(), Any{f2()}.I0())
+	IfElseInt(true, Any{f1()}.Int(), Any{f2()}.Int())
 	if f1runed && f2runed {
 		t.Log(f1runed, f2runed)
 		t.Fail()

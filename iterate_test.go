@@ -139,3 +139,36 @@ func TestIV2Str(t *testing.T) {
 	}
 
 }
+
+// go test -v -bench RangeA -run RangeA
+
+func BenchmarkRangeA(b *testing.B) {
+	// for n := 0; n < b.N; n++ {
+	// 	fib(30) // run fib(30) b.N times
+	// }
+	// log.Println(b.N)
+	for n := 0; n < b.N; n++ {
+		for range _RangeA(33) {
+		}
+	}
+}
+func BenchmarkRangeA2(b *testing.B) {
+	// for n := 0; n < b.N; n++ {
+	// 	fib(30) // run fib(30) b.N times
+	// }
+	// log.Println(b.N)
+	for n := 0; n < b.N; n++ {
+		for range RangeA(33) {
+		}
+	}
+}
+func BenchmarkRangeC(b *testing.B) {
+	// for n := 0; n < b.N; n++ {
+	// 	fib(30) // run fib(30) b.N times
+	// }
+	// log.Println(b.N)
+	for n := 0; n < b.N; n++ {
+		for range RangeC(33) {
+		}
+	}
+}
