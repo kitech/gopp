@@ -476,8 +476,10 @@ func (me *ListMap[KT, VT]) Get(key KT) (rv VT, exist bool) {
 
 	me.mu.RLock()
 	kv, ok := me.m0[hkey]
-	rv = kv.Val
 	exist = ok
+	if ok {
+		rv = kv.Val
+	}
 	me.mu.RUnlock()
 
 	return
@@ -486,20 +488,38 @@ func (me *ListMap[KT, VT]) GetMust(key KT) (rv VT) {
 	hkey := me.hhker.Hash(key)
 
 	me.mu.RLock()
-	kv := me.m0[hkey]
-	rv = kv.Val
+	kv, ok := me.m0[hkey]
+	if ok {
+		rv = kv.Val
+	}
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap[KT, VT]) GetMany(key ...KT) (rv *ListMap[KT, VT]) {
+func (me *ListMap[KT, VT]) GetMany(keys ...KT) (rv *ListMap[KT, VT]) {
+	rv = ListMapNew[KT, VT]()
 	me.mu.RLock()
+	for _, key := range keys {
+		hkey := me.hhker.Hash(key)
+		kv, ok := me.m0[hkey]
+		if ok {
+			rv.putnolock(key, kv.Val)
+		}
+	}
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap[KT, VT]) GetMany2(key ...KT) (rv map[KT]VT) {
+func (me *ListMap[KT, VT]) GetMany2(keys ...KT) (rv map[KT]VT) {
+	rv = map[KT]VT{}
 	me.mu.RLock()
+	for _, key := range keys {
+		hkey := me.hhker.Hash(key)
+		kv, ok := me.m0[hkey]
+		if ok {
+			rv[kv.Key] = kv.Val
+		}
+	}
 	me.mu.RUnlock()
 
 	return
