@@ -198,6 +198,17 @@ func IsInteger(s string) bool {
 	return true
 }
 
+func IsFloat(s string) bool {
+	for _, c := range s {
+		if unicode.IsDigit(c) || c == '.' {
+		} else {
+			return false
+		}
+	}
+
+	return true
+}
+
 func IsPrint(s string) bool {
 	for _, c := range s {
 		if !unicode.IsPrint(rune(c)) {

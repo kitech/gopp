@@ -17,6 +17,63 @@ func JsonMarshalMust(v any) string {
 
 ////////
 
+type Spjson struct {
+	*spjson.Json
+}
+
+func (me *Spjson) Origin() *spjson.Json {
+	return me.Json
+}
+func originspjson2wrap(jo *spjson.Json) *Spjson {
+	return &Spjson{jo}
+}
+
+// key1.key2.key3
+func (me *Spjson) GetPathDot(paths string) *Spjson {
+	jo := me.Origin()
+	rjo := jo.GetPath(strings.Split(paths, ".")...)
+	return originspjson2wrap(rjo)
+}
+
+// key1.idx1.key2.idx2
+func (me *Spjson) GetPathIndexDot(pathidxs string) *Spjson {
+	jo := me.Origin()
+
+	var rv = jo
+	for i, p := range strings.Split(pathidxs, ".") {
+		if IsInteger(p) {
+			idx := MustInt(p)
+			if idx < 0 {
+				Warnp("idx < 0", idx, i, pathidxs)
+				rv = jo.GetIndex(idx) // what error?
+			} else {
+				rv = jo.GetIndex(idx)
+			}
+		} else {
+			rv = jo.Get(p)
+		}
+	}
+	return originspjson2wrap(rv)
+}
+
+func JsonNew(body []byte) (*Spjson, error) {
+	jo, err := spjson.NewJson(body)
+	if err != nil {
+		return nil, err
+	}
+	me := originspjson2wrap(jo)
+	return me, err
+}
+func JsonNewEmpty() *Spjson {
+	me := originspjson2wrap(spjson.New())
+	return me
+}
+func Spjsonof(jo *spjson.Json) *Spjson {
+	return originspjson2wrap(jo)
+}
+
+//////
+
 type Json struct {
 	jo *spjson.Json
 }
