@@ -32,6 +32,23 @@ var (
 	// PlainError error
 )
 
+func ErrAny(errs ...error) bool {
+	for _, err := range errs {
+		if err != nil {
+			return true
+		}
+	}
+	return false
+}
+func ErrAll(errs ...error) bool {
+	for _, err := range errs {
+		if err == nil {
+			return false
+		}
+	}
+	return true
+}
+
 // Error with errno and stack info
 type Error struct {
 	errno  int
@@ -133,16 +150,54 @@ func UnsetLogPrintFunc() (oldasync bool, oldfn func(string)) {
 }
 
 // =PackArg?
-func printq(v interface{}, args ...interface{}) string {
+func printq(v any, args ...any) string {
 	msg := fmt.Sprintf("%+v", v)
-	for _, arg := range args {
-		msg += fmt.Sprintf(" %+v", arg)
+	for _, argx := range args {
+		switch arg := argx.(type) {
+		case string:
+			if len(arg) == 0 {
+				argx = "\"\""
+			}
+		}
+		msg += fmt.Sprintf(" %+v", argx)
 	}
 	return msg
 }
 
+// 开头类型为error的，可以多个，之后任意类型
+// 如果没有error类型的开头，则不打印直接返回
+func ErrsPrint(errandargs ...any) {
+	var errs []error
+	var args []any
+	for i, vx := range errandargs {
+		switch v := vx.(type) {
+		case error:
+			if v != nil {
+				errs = append(errs, v)
+			}
+		default:
+			args = errandargs[i:]
+			goto endfor
+		}
+	}
+endfor:
+	if len(errs) > 0 {
+		err := fmt.Errorf("%v", errs)
+		s := printq(err, args...)
+		log.Output(2, s)
+		if justprintoutfn != nil {
+			if justprintoutfnasync {
+				go justprintoutfn(s)
+			} else {
+				justprintoutfn(s)
+			}
+
+		}
+	}
+}
+
 // ErrPrint 用的最多，其次是 NilPrint, ZeroPrint, TruePrint, FalsePrint
-func ErrPrint(err error, args ...interface{}) error {
+func ErrPrint(err error, args ...any) error {
 	if err != nil {
 		s := printq(err, args...)
 		log.Output(2, s)
@@ -157,7 +212,7 @@ func ErrPrint(err error, args ...interface{}) error {
 	}
 	return err
 }
-func ErrPrintExcept(err error, except error, args ...interface{}) error {
+func ErrPrintExcept(err error, except error, args ...any) error {
 	if err == except {
 		return err
 	}
@@ -167,7 +222,7 @@ func ErrPrintExcept(err error, except error, args ...interface{}) error {
 	return err
 }
 
-func ErrFatal(err error, args ...interface{}) {
+func ErrFatal(err error, args ...any) {
 	if err != nil {
 		log.Output(2, printq(err, args...))
 		os.Exit(-1)
@@ -213,7 +268,7 @@ func ErrHumanShort(err error) string {
 	return "Failed"
 }
 
-func FalsePrint(ok bool, args ...interface{}) bool {
+func FalsePrint(ok bool, args ...any) bool {
 	if !ok {
 		s := printq("CondFalse", args...)
 		log.Output(2, s)
@@ -229,7 +284,7 @@ func FalsePrint(ok bool, args ...interface{}) bool {
 	return ok
 }
 
-func TruePrint(ok bool, args ...interface{}) bool {
+func TruePrint(ok bool, args ...any) bool {
 	if ok {
 		s := printq("CondTrue", args...)
 		log.Output(2, s)
@@ -245,7 +300,7 @@ func TruePrint(ok bool, args ...interface{}) bool {
 	return ok
 }
 
-func LevelPrint(lvl string, args ...interface{}) {
+func LevelPrint(lvl string, args ...any) {
 	s := printq(lvl, args...)
 	log.Output(2, s)
 	if justprintoutfn != nil {
@@ -258,7 +313,7 @@ func LevelPrint(lvl string, args ...interface{}) {
 	}
 	return
 }
-func Infop(args ...interface{}) {
+func Infop(args ...any) {
 	s := printq("Info", args...)
 	log.Output(2, s)
 	if justprintoutfn != nil {
@@ -271,7 +326,7 @@ func Infop(args ...interface{}) {
 	}
 	return
 }
-func Warnp(args ...interface{}) {
+func Warnp(args ...any) {
 	s := printq("Warn", args...)
 	log.Output(2, s)
 	if justprintoutfn != nil {
@@ -284,7 +339,7 @@ func Warnp(args ...interface{}) {
 	}
 	return
 }
-func Debugp(args ...interface{}) {
+func Debugp(args ...any) {
 	s := printq("Debug", args...)
 	log.Output(2, s)
 	if justprintoutfn != nil {
@@ -299,7 +354,7 @@ func Debugp(args ...interface{}) {
 }
 
 // BUG: panic: reflect: call of reflect.Value.IsNil on uint64 Value
-func NilPrint(v interface{}, args ...interface{}) interface{} {
+func NilPrint(v interface{}, args ...any) any {
 	if v == nil {
 		s := printq("CondNil", args...)
 		log.Output(2, s)
@@ -314,13 +369,14 @@ func NilPrint(v interface{}, args ...interface{}) interface{} {
 	return v
 }
 
-func NilFatal(v interface{}, args ...interface{}) {
+func NilFatal(v any, args ...any) {
 	if v == nil {
 		log.Fatalln(printq("CondNil", args...))
 	}
 }
 
-func ZeroPrint(v interface{}, args ...interface{}) interface{} {
+// supported: number,string,pointer
+func ZeroPrint(v any, args ...any) any {
 	if reflect.Zero(reflect.TypeOf(v)).Interface() == v {
 		s := printq("CondZero", args...)
 		log.Output(2, s)
@@ -335,13 +391,17 @@ func ZeroPrint(v interface{}, args ...interface{}) interface{} {
 	return v
 }
 
-// NOT mean: error != nil or bool == false or int == 0 or pointer == nil or other what?
-func NotPrint(v interface{}, args ...interface{}) interface{} {
+// NOT mean: error != nil or bool == false or int == 0 or pointer == nil or string == "" other what?
+func NotPrint(v any, args ...any) any {
 	switch rv := v.(type) {
 	case error:
 		ErrPrint(rv, args...)
 	case bool:
 		FalsePrint(rv, args...)
+	case string:
+		if len(rv) == 0 {
+			ZeroPrint(rv, args...)
+		}
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
 		ZeroPrint(rv, args...)
 	default:
@@ -359,7 +419,7 @@ func NotPrint(v interface{}, args ...interface{}) interface{} {
 }
 
 // seperate by commba
-func CommaPrintln(args ...interface{}) {
+func CommaPrintln(args ...any) {
 	nargs := []interface{}{}
 	for _, arg := range args {
 		nargs = append(nargs, arg, ", ")
