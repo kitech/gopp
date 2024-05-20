@@ -81,23 +81,21 @@ func (me *ListMap[KT, VT]) Len() int {
 func (me *ListMap[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
 	hkey := me.hhker.Hash(key)
 
-	kv, exist2 := me.m0[hkey]
-	exist = exist2
+	kv, exist := me.m0[hkey]
 	if exist {
 		kv.Val = val
-		idx := slices.Index(me.a0, hkey)         // olog(n)
-		me.a0 = slices.Delete(me.a0, idx, idx+1) // olog(n)
-		_ = idx
+		// 25530 ns/op
+		// 应该是slice index 效率差
+		// idx := slices.Index(me.a0, hkey)         // olog(n)
+		// me.a0 = slices.Delete(me.a0, idx, idx+1) // olog(n)
+		// _ = idx
 	} else {
 		kv = PairNew(key, val)
+		me.m0[hkey] = kv
+		me.a0 = append(me.a0, hkey)
 	}
 
-	// 25530 ns/op
-	// 应该是slice index 效率差
-	me.m0[hkey] = kv
-	me.a0 = append(me.a0, hkey)
 	ok = true
-
 	if me.reversemap {
 		hval := me.hhver.Hash(val)
 		me.mr[hval] = kv
@@ -106,7 +104,7 @@ func (me *ListMap[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
 	return
 }
 
-func (me *ListMap[KT, VT]) Put(key KT, val VT) {
+func (me *ListMap[KT, VT]) Put(key KT, val VT) (ok bool) {
 	me.mu.Lock()
 	exist, ok := me.putnolock(key, val)
 	_, _ = exist, ok
