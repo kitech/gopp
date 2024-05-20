@@ -257,22 +257,28 @@ func (me *ListMap[KT, VT]) DelIndex(idx int) (rv VT, exist bool) {
 
 	return
 }
-func (me *ListMap[KT, VT]) _DelIndexN(idx int, n int) (rv *ListMap[KT, VT]) {
+func (me *ListMap[KT, VT]) DelIndexN(idx int, n int) (rv *ListMap[KT, VT]) {
 	Assert(idx >= 0, "idx must >= 0")
 	Assert(n >= 0, "n must >= 0")
 	rv = ListMapNew[KT, VT]()
 
+	var elems = make([]*Element[KT, VT], n, n)
 	me.mu.Lock()
 
 	eidx := idx + n
 	eidx = IfElse2(eidx > me.m0.Len()-1, me.m0.Len()-1, eidx)
 	var i = me.m0.Len() - 1
+	var j = 0
 	for el := me.m0.Back(); el != nil; el = el.Prev() {
 		if i >= idx && i <= eidx {
-			rv.putnolock(el.Key, el.Value)
-			me.delnolock(el.Key)
+			elems[j] = el
 		}
 		i++
+		j++
+	}
+	for _, el := range elems {
+		rv.putnolock(el.Key, el.Value)
+		me.delnolock(el.Key)
 	}
 
 	me.mu.Unlock()
@@ -283,8 +289,8 @@ func (me *ListMap[KT, VT]) _DelIndexN(idx int, n int) (rv *ListMap[KT, VT]) {
 
 	return
 }
-func (me *ListMap[KT, VT]) _DelIndexN2(idx int, n int) {
-	me._DelIndexN(idx, n)
+func (me *ListMap[KT, VT]) DelIndexN2(idx int, n int) {
+	me.DelIndexN(idx, n)
 	return
 }
 
@@ -578,14 +584,18 @@ func (me *ListMap[KT, VT]) DelFirst() (ok bool) {
 	me.mu.Unlock()
 	return
 }
-func (me *ListMap[KT, VT]) DelFirstN(n int) (ok bool) {
+func (me *ListMap[KT, VT]) DelFirstN(n int) (rvlm *ListMap[KT, VT]) {
+	rvlm = ListMapNew[KT, VT]()
 	var elems = make([]*Element[KT, VT], n, n)
 	me.mu.Lock()
 	for i, el := 0, me.m0.Front(); i < n && el != nil; i, el = i+1, el.Next() {
 		elems = append(elems, el)
 	}
+
 	for _, el := range elems {
-		ok = me.delnolock(el.Key)
+		me.delnolock(el.Key)
+
+		rvlm.putnolock(el.Key, el.Value)
 	}
 	me.mu.Unlock()
 	return
@@ -600,14 +610,17 @@ func (me *ListMap[KT, VT]) DelLast() (ok bool) {
 	me.mu.Unlock()
 	return
 }
-func (me *ListMap[KT, VT]) DelLastN(n int) (ok bool) {
+func (me *ListMap[KT, VT]) DelLastN(n int) (rvlm *ListMap[KT, VT]) {
+	rvlm = ListMapNew[KT, VT]()
 	var elems = make([]*Element[KT, VT], n, n)
 	me.mu.Lock()
 	for i, el := 0, me.m0.Back(); i < n && el != nil; i, el = i+1, el.Prev() {
 		elems = append(elems, el)
 	}
 	for _, el := range elems {
-		ok = me.delnolock(el.Key)
+		me.delnolock(el.Key)
+
+		rvlm.putnolock(el.Key, el.Value)
 	}
 	me.mu.Unlock()
 	return
