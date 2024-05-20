@@ -17,6 +17,7 @@ require (
 
 require (
 	github.com/dolthub/maphash v0.1.0 // indirect
+	github.com/elliotchance/orderedmap/v2 v2.2.0 // indirect
 	github.com/petermattis/goid v0.0.0-20180202154549-b0b1615b78e5 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 )

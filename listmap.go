@@ -7,6 +7,8 @@ import (
 	"sync"
 
 	"github.com/dolthub/maphash"
+
+	_ "github.com/elliotchance/orderedmap/v2"
 )
 
 // hash 任意类型，来自go内部实现
@@ -86,10 +88,13 @@ func (me *ListMap[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
 		kv.Val = val
 		idx := slices.Index(me.a0, hkey)         // olog(n)
 		me.a0 = slices.Delete(me.a0, idx, idx+1) // olog(n)
+		_ = idx
 	} else {
 		kv = PairNew(key, val)
 	}
 
+	// 25530 ns/op
+	// 应该是slice index 效率差
 	me.m0[hkey] = kv
 	me.a0 = append(me.a0, hkey)
 	ok = true
@@ -101,6 +106,7 @@ func (me *ListMap[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
 
 	return
 }
+
 func (me *ListMap[KT, VT]) Put(key KT, val VT) {
 	me.mu.Lock()
 	exist, ok := me.putnolock(key, val)
