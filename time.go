@@ -2,6 +2,7 @@ package gopp
 
 import (
 	"fmt"
+	mrand "math/rand"
 	"strconv"
 	"strings"
 	"time"
@@ -111,3 +112,20 @@ func TimeFromUnixMSStr(tsms string) (time.Time, error) {
 func SleepSec(sec int) { time.Sleep(time.Duration(sec) * time.Second) }
 func SleepMs(msec int) { time.Sleep(time.Duration(msec) * time.Millisecond) }
 func SleepUs(usec int) { time.Sleep(time.Duration(usec) * time.Microsecond) }
+
+func DurandMs(basems int, rdms int) time.Duration {
+	var rdval = 0
+	if rdms != 0 {
+		rdval = mrand.Int() % rdms
+		rdval = Abs(rdval)
+	}
+	return time.Duration(basems+rdval) * time.Millisecond
+}
+func DurandSec(basesec int, rdsec int) time.Duration {
+	var rdval = 0
+	if rdsec != 0 {
+		rdval = mrand.Int() % rdsec
+		rdval = Abs(rdval)
+	}
+	return time.Duration(basesec+rdval) * time.Second
+}

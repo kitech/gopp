@@ -23,6 +23,7 @@ type ListMap[KT comparable, VT comparable] struct {
 	// mr2 map[VT][]KT // TODO, reverse map conflict
 
 	reversemap bool
+	lockless   bool // todo
 
 	hhker maphash.Hasher[KT] // todo
 	hhver maphash.Hasher[VT]
@@ -72,18 +73,26 @@ func ListMapFrom[KT comparable, VT comparable](m map[KT]VT) *ListMap[KT, VT] {
 func (me *ListMap[KT, VT]) Count() int {
 	return len(me.a0)
 }
+func (me *ListMap[KT, VT]) Len() int {
+	return len(me.a0)
+}
 
-func (me *ListMap[KT, VT]) putnolock(key KT, val VT) {
+func (me *ListMap[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
 	hkey := me.hhker.Hash(key)
 
-	_, exist := me.m0[hkey]
+	kv, exist2 := me.m0[hkey]
+	exist = exist2
 	if exist {
-		idx := slices.Index(me.a0, hkey)
-		me.a0 = slices.Delete(me.a0, idx, idx+1)
+		kv.Val = val
+		idx := slices.Index(me.a0, hkey)         // olog(n)
+		me.a0 = slices.Delete(me.a0, idx, idx+1) // olog(n)
+	} else {
+		kv = PairNew(key, val)
 	}
-	kv := PairNew(key, val)
+
 	me.m0[hkey] = kv
 	me.a0 = append(me.a0, hkey)
+	ok = true
 
 	if me.reversemap {
 		hval := me.hhver.Hash(val)
@@ -94,7 +103,8 @@ func (me *ListMap[KT, VT]) putnolock(key KT, val VT) {
 }
 func (me *ListMap[KT, VT]) Put(key KT, val VT) {
 	me.mu.Lock()
-	me.putnolock(key, val)
+	exist, ok := me.putnolock(key, val)
+	_, _ = exist, ok
 	me.mu.Unlock()
 
 	return
@@ -140,23 +150,19 @@ func (me *ListMap[KT, VT]) PutMany2(kvs ...any) {
 	return
 }
 
+func (me *ListMap[KT, VT]) Add(key KT, val VT) bool {
+	return me.PutTry(key, val)
+}
 func (me *ListMap[KT, VT]) PutTry(key KT, val VT) bool {
 	hkey := me.hhker.Hash(key)
 
 	var putok bool
 	me.mu.Lock()
 	_, exist := me.m0[hkey]
-	if !exist {
-		kv := PairNew(key, val)
-		me.m0[hkey] = kv
-		me.a0 = append(me.a0, hkey)
-
-		if me.reversemap {
-			hval := me.hhver.Hash(val)
-			me.mr[hval] = kv
-		}
-	}
 	putok = !exist
+	if !exist {
+		_, putok = me.putnolock(key, val)
+	}
 	me.mu.Unlock()
 
 	return putok
@@ -287,6 +293,33 @@ func (me *ListMap[KT, VT]) DelIndexN2(idx int, n int) {
 	me.mu.Unlock()
 
 	return
+}
+
+// return false if exist
+func (me *ListMap[KT, VT]) InsertAt(idx int, key KT, val VT) (ok bool) {
+	hkey := me.hhker.Hash(key)
+	me.mu.Lock()
+	_, exist := me.m0[hkey]
+	ok = !exist
+	if !exist {
+		kv := PairNew(key, val)
+		me.a0 = slices.Insert(me.a0, idx, hkey)
+		me.m0[hkey] = kv
+
+		if me.reversemap {
+			hval := me.hhver.Hash(val)
+			me.mr[hval] = kv
+		}
+	}
+	me.mu.Unlock()
+	return
+}
+
+// there this no append because Put/Add is append already
+// return false if exist
+// \see InsertAt
+func (me *ListMap[KT, VT]) Prepend(idx int, key KT, val VT) (ok bool) {
+	return me.InsertAt(0, key, val)
 }
 
 func (me *ListMap[KT, VT]) firstnolock() (key KT, val VT, exist bool) {

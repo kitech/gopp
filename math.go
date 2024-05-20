@@ -6,6 +6,13 @@ import (
 	"reflect"
 )
 
+func Abs[T int | int64 | int32 | float32 | float64](vx T) T {
+	if vx < 0 {
+		return -vx
+	}
+	return vx
+}
+
 func AbsNum(x interface{}) interface{} {
 	f1 := func(x int64) int64 {
 		if x < 0 {

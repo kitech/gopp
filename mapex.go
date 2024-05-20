@@ -55,6 +55,21 @@ func MapValues[KT comparable, VT any](m map[KT]VT) []VT {
 	return outs
 }
 
+func MapByval[KT comparable, VT comparable](m map[KT]VT, val VT) (key KT, exist bool) {
+	for k, v := range m {
+		exist = v == val
+		if exist {
+			key = k
+		}
+	}
+	return
+}
+func MapByvalMust[KT comparable, VT comparable](m map[KT]VT, val VT) (key KT) {
+	key, ok := MapByval(m, val)
+	_ = ok
+	return
+}
+
 // 这个可以用 Mapdo 实现，不过这个是带类型的，好点
 func MapFlat[KT comparable, VT any](m map[KT]VT) []any {
 	mt := reflect.ValueOf(m)
