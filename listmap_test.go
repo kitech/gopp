@@ -144,7 +144,7 @@ func BenchmarkListMap12(b *testing.B) {
 }
 func BenchmarkListMap11(b *testing.B) {
 	// 这个速度可以，100ns/op
-	lm := NewOrderedMap[int, int]()
+	lm := orderedMapNew[int, int]()
 	{
 		var mu sync.RWMutex
 		for i := 0; i < b.N; i++ {

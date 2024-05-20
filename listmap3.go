@@ -19,8 +19,8 @@ const ListMap_SHARD_COUNT = 32
 // 按照随机index删除速度就慢了
 type ListMap[KT comparable, VT comparable] struct {
 	mu sync.RWMutex
-	m0 *OrderedMap[KT, VT]
-	mr map[uint64]*Element[KT, VT] // hash(val)=>
+	m0 *orderedMap[KT, VT]
+	mr map[uint64]*odmapElement[KT, VT] // hash(val)=>
 
 	reversemap bool
 	lockless   bool // todo
@@ -52,8 +52,8 @@ func ListMapNewr[KT comparable, VT comparable]() *ListMap[KT, VT] {
 
 func ListMapNew[KT comparable, VT comparable]() *ListMap[KT, VT] {
 	me := &ListMap[KT, VT]{}
-	me.m0 = NewOrderedMap[KT, VT]()
-	me.mr = map[uint64]*Element[KT, VT]{}
+	me.m0 = orderedMapNew[KT, VT]()
+	me.mr = map[uint64]*odmapElement[KT, VT]{}
 
 	// me.hhker = maphash.Hasher[KT](maphash.NewHasher[KT]())
 	me.hhver = maphash.Hasher[VT](maphash.NewHasher[VT]())
@@ -211,7 +211,7 @@ func (me *ListMap[KT, VT]) Each(fx func(idx int, key KT, val VT) bool) {
 
 /////// array method
 
-func (me *ListMap[KT, VT]) elematnolock(idx int) (elem *Element[KT, VT]) {
+func (me *ListMap[KT, VT]) elematnolock(idx int) (elem *odmapElement[KT, VT]) {
 	var i = 0
 	for el := me.m0.Front(); el != nil; el = el.Next() {
 		if i == idx {
@@ -262,7 +262,7 @@ func (me *ListMap[KT, VT]) DelIndexN(idx int, n int) (rv *ListMap[KT, VT]) {
 	Assert(n >= 0, "n must >= 0")
 	rv = ListMapNew[KT, VT]()
 
-	var elems = make([]*Element[KT, VT], n, n)
+	var elems = make([]*odmapElement[KT, VT], n, n)
 	me.mu.Lock()
 
 	eidx := idx + n
@@ -586,7 +586,7 @@ func (me *ListMap[KT, VT]) DelFirst() (ok bool) {
 }
 func (me *ListMap[KT, VT]) DelFirstN(n int) (rvlm *ListMap[KT, VT]) {
 	rvlm = ListMapNew[KT, VT]()
-	var elems = make([]*Element[KT, VT], n, n)
+	var elems = make([]*odmapElement[KT, VT], n, n)
 	me.mu.Lock()
 	for i, el := 0, me.m0.Front(); i < n && el != nil; i, el = i+1, el.Next() {
 		elems = append(elems, el)
@@ -612,7 +612,7 @@ func (me *ListMap[KT, VT]) DelLast() (ok bool) {
 }
 func (me *ListMap[KT, VT]) DelLastN(n int) (rvlm *ListMap[KT, VT]) {
 	rvlm = ListMapNew[KT, VT]()
-	var elems = make([]*Element[KT, VT], n, n)
+	var elems = make([]*odmapElement[KT, VT], n, n)
 	me.mu.Lock()
 	for i, el := 0, me.m0.Back(); i < n && el != nil; i, el = i+1, el.Prev() {
 		elems = append(elems, el)
