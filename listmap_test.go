@@ -5,8 +5,6 @@ import (
 	"slices"
 	"sync"
 	"testing"
-
-	"github.com/elliotchance/orderedmap/v2"
 )
 
 func TestListMap0(t *testing.T) {
@@ -122,7 +120,7 @@ func TestListMap0(t *testing.T) {
 
 func TestListMap02(t *testing.T) {
 	{
-		lm := ListMap2NewInt[string]()
+		lm := ListMap3NewInt[string]()
 		{
 			_, ok := lm.First()
 			if ok {
@@ -248,7 +246,7 @@ func BenchmarkListMap1(b *testing.B) {
 	}
 }
 func BenchmarkListMap12(b *testing.B) {
-	lm := ListMap2New[int, int]()
+	lm := ListMap3New[int, int]()
 	{
 		for i := 0; i < b.N; i++ {
 			lm.Put(mrand.Int()%123456, mrand.Int())
@@ -257,7 +255,7 @@ func BenchmarkListMap12(b *testing.B) {
 }
 func BenchmarkListMap11(b *testing.B) {
 	// 这个速度可以，100ns/op
-	lm := orderedmap.NewOrderedMap[int, int]()
+	lm := NewOrderedMap[int, int]()
 	{
 		var mu sync.RWMutex
 		for i := 0; i < b.N; i++ {
@@ -276,4 +274,10 @@ func BenchmarkListMap2(b *testing.B) {
 			v = append(v, mrand.Int()%123456)
 		}
 	}
+}
+
+func TestListMap3(t *testing.T) {
+	lm := ListMap3New[int, int]()
+	lm.Put(555, 666)
+	lm.Prepend(111, 222)
 }
