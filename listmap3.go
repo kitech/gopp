@@ -5,8 +5,13 @@ import (
 	mrand "math/rand"
 	"sync"
 	_ "unsafe"
+
+	"github.com/dolthub/maphash"
 	// _ "github.com/elliotchance/orderedmap/v2"
 )
+
+// hash 任意类型，来自go内部实现
+// https://github.com/dolthub/maphash
 
 const ListMap3_SHARD_COUNT = 32
 
@@ -14,147 +19,14 @@ const ListMap3_SHARD_COUNT = 32
 type ListMap3[KT comparable, VT comparable] struct {
 	mu sync.RWMutex
 	m0 *OrderedMap[KT, VT]
-	mr map[VT]KT
+	mr map[uint64]*Element[KT, VT] // hash(val)=>
 
 	reversemap bool
 	lockless   bool // todo
+
+	// hhker maphash.Hasher[KT] // todo
+	hhver maphash.Hasher[VT]
 }
-
-// /////////////
-type OrderedMap[K comparable, V any] struct {
-	kv map[K]*Element[K, V]
-	ll list[K, V]
-}
-
-func NewOrderedMap[K comparable, V any]() *OrderedMap[K, V] {
-	return &OrderedMap[K, V]{
-		kv: make(map[K]*Element[K, V]),
-	}
-}
-
-// Get returns the value for a key. If the key does not exist, the second return
-// parameter will be false and the value will be nil.
-func (m *OrderedMap[K, V]) Get(key K) (value V, ok bool) {
-	v, ok := m.kv[key]
-	if ok {
-		value = v.Value
-	}
-
-	return
-}
-
-// Set will set (or replace) a value for a key. If the key was new, then true
-// will be returned. The returned value will be false if the value was replaced
-// (even if the value was the same).
-func (m *OrderedMap[K, V]) Set(key K, value V) bool {
-	_, alreadyExist := m.kv[key]
-	if alreadyExist {
-		m.kv[key].Value = value
-		return false
-	}
-
-	element := m.ll.PushBack(key, value)
-	m.kv[key] = element
-	return true
-}
-
-// GetOrDefault returns the value for a key. If the key does not exist, returns
-// the default value instead.
-func (m *OrderedMap[K, V]) GetOrDefault(key K, defaultValue V) V {
-	if value, ok := m.kv[key]; ok {
-		return value.Value
-	}
-
-	return defaultValue
-}
-
-// GetElement returns the element for a key. If the key does not exist, the
-// pointer will be nil.
-func (m *OrderedMap[K, V]) GetElement(key K) *Element[K, V] {
-	element, ok := m.kv[key]
-	if ok {
-		return element
-	}
-
-	return nil
-}
-
-// Len returns the number of elements in the map.
-func (m *OrderedMap[K, V]) Len() int {
-	return len(m.kv)
-}
-
-// Keys returns all of the keys in the order they were inserted. If a key was
-// replaced it will retain the same position. To ensure most recently set keys
-// are always at the end you must always Delete before Set.
-func (m *OrderedMap[K, V]) Keys() (keys []K) {
-	keys = make([]K, 0, m.Len())
-	for el := m.Front(); el != nil; el = el.Next() {
-		keys = append(keys, el.Key)
-	}
-	return keys
-}
-
-// Delete will remove a key from the map. It will return true if the key was
-// removed (the key did exist).
-func (m *OrderedMap[K, V]) Delete(key K) (didDelete bool) {
-	element, ok := m.kv[key]
-	if ok {
-		m.ll.Remove(element)
-		delete(m.kv, key)
-	}
-
-	return ok
-}
-
-// Front will return the element that is the first (oldest Set element). If
-// there are no elements this will return nil.
-func (m *OrderedMap[K, V]) Front() *Element[K, V] {
-	return m.ll.Front()
-}
-
-// Back will return the element that is the last (most recent Set element). If
-// there are no elements this will return nil.
-func (m *OrderedMap[K, V]) Back() *Element[K, V] {
-	return m.ll.Back()
-}
-
-// Copy returns a new OrderedMap with the same elements.
-// Using Copy while there are concurrent writes may mangle the result.
-func (m *OrderedMap[K, V]) Copy() *OrderedMap[K, V] {
-	m2 := NewOrderedMap[K, V]()
-	for el := m.Front(); el != nil; el = el.Next() {
-		m2.Set(el.Key, el.Value)
-	}
-	return m2
-}
-
-// ///
-func (m *OrderedMap[K, V]) Prepend(key K, value V) bool {
-	_, alreadyExist := m.kv[key]
-	if alreadyExist {
-		m.kv[key].Value = value
-		return false
-	}
-
-	element := m.ll.PushFront(key, value)
-	m.kv[key] = element
-	return true
-}
-
-////////////////////
-
-// type odmapst[K comparable, V any] struct {
-// 	kv map[K]*odmap.Element[K, V]
-// 	ll odlistst[K, V]
-// }
-
-// type odlistst[K comparable, V any] struct {
-// 	root odmap.Element[K, V] // list head and tail
-// }
-
-// must refer to declared function or variable
-// //go:linkname mylist odmap.list
 
 // type Stringer interface {
 // 	fmt.Stringer
@@ -180,15 +52,17 @@ func ListMap3Newr[KT comparable, VT comparable]() *ListMap3[KT, VT] {
 func ListMap3New[KT comparable, VT comparable]() *ListMap3[KT, VT] {
 	me := &ListMap3[KT, VT]{}
 	me.m0 = NewOrderedMap[KT, VT]()
-	me.mr = map[VT]KT{}
+	me.mr = map[uint64]*Element[KT, VT]{}
 
+	// me.hhker = maphash.Hasher[KT](maphash.NewHasher[KT]())
+	me.hhver = maphash.Hasher[VT](maphash.NewHasher[VT]())
 	return me
 }
 
 // /////////
 func ListMap3From[KT comparable, VT comparable](m map[KT]VT) *ListMap3[KT, VT] {
 	me := ListMap3New[KT, VT]()
-	me.PutMany(m)
+	me.putmanynolock(m)
 	return me
 }
 
@@ -203,11 +77,13 @@ func (me *ListMap3[KT, VT]) Len() int {
 
 func (me *ListMap3[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
 
-	_, exist = me.m0.Get(key)
+	elem := me.m0.GetElement(key)
+	exist = elem != nil
 	ok = me.m0.Set(key, val)
 
-	if me.reversemap {
-		me.mr[val] = key
+	if exist && me.reversemap {
+		hval := me.hhver.Hash(val)
+		me.mr[hval] = elem
 	}
 
 	return
@@ -223,11 +99,15 @@ func (me *ListMap3[KT, VT]) Put(key KT, val VT) {
 }
 func (me *ListMap3[KT, VT]) PutMany(kvs map[KT]VT) {
 	me.mu.Lock()
+	me.putmanynolock(kvs)
+	me.mu.Unlock()
+
+	return
+}
+func (me *ListMap3[KT, VT]) putmanynolock(kvs map[KT]VT) {
 	for k, v := range kvs {
 		me.putnolock(k, v)
 	}
-	me.mu.Unlock()
-
 	return
 }
 func (me *ListMap3[KT, VT]) PutMany3(keys []KT, vals []VT) {
@@ -587,10 +467,7 @@ func (me *ListMap3[KT, VT]) Get(key KT) (rv VT, exist bool) {
 func (me *ListMap3[KT, VT]) GetOr(key KT, dftval VT) (rv VT) {
 
 	me.mu.RLock()
-	rv, exist := me.m0.Get(key)
-	if !exist {
-		rv = dftval
-	}
+	rv = me.m0.GetOrDefault(key, dftval)
 	me.mu.RUnlock()
 
 	return
@@ -679,8 +556,12 @@ func (me *ListMap3[KT, VT]) DelMany(keys ...KT) (rv int) {
 
 // ///// reverse operation
 func (me *ListMap3[KT, VT]) Getr(val VT) (key KT, exist bool) {
+	hval := me.hhver.Hash(val)
 	me.mu.RLock()
-	key, exist = me.mr[val]
+	elem, exist := me.mr[hval]
+	if exist {
+		key = elem.Key
+	}
 	me.mu.RUnlock()
 	return
 }
@@ -688,28 +569,29 @@ func (me *ListMap3[KT, VT]) GetrMany(vals ...VT) (keys []KT) {
 
 	me.mu.RLock()
 	for _, val := range vals {
-		key, ok := me.mr[val]
+		hval := me.hhver.Hash(val)
+		elem, ok := me.mr[hval]
 		if ok {
-			keys = append(keys, key)
+			keys = append(keys, elem.Key)
 		}
 	}
 	me.mu.RUnlock()
 	return
 }
 func (me *ListMap3[KT, VT]) Hasr(val VT) (exist bool) {
-
+	hval := me.hhver.Hash(val)
 	me.mu.RLock()
-	_, exist = me.mr[val]
+	_, exist = me.mr[hval]
 	me.mu.RUnlock()
 	return
 }
 func (me *ListMap3[KT, VT]) Delr(val VT) (exist bool) {
-
+	hval := me.hhver.Hash(val)
 	me.mu.Lock()
-	key, ok := me.mr[val]
+	elem, ok := me.mr[hval]
 	exist = ok
 	if ok {
-		me.delnolock(key)
+		me.delnolock(elem.Key)
 	}
 	me.mu.Unlock()
 	return
@@ -718,9 +600,10 @@ func (me *ListMap3[KT, VT]) DelrMany(vals ...VT) (rv int) {
 
 	me.mu.Lock()
 	for _, val := range vals {
-		key, ok := me.mr[val]
+		hval := me.hhver.Hash(val)
+		elem, ok := me.mr[hval]
 		if ok {
-			rv += Toint(me.delnolock(key))
+			rv += Toint(me.delnolock(elem.Key))
 		}
 	}
 	me.mu.Unlock()

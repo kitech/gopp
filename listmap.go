@@ -7,8 +7,7 @@ import (
 	"sync"
 
 	"github.com/dolthub/maphash"
-
-	_ "github.com/elliotchance/orderedmap/v2"
+	// _ "github.com/elliotchance/orderedmap/v2"
 )
 
 // hash 任意类型，来自go内部实现
