@@ -12,12 +12,12 @@ import (
 // hash 任意类型，来自go内部实现
 // https://github.com/dolthub/maphash
 
-const ListMap3_SHARD_COUNT = 32
+const ListMap_SHARD_COUNT = 32
 
 // ordered map, thread safe, reversemap
 // 实现从头部删除，或者尾部删除
 // 按照随机index删除速度就慢了
-type ListMap3[KT comparable, VT comparable] struct {
+type ListMap[KT comparable, VT comparable] struct {
 	mu sync.RWMutex
 	m0 *OrderedMap[KT, VT]
 	mr map[uint64]*Element[KT, VT] // hash(val)=>
@@ -34,24 +34,24 @@ type ListMap3[KT comparable, VT comparable] struct {
 // 	comparable
 // }
 
-func ListMap3NewAny[VT comparable]() *ListMap3[any, VT] {
-	return ListMap3New[any, VT]()
+func ListMapNewAny[VT comparable]() *ListMap[any, VT] {
+	return ListMapNew[any, VT]()
 }
-func ListMap3NewInt[VT comparable]() *ListMap3[int, VT] {
-	return ListMap3New[int, VT]()
+func ListMapNewInt[VT comparable]() *ListMap[int, VT] {
+	return ListMapNew[int, VT]()
 }
-func ListMap3NewStr[VT comparable]() *ListMap3[string, VT] {
-	return ListMap3New[string, VT]()
+func ListMapNewStr[VT comparable]() *ListMap[string, VT] {
+	return ListMapNew[string, VT]()
 }
-func ListMap3Newr[KT comparable, VT comparable]() *ListMap3[KT, VT] {
-	me := ListMap3New[KT, VT]()
+func ListMapNewr[KT comparable, VT comparable]() *ListMap[KT, VT] {
+	me := ListMapNew[KT, VT]()
 	me.reversemap = true
 
 	return me
 }
 
-func ListMap3New[KT comparable, VT comparable]() *ListMap3[KT, VT] {
-	me := &ListMap3[KT, VT]{}
+func ListMapNew[KT comparable, VT comparable]() *ListMap[KT, VT] {
+	me := &ListMap[KT, VT]{}
 	me.m0 = NewOrderedMap[KT, VT]()
 	me.mr = map[uint64]*Element[KT, VT]{}
 
@@ -61,28 +61,30 @@ func ListMap3New[KT comparable, VT comparable]() *ListMap3[KT, VT] {
 }
 
 // /////////
-func ListMap3From[KT comparable, VT comparable](m map[KT]VT) *ListMap3[KT, VT] {
-	me := ListMap3New[KT, VT]()
+func ListMapFrom[KT comparable, VT comparable](m map[KT]VT) *ListMap[KT, VT] {
+	me := ListMapNew[KT, VT]()
 	me.putmanynolock(m)
 	return me
 }
 
 /////////
 
-func (me *ListMap3[KT, VT]) Count() int {
+func (me *ListMap[KT, VT]) Count() int {
 	return me.m0.Len()
 }
-func (me *ListMap3[KT, VT]) Len() int {
+func (me *ListMap[KT, VT]) Len() int {
 	return me.m0.Len()
 }
 
-func (me *ListMap3[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
+func (me *ListMap[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
 
 	elem := me.m0.GetElement(key)
 	exist = elem != nil
 	ok = me.m0.Set(key, val)
 
-	if exist && me.reversemap {
+	if me.reversemap {
+		elem := me.m0.GetElement(key)
+
 		hval := me.hhver.Hash(val)
 		me.mr[hval] = elem
 	}
@@ -90,7 +92,7 @@ func (me *ListMap3[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
 	return
 }
 
-func (me *ListMap3[KT, VT]) Put(key KT, val VT) {
+func (me *ListMap[KT, VT]) Put(key KT, val VT) {
 	me.mu.Lock()
 	exist, ok := me.putnolock(key, val)
 	_, _ = exist, ok
@@ -98,20 +100,20 @@ func (me *ListMap3[KT, VT]) Put(key KT, val VT) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) PutMany(kvs map[KT]VT) {
+func (me *ListMap[KT, VT]) PutMany(kvs map[KT]VT) {
 	me.mu.Lock()
 	me.putmanynolock(kvs)
 	me.mu.Unlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) putmanynolock(kvs map[KT]VT) {
+func (me *ListMap[KT, VT]) putmanynolock(kvs map[KT]VT) {
 	for k, v := range kvs {
 		me.putnolock(k, v)
 	}
 	return
 }
-func (me *ListMap3[KT, VT]) PutMany3(keys []KT, vals []VT) {
+func (me *ListMap[KT, VT]) PutMany3(keys []KT, vals []VT) {
 	if len(keys) != len(vals) {
 		log.Println("keys and vals len not same", len(keys), len(vals))
 		return
@@ -127,7 +129,7 @@ func (me *ListMap3[KT, VT]) PutMany3(keys []KT, vals []VT) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) PutMany2(kvs ...any) {
+func (me *ListMap[KT, VT]) PutMany2(kvs ...any) {
 	if len(kvs)%2 != 0 {
 		log.Println("kvs len not 2x", len(kvs))
 	}
@@ -143,10 +145,10 @@ func (me *ListMap3[KT, VT]) PutMany2(kvs ...any) {
 	return
 }
 
-func (me *ListMap3[KT, VT]) Add(key KT, val VT) bool {
+func (me *ListMap[KT, VT]) Add(key KT, val VT) bool {
 	return me.PutTry(key, val)
 }
-func (me *ListMap3[KT, VT]) PutTry(key KT, val VT) bool {
+func (me *ListMap[KT, VT]) PutTry(key KT, val VT) bool {
 	var putok = false
 	me.mu.Lock()
 	_, ok := me.m0.Get(key)
@@ -160,7 +162,7 @@ func (me *ListMap3[KT, VT]) PutTry(key KT, val VT) bool {
 }
 
 // ///// range/iterate
-func (me *ListMap3[KT, VT]) snapshotOrder() (keys []KT, vals []VT) {
+func (me *ListMap[KT, VT]) snapshotOrder() (keys []KT, vals []VT) {
 	me.mu.RLock()
 	if me.m0.Len() > 0 {
 		keys = make([]KT, len(keys), len(keys))
@@ -176,7 +178,7 @@ func (me *ListMap3[KT, VT]) snapshotOrder() (keys []KT, vals []VT) {
 	return
 }
 
-func (me *ListMap3[KT, VT]) EachOrder(fx func(idx int, key KT, val VT) bool) {
+func (me *ListMap[KT, VT]) EachOrder(fx func(idx int, key KT, val VT) bool) {
 	keys, vals := me.snapshotOrder()
 	for i := 0; i < len(keys); i++ {
 		ok := fx(i, keys[i], vals[i])
@@ -185,7 +187,7 @@ func (me *ListMap3[KT, VT]) EachOrder(fx func(idx int, key KT, val VT) bool) {
 		}
 	}
 }
-func (me *ListMap3[KT, VT]) snapshot() (kvs map[KT]VT) {
+func (me *ListMap[KT, VT]) snapshot() (kvs map[KT]VT) {
 	me.mu.RLock()
 	if me.m0.Len() > 0 {
 		kvs = make(map[KT]VT, me.m0.Len())
@@ -197,7 +199,7 @@ func (me *ListMap3[KT, VT]) snapshot() (kvs map[KT]VT) {
 	return
 }
 
-func (me *ListMap3[KT, VT]) Each(fx func(idx int, key KT, val VT) bool) {
+func (me *ListMap[KT, VT]) Each(fx func(idx int, key KT, val VT) bool) {
 	kvs := me.snapshot()
 	for k, v := range kvs {
 		ok := fx(0, k, v)
@@ -209,7 +211,7 @@ func (me *ListMap3[KT, VT]) Each(fx func(idx int, key KT, val VT) bool) {
 
 /////// array method
 
-func (me *ListMap3[KT, VT]) elematnolock(idx int) (elem *Element[KT, VT]) {
+func (me *ListMap[KT, VT]) elematnolock(idx int) (elem *Element[KT, VT]) {
 	var i = 0
 	for el := me.m0.Front(); el != nil; el = el.Next() {
 		if i == idx {
@@ -221,7 +223,7 @@ func (me *ListMap3[KT, VT]) elematnolock(idx int) (elem *Element[KT, VT]) {
 }
 
 // O(log(n)), 少用
-func (me *ListMap3[KT, VT]) GetIndex(idx int) (rk KT, rv VT, exist bool) {
+func (me *ListMap[KT, VT]) GetIndex(idx int) (rk KT, rv VT, exist bool) {
 	if idx < 0 || idx >= me.m0.Len() {
 		return
 	}
@@ -240,7 +242,7 @@ func (me *ListMap3[KT, VT]) GetIndex(idx int) (rk KT, rv VT, exist bool) {
 }
 
 // O(log(n)), 少用
-func (me *ListMap3[KT, VT]) DelIndex(idx int) (rv VT, exist bool) {
+func (me *ListMap[KT, VT]) DelIndex(idx int) (rv VT, exist bool) {
 	// Assert(idx >= 0, "idx must >= 0")
 	if idx < 0 || idx >= me.m0.Len() {
 		return
@@ -255,10 +257,10 @@ func (me *ListMap3[KT, VT]) DelIndex(idx int) (rv VT, exist bool) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) _DelIndexN(idx int, n int) (rv *ListMap3[KT, VT]) {
+func (me *ListMap[KT, VT]) _DelIndexN(idx int, n int) (rv *ListMap[KT, VT]) {
 	Assert(idx >= 0, "idx must >= 0")
 	Assert(n >= 0, "n must >= 0")
-	rv = ListMap3New[KT, VT]()
+	rv = ListMapNew[KT, VT]()
 
 	me.mu.Lock()
 
@@ -281,13 +283,13 @@ func (me *ListMap3[KT, VT]) _DelIndexN(idx int, n int) (rv *ListMap3[KT, VT]) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) _DelIndexN2(idx int, n int) {
+func (me *ListMap[KT, VT]) _DelIndexN2(idx int, n int) {
 	me._DelIndexN(idx, n)
 	return
 }
 
 // return false if exist
-func (me *ListMap3[KT, VT]) _InsertAt(idx int, key KT, val VT) (ok bool) {
+func (me *ListMap[KT, VT]) _InsertAt(idx int, key KT, val VT) (ok bool) {
 	panic("not support")
 	// return
 }
@@ -295,7 +297,7 @@ func (me *ListMap3[KT, VT]) _InsertAt(idx int, key KT, val VT) (ok bool) {
 // there this no append because Put/Add is append already
 // return false if exist
 // \see InsertAt
-func (me *ListMap3[KT, VT]) Prepend(key KT, val VT) (ok bool) {
+func (me *ListMap[KT, VT]) Prepend(key KT, val VT) (ok bool) {
 
 	me.mu.Lock()
 	ok = me.m0.Prepend(key, val)
@@ -307,7 +309,7 @@ func (me *ListMap3[KT, VT]) Prepend(key KT, val VT) (ok bool) {
 	return
 }
 
-func (me *ListMap3[KT, VT]) firstnolock() (key KT, val VT, exist bool) {
+func (me *ListMap[KT, VT]) firstnolock() (key KT, val VT, exist bool) {
 	if me.m0.Len() > 0 {
 		exist = true
 		el := me.m0.Front()
@@ -317,49 +319,49 @@ func (me *ListMap3[KT, VT]) firstnolock() (key KT, val VT, exist bool) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) FirstPair() (key KT, val VT, exist bool) {
+func (me *ListMap[KT, VT]) FirstPair() (key KT, val VT, exist bool) {
 	me.mu.RLock()
 	key, val, exist = me.firstnolock()
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) FirstKey() (key KT, exist bool) {
+func (me *ListMap[KT, VT]) FirstKey() (key KT, exist bool) {
 	me.mu.RLock()
 	key, _, exist = me.firstnolock()
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) FirstKeyMust() (key KT) {
+func (me *ListMap[KT, VT]) FirstKeyMust() (key KT) {
 	me.mu.RLock()
 	key, _, _ = me.firstnolock()
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) First() (val VT, exist bool) {
+func (me *ListMap[KT, VT]) First() (val VT, exist bool) {
 	me.mu.RLock()
 	_, val, exist = me.firstnolock()
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) FirstMust() (rv VT) {
+func (me *ListMap[KT, VT]) FirstMust() (rv VT) {
 	me.mu.RLock()
 	_, rv, _ = me.firstnolock()
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) FirstN(n int) (rv *ListMap3[KT, VT]) {
+func (me *ListMap[KT, VT]) FirstN(n int) (rv *ListMap[KT, VT]) {
 	me.mu.RLock()
 
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) FirstKeysN(n int) (rv *ListMap3[KT, VT]) {
+func (me *ListMap[KT, VT]) FirstKeysN(n int) (rv *ListMap[KT, VT]) {
 	me.mu.RLock()
 
 	me.mu.RUnlock()
@@ -367,7 +369,7 @@ func (me *ListMap3[KT, VT]) FirstKeysN(n int) (rv *ListMap3[KT, VT]) {
 	return
 }
 
-func (me *ListMap3[KT, VT]) lastnolock() (key KT, val VT, exist bool) {
+func (me *ListMap[KT, VT]) lastnolock() (key KT, val VT, exist bool) {
 	if me.m0.Len() > 0 {
 		el := me.m0.Back()
 		exist = true
@@ -376,14 +378,14 @@ func (me *ListMap3[KT, VT]) lastnolock() (key KT, val VT, exist bool) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) LastPair() (key KT, val VT, exist bool) {
+func (me *ListMap[KT, VT]) LastPair() (key KT, val VT, exist bool) {
 	me.mu.RLock()
 	key, val, exist = me.lastnolock()
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) LastKey() (key KT, exist bool) {
+func (me *ListMap[KT, VT]) LastKey() (key KT, exist bool) {
 	me.mu.RLock()
 	key, _, exist = me.lastnolock()
 	me.mu.RUnlock()
@@ -392,55 +394,55 @@ func (me *ListMap3[KT, VT]) LastKey() (key KT, exist bool) {
 }
 
 // todo
-func (me *ListMap3[KT, VT]) LastKeysN(n int) (keys []KT) {
+func (me *ListMap[KT, VT]) LastKeysN(n int) (keys []KT) {
 	me.mu.RLock()
 
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) LastKeyMust() (key KT) {
+func (me *ListMap[KT, VT]) LastKeyMust() (key KT) {
 	me.mu.RLock()
 	key, _, _ = me.lastnolock()
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) Last() (rv VT, exist bool) {
+func (me *ListMap[KT, VT]) Last() (rv VT, exist bool) {
 	me.mu.RLock()
 	_, rv, exist = me.lastnolock()
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) LastMust() (rv VT) {
+func (me *ListMap[KT, VT]) LastMust() (rv VT) {
 	me.mu.RLock()
 	_, rv, _ = me.lastnolock()
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) LastN(n int) (rv *ListMap3[KT, VT]) {
+func (me *ListMap[KT, VT]) LastN(n int) (rv *ListMap[KT, VT]) {
 	me.mu.RLock()
 	me.mu.RUnlock()
 
 	return
 }
 
-func (me *ListMap3[KT, VT]) Mid(idx int, n int) (rv *ListMap3[KT, VT]) {
+func (me *ListMap[KT, VT]) Mid(idx int, n int) (rv *ListMap[KT, VT]) {
 	me.mu.RLock()
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) KeysOrder() (keys []KT) {
+func (me *ListMap[KT, VT]) KeysOrder() (keys []KT) {
 	me.mu.RLock()
 	keys = me.m0.Keys()
 	me.mu.RUnlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) ValuesOrder() (vals []VT) {
+func (me *ListMap[KT, VT]) ValuesOrder() (vals []VT) {
 	me.mu.RLock()
 	if me.m0.Len() > 0 {
 		vals = make([]VT, me.m0.Len(), me.m0.Len())
@@ -457,13 +459,13 @@ func (me *ListMap3[KT, VT]) ValuesOrder() (vals []VT) {
 
 ///////  map method
 
-func (me *ListMap3[KT, VT]) Keys() (keys []KT) {
+func (me *ListMap[KT, VT]) Keys() (keys []KT) {
 	return me.KeysOrder()
 }
-func (me *ListMap3[KT, VT]) Values() (vals []VT) {
+func (me *ListMap[KT, VT]) Values() (vals []VT) {
 	return me.ValuesOrder()
 }
-func (me *ListMap3[KT, VT]) Get(key KT) (rv VT, exist bool) {
+func (me *ListMap[KT, VT]) Get(key KT) (rv VT, exist bool) {
 
 	me.mu.RLock()
 	rv, exist = me.m0.Get(key)
@@ -471,7 +473,7 @@ func (me *ListMap3[KT, VT]) Get(key KT) (rv VT, exist bool) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) GetOr(key KT, dftval VT) (rv VT) {
+func (me *ListMap[KT, VT]) GetOr(key KT, dftval VT) (rv VT) {
 
 	me.mu.RLock()
 	rv = me.m0.GetOrDefault(key, dftval)
@@ -479,7 +481,7 @@ func (me *ListMap3[KT, VT]) GetOr(key KT, dftval VT) (rv VT) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) GetMust(key KT) (rv VT) {
+func (me *ListMap[KT, VT]) GetMust(key KT) (rv VT) {
 	me.mu.RLock()
 	rv2, ok := me.m0.Get(key)
 	if ok {
@@ -489,8 +491,8 @@ func (me *ListMap3[KT, VT]) GetMust(key KT) (rv VT) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) GetMany(keys ...KT) (rv *ListMap3[KT, VT]) {
-	rv = ListMap3New[KT, VT]()
+func (me *ListMap[KT, VT]) GetMany(keys ...KT) (rv *ListMap[KT, VT]) {
+	rv = ListMapNew[KT, VT]()
 
 	me.mu.RLock()
 	for _, key := range keys {
@@ -503,7 +505,7 @@ func (me *ListMap3[KT, VT]) GetMany(keys ...KT) (rv *ListMap3[KT, VT]) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) GetMany2(keys ...KT) (rv map[KT]VT) {
+func (me *ListMap[KT, VT]) GetMany2(keys ...KT) (rv map[KT]VT) {
 	rv = map[KT]VT{}
 
 	me.mu.RLock()
@@ -517,7 +519,7 @@ func (me *ListMap3[KT, VT]) GetMany2(keys ...KT) (rv map[KT]VT) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) Has(key KT) (exist bool) {
+func (me *ListMap[KT, VT]) Has(key KT) (exist bool) {
 
 	me.mu.RLock()
 	_, exist = me.m0.Get(key)
@@ -525,7 +527,7 @@ func (me *ListMap3[KT, VT]) Has(key KT) (exist bool) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) HasMany(keys ...KT) (rv map[KT]bool) {
+func (me *ListMap[KT, VT]) HasMany(keys ...KT) (rv map[KT]bool) {
 	me.mu.RLock()
 	rv = make(map[KT]bool, len(keys))
 	for _, key := range keys {
@@ -537,14 +539,14 @@ func (me *ListMap3[KT, VT]) HasMany(keys ...KT) (rv map[KT]bool) {
 	return
 }
 
-func (me *ListMap3[KT, VT]) Del(key KT) (exist bool) {
+func (me *ListMap[KT, VT]) Del(key KT) (exist bool) {
 	me.mu.Lock()
 	exist = me.delnolock(key)
 	me.mu.Unlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) delnolock(key KT) (exist bool) {
+func (me *ListMap[KT, VT]) delnolock(key KT) (exist bool) {
 
 	if me.reversemap {
 		var val VT
@@ -556,7 +558,7 @@ func (me *ListMap3[KT, VT]) delnolock(key KT) (exist bool) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) DelMany(keys ...KT) (rv int) {
+func (me *ListMap[KT, VT]) DelMany(keys ...KT) (rv int) {
 	me.mu.Lock()
 	for _, k := range keys {
 		exist := me.delnolock(k)
@@ -566,7 +568,7 @@ func (me *ListMap3[KT, VT]) DelMany(keys ...KT) (rv int) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) DelFirst() (ok bool) {
+func (me *ListMap[KT, VT]) DelFirst() (ok bool) {
 	me.mu.Lock()
 	elem := me.m0.Front()
 	ok = elem != nil
@@ -576,7 +578,7 @@ func (me *ListMap3[KT, VT]) DelFirst() (ok bool) {
 	me.mu.Unlock()
 	return
 }
-func (me *ListMap3[KT, VT]) DelFirstN(n int) (ok bool) {
+func (me *ListMap[KT, VT]) DelFirstN(n int) (ok bool) {
 	var elems = make([]*Element[KT, VT], n, n)
 	me.mu.Lock()
 	for i, el := 0, me.m0.Front(); i < n && el != nil; i, el = i+1, el.Next() {
@@ -588,7 +590,7 @@ func (me *ListMap3[KT, VT]) DelFirstN(n int) (ok bool) {
 	me.mu.Unlock()
 	return
 }
-func (me *ListMap3[KT, VT]) DelLast() (ok bool) {
+func (me *ListMap[KT, VT]) DelLast() (ok bool) {
 	me.mu.Lock()
 	elem := me.m0.Back()
 	ok = elem != nil
@@ -598,7 +600,7 @@ func (me *ListMap3[KT, VT]) DelLast() (ok bool) {
 	me.mu.Unlock()
 	return
 }
-func (me *ListMap3[KT, VT]) DelLastN(n int) (ok bool) {
+func (me *ListMap[KT, VT]) DelLastN(n int) (ok bool) {
 	var elems = make([]*Element[KT, VT], n, n)
 	me.mu.Lock()
 	for i, el := 0, me.m0.Back(); i < n && el != nil; i, el = i+1, el.Prev() {
@@ -612,7 +614,17 @@ func (me *ListMap3[KT, VT]) DelLastN(n int) (ok bool) {
 }
 
 // ///// reverse operation
-func (me *ListMap3[KT, VT]) Getr(val VT) (key KT, exist bool) {
+func (me *ListMap[KT, VT]) checkreversemap() bool {
+	if !me.reversemap {
+		Warnp("reversemap not enabled")
+	}
+	return me.reversemap
+}
+func (me *ListMap[KT, VT]) Getr(val VT) (key KT, exist bool) {
+	if !me.checkreversemap() {
+		return
+	}
+
 	hval := me.hhver.Hash(val)
 	me.mu.RLock()
 	elem, exist := me.mr[hval]
@@ -622,7 +634,10 @@ func (me *ListMap3[KT, VT]) Getr(val VT) (key KT, exist bool) {
 	me.mu.RUnlock()
 	return
 }
-func (me *ListMap3[KT, VT]) GetrMany(vals ...VT) (keys []KT) {
+func (me *ListMap[KT, VT]) GetrMany(vals ...VT) (keys []KT) {
+	if !me.checkreversemap() {
+		return
+	}
 
 	me.mu.RLock()
 	for _, val := range vals {
@@ -635,14 +650,22 @@ func (me *ListMap3[KT, VT]) GetrMany(vals ...VT) (keys []KT) {
 	me.mu.RUnlock()
 	return
 }
-func (me *ListMap3[KT, VT]) Hasr(val VT) (exist bool) {
+func (me *ListMap[KT, VT]) Hasr(val VT) (exist bool) {
+	if !me.checkreversemap() {
+		return
+	}
+
 	hval := me.hhver.Hash(val)
 	me.mu.RLock()
 	_, exist = me.mr[hval]
 	me.mu.RUnlock()
 	return
 }
-func (me *ListMap3[KT, VT]) Delr(val VT) (exist bool) {
+func (me *ListMap[KT, VT]) Delr(val VT) (exist bool) {
+	if !me.checkreversemap() {
+		return
+	}
+
 	hval := me.hhver.Hash(val)
 
 	me.mu.Lock()
@@ -653,7 +676,10 @@ func (me *ListMap3[KT, VT]) Delr(val VT) (exist bool) {
 	me.mu.Unlock()
 	return
 }
-func (me *ListMap3[KT, VT]) DelrMany(vals ...VT) (rv int) {
+func (me *ListMap[KT, VT]) DelrMany(vals ...VT) (rv int) {
+	if !me.checkreversemap() {
+		return
+	}
 
 	me.mu.Lock()
 	for _, val := range vals {
@@ -671,7 +697,7 @@ func (me *ListMap3[KT, VT]) DelrMany(vals ...VT) (rv int) {
 
 // //// other
 
-func (me *ListMap3[KT, VT]) RandKey() (rv KT) {
+func (me *ListMap[KT, VT]) RandKey() (rv KT) {
 
 	me.mu.RLock()
 	for key, _ := range me.m0.kv {
@@ -684,12 +710,12 @@ func (me *ListMap3[KT, VT]) RandKey() (rv KT) {
 }
 
 // todo
-func (me *ListMap3[KT, VT]) RandKeys(n int) (rv []KT) {
+func (me *ListMap[KT, VT]) RandKeys(n int) (rv []KT) {
 	me.mu.RLock()
 	me.mu.RUnlock()
 	return
 }
-func (me *ListMap3[KT, VT]) RandVal() (rv VT) {
+func (me *ListMap[KT, VT]) RandVal() (rv VT) {
 	me.mu.RLock()
 	for _, elem := range me.m0.kv {
 		rv = elem.Value
@@ -700,24 +726,26 @@ func (me *ListMap3[KT, VT]) RandVal() (rv VT) {
 }
 
 // todo
-func (me *ListMap3[KT, VT]) RandVals(n int) (rv []VT) {
+func (me *ListMap[KT, VT]) RandVals(n int) (rv []VT) {
 	me.mu.RLock()
 	me.mu.RUnlock()
 	return
 }
 
-func (me *ListMap3[KT, VT]) Notin(keys ...KT) (rv []KT) {
+// more more more ...
+
+func (me *ListMap[KT, VT]) Notin(keys ...KT) (rv []KT) {
 	panic("not support")
 	// return
 }
-func (me *ListMap3[KT, VT]) In(keys ...KT) (rv []KT) {
+func (me *ListMap[KT, VT]) In(keys ...KT) (rv []KT) {
 	panic("not support")
 	// return
 }
 
 // todo
 // not change exist one
-func (me *ListMap3[KT, VT]) Merge(m *ListMap3[KT, VT]) (rv []KT) {
+func (me *ListMap[KT, VT]) Merge(m *ListMap[KT, VT]) (rv []KT) {
 	me.mu.RLock()
 
 	me.mu.RUnlock()
@@ -727,7 +755,7 @@ func (me *ListMap3[KT, VT]) Merge(m *ListMap3[KT, VT]) (rv []KT) {
 
 // todo
 // change exist one
-func (me *ListMap3[KT, VT]) Update(m *ListMap3[KT, VT]) (rv []KT) {
+func (me *ListMap[KT, VT]) Update(m *ListMap[KT, VT]) (rv []KT) {
 	me.mu.RLock()
 
 	me.mu.RUnlock()
@@ -736,7 +764,7 @@ func (me *ListMap3[KT, VT]) Update(m *ListMap3[KT, VT]) (rv []KT) {
 }
 
 // todo
-func (me *ListMap3[KT, VT]) Diff(m *ListMap3[KT, VT]) (rv []KT) {
+func (me *ListMap[KT, VT]) Diff(m *ListMap[KT, VT]) (rv []KT) {
 	me.mu.RLock()
 
 	me.mu.RUnlock()
