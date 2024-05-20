@@ -18,7 +18,7 @@ import (
 type ListMap2[KT comparable, VT comparable] struct {
 	mu sync.RWMutex
 	m0 *odmap.OrderedMap[KT, VT]
-	mr *odmap.OrderedMap[VT, KT]
+	mr map[VT]KT
 
 	reversemap bool
 	lockless   bool // todo
@@ -48,7 +48,7 @@ func ListMap2Newr[KT comparable, VT comparable]() *ListMap2[KT, VT] {
 func ListMap2New[KT comparable, VT comparable]() *ListMap2[KT, VT] {
 	me := &ListMap2[KT, VT]{}
 	me.m0 = odmap.NewOrderedMap[KT, VT]()
-	me.mr = odmap.NewOrderedMap[VT, KT]()
+	me.mr = map[VT]KT{}
 
 	return me
 }
@@ -75,7 +75,7 @@ func (me *ListMap2[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
 	ok = me.m0.Set(key, val)
 
 	if me.reversemap {
-		me.mr.Set(val, key)
+		me.mr[val] = key
 	}
 
 	return
@@ -534,7 +534,7 @@ func (me *ListMap2[KT, VT]) DelMany(keys ...KT) (rv int) {
 // ///// reverse operation
 func (me *ListMap2[KT, VT]) Getr(val VT) (key KT, exist bool) {
 	me.mu.RLock()
-	key, exist = me.mr.Get(val)
+	key, exist = me.mr[val]
 	me.mu.RUnlock()
 	return
 }
@@ -542,7 +542,7 @@ func (me *ListMap2[KT, VT]) GetrMany(vals ...VT) (keys []KT) {
 
 	me.mu.RLock()
 	for _, val := range vals {
-		key, ok := me.mr.Get(val)
+		key, ok := me.mr[val]
 		if ok {
 			keys = append(keys, key)
 		}
@@ -553,14 +553,14 @@ func (me *ListMap2[KT, VT]) GetrMany(vals ...VT) (keys []KT) {
 func (me *ListMap2[KT, VT]) Hasr(val VT) (exist bool) {
 
 	me.mu.RLock()
-	_, exist = me.mr.Get(val)
+	_, exist = me.mr[val]
 	me.mu.RUnlock()
 	return
 }
 func (me *ListMap2[KT, VT]) Delr(val VT) (exist bool) {
 
 	me.mu.Lock()
-	key, ok := me.mr.Get(val)
+	key, ok := me.mr[val]
 	exist = ok
 	if ok {
 		me.delnolock(key)
@@ -572,7 +572,7 @@ func (me *ListMap2[KT, VT]) DelrMany(vals ...VT) (rv int) {
 
 	me.mu.Lock()
 	for _, val := range vals {
-		key, ok := me.mr.Get(val)
+		key, ok := me.mr[val]
 		if ok {
 			rv += Toint(me.delnolock(key))
 		}
