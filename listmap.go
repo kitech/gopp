@@ -139,7 +139,7 @@ func (me *ListMap[KT, VT]) PutMany3(keys []KT, vals []VT) {
 }
 func (me *ListMap[KT, VT]) PutMany2(kvs ...any) {
 	if len(kvs)%2 != 0 {
-		log.Println("kvs len not 2x", len(kvs))
+		Warnp("kvs len not 2x", len(kvs))
 	}
 	me.mu.Lock()
 	for i := 0; i < len(kvs)/2; i++ {
@@ -594,6 +594,8 @@ func (me *ListMap[KT, VT]) delnolock(key KT) (exist bool) {
 	exist = me.delnolock2(hkey)
 	return
 }
+
+// del 不如链表版本
 func (me *ListMap[KT, VT]) delnolock2(hkey uint64) (exist bool) {
 
 	kv, ok := me.m0[hkey]

@@ -2,7 +2,6 @@ package gopp
 
 import (
 	"log"
-	mrand "math/rand"
 	"sync"
 	_ "unsafe"
 
@@ -16,6 +15,8 @@ import (
 const ListMap3_SHARD_COUNT = 32
 
 // ordered map, thread safe, reversemap
+// 实现从头部删除，或者尾部删除
+// 按照随机index删除速度就慢了
 type ListMap3[KT comparable, VT comparable] struct {
 	mu sync.RWMutex
 	m0 *OrderedMap[KT, VT]
@@ -219,6 +220,7 @@ func (me *ListMap3[KT, VT]) elematnolock(idx int) (elem *Element[KT, VT]) {
 	return nil
 }
 
+// O(log(n)), 少用
 func (me *ListMap3[KT, VT]) GetIndex(idx int) (rk KT, rv VT, exist bool) {
 	if idx < 0 || idx >= me.m0.Len() {
 		return
@@ -237,6 +239,7 @@ func (me *ListMap3[KT, VT]) GetIndex(idx int) (rk KT, rv VT, exist bool) {
 	return
 }
 
+// O(log(n)), 少用
 func (me *ListMap3[KT, VT]) DelIndex(idx int) (rv VT, exist bool) {
 	// Assert(idx >= 0, "idx must >= 0")
 	if idx < 0 || idx >= me.m0.Len() {
@@ -245,14 +248,14 @@ func (me *ListMap3[KT, VT]) DelIndex(idx int) (rv VT, exist bool) {
 	me.mu.Lock()
 	el := me.elematnolock(idx)
 	if el != nil {
-		me.m0.Delete(el.Key)
+		me.delnolock(el.Key)
 	}
 	exist = el != nil
 	me.mu.Unlock()
 
 	return
 }
-func (me *ListMap3[KT, VT]) DelIndexN(idx int, n int) (rv *ListMap3[KT, VT]) {
+func (me *ListMap3[KT, VT]) _DelIndexN(idx int, n int) (rv *ListMap3[KT, VT]) {
 	Assert(idx >= 0, "idx must >= 0")
 	Assert(n >= 0, "n must >= 0")
 	rv = ListMap3New[KT, VT]()
@@ -265,7 +268,7 @@ func (me *ListMap3[KT, VT]) DelIndexN(idx int, n int) (rv *ListMap3[KT, VT]) {
 	for el := me.m0.Back(); el != nil; el = el.Prev() {
 		if i >= idx && i <= eidx {
 			rv.putnolock(el.Key, el.Value)
-			me.m0.Delete(el.Key)
+			me.delnolock(el.Key)
 		}
 		i++
 	}
@@ -278,13 +281,13 @@ func (me *ListMap3[KT, VT]) DelIndexN(idx int, n int) (rv *ListMap3[KT, VT]) {
 
 	return
 }
-func (me *ListMap3[KT, VT]) DelIndexN2(idx int, n int) {
-	me.DelIndexN(idx, n)
+func (me *ListMap3[KT, VT]) _DelIndexN2(idx int, n int) {
+	me._DelIndexN(idx, n)
 	return
 }
 
 // return false if exist
-func (me *ListMap3[KT, VT]) InsertAt(idx int, key KT, val VT) (ok bool) {
+func (me *ListMap3[KT, VT]) _InsertAt(idx int, key KT, val VT) (ok bool) {
 	panic("not support")
 	// return
 }
@@ -296,6 +299,10 @@ func (me *ListMap3[KT, VT]) Prepend(key KT, val VT) (ok bool) {
 
 	me.mu.Lock()
 	ok = me.m0.Prepend(key, val)
+	if me.reversemap {
+		hval := me.hhver.Hash(val)
+		me.mr[hval] = me.m0.GetElement(key)
+	}
 	me.mu.Unlock()
 	return
 }
@@ -539,6 +546,12 @@ func (me *ListMap3[KT, VT]) Del(key KT) (exist bool) {
 }
 func (me *ListMap3[KT, VT]) delnolock(key KT) (exist bool) {
 
+	if me.reversemap {
+		var val VT
+		val, exist = me.m0.Get(key)
+		hval := me.hhver.Hash(val)
+		delete(me.mr, hval)
+	}
 	exist = me.m0.Delete(key)
 
 	return
@@ -551,6 +564,50 @@ func (me *ListMap3[KT, VT]) DelMany(keys ...KT) (rv int) {
 	}
 	me.mu.Unlock()
 
+	return
+}
+func (me *ListMap3[KT, VT]) DelFirst() (ok bool) {
+	me.mu.Lock()
+	elem := me.m0.Front()
+	ok = elem != nil
+	if ok {
+		ok = me.delnolock(elem.Key)
+	}
+	me.mu.Unlock()
+	return
+}
+func (me *ListMap3[KT, VT]) DelFirstN(n int) (ok bool) {
+	var elems = make([]*Element[KT, VT], n, n)
+	me.mu.Lock()
+	for i, el := 0, me.m0.Front(); i < n && el != nil; i, el = i+1, el.Next() {
+		elems = append(elems, el)
+	}
+	for _, el := range elems {
+		ok = me.delnolock(el.Key)
+	}
+	me.mu.Unlock()
+	return
+}
+func (me *ListMap3[KT, VT]) DelLast() (ok bool) {
+	me.mu.Lock()
+	elem := me.m0.Back()
+	ok = elem != nil
+	if ok {
+		ok = me.delnolock(elem.Key)
+	}
+	me.mu.Unlock()
+	return
+}
+func (me *ListMap3[KT, VT]) DelLastN(n int) (ok bool) {
+	var elems = make([]*Element[KT, VT], n, n)
+	me.mu.Lock()
+	for i, el := 0, me.m0.Back(); i < n && el != nil; i, el = i+1, el.Prev() {
+		elems = append(elems, el)
+	}
+	for _, el := range elems {
+		ok = me.delnolock(el.Key)
+	}
+	me.mu.Unlock()
 	return
 }
 
@@ -587,10 +644,10 @@ func (me *ListMap3[KT, VT]) Hasr(val VT) (exist bool) {
 }
 func (me *ListMap3[KT, VT]) Delr(val VT) (exist bool) {
 	hval := me.hhver.Hash(val)
+
 	me.mu.Lock()
-	elem, ok := me.mr[hval]
-	exist = ok
-	if ok {
+	elem, exist := me.mr[hval]
+	if exist {
 		me.delnolock(elem.Key)
 	}
 	me.mu.Unlock()
@@ -616,8 +673,12 @@ func (me *ListMap3[KT, VT]) DelrMany(vals ...VT) (rv int) {
 
 func (me *ListMap3[KT, VT]) RandKey() (rv KT) {
 
-	idx := Abs(mrand.Int() % (me.m0.Len()))
-	rv, _, _ = me.GetIndex(idx)
+	me.mu.RLock()
+	for key, _ := range me.m0.kv {
+		rv = key
+		break
+	}
+	me.mu.RUnlock()
 
 	return
 }
@@ -629,8 +690,12 @@ func (me *ListMap3[KT, VT]) RandKeys(n int) (rv []KT) {
 	return
 }
 func (me *ListMap3[KT, VT]) RandVal() (rv VT) {
-	idx := Abs(mrand.Int() % (me.m0.Len()))
-	_, rv, _ = me.GetIndex(idx)
+	me.mu.RLock()
+	for _, elem := range me.m0.kv {
+		rv = elem.Value
+		break
+	}
+	me.mu.RUnlock()
 	return
 }
 
