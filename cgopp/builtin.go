@@ -6,7 +6,7 @@ package cgopp
 import "C"
 
 import (
-	"gopp"
+	"github.com/kitech/gopp"
 )
 
 func _TestAssign1() bool {

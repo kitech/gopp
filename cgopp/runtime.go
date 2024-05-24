@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"unsafe"
 
-	"gopp"
+	"github.com/kitech/gopp"
 )
 
 // 需要关闭的对象的自动处理

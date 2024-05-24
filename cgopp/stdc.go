@@ -3,16 +3,19 @@ package cgopp
 /*
 #include <string.h>
 #include <stdlib.h>
-#include <malloc.h>
+// macos not found
+// #include <malloc.h>
+// #include <memory.h>
 
 */
 import "C"
 
 import (
-	"gopp"
 	"reflect"
 	"strings"
 	"unsafe"
+
+	"github.com/kitech/gopp"
 )
 
 // std c library functions
@@ -49,5 +52,6 @@ func CStrdup()  {}
 const CBoolTySz = gopp.Int32TySz
 const CppBoolTySz = gopp.Int8TySz
 
+// macos not this func
 // let freed memory really given back to OS
-func MallocTrim() int { return int(C.malloc_trim(0)) }
+// func MallocTrim() int { return int(C.malloc_trim(0)) }

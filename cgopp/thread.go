@@ -1,16 +1,5 @@
 package cgopp
 
-/*
-
-#include <unistd.h>
-#include <sys/syscall.h>
-#include <stdint.h>
-#include <pthread.h>
-
-static uint64_t MyTid() { return pthread_self(); }
-static uint64_t MyTid2() { return syscall(sizeof(void*)==4?224:186); }
-*/
-import "C"
 import (
 	"fmt"
 	"log"
@@ -19,6 +8,18 @@ import (
 	"strings"
 	"syscall"
 )
+
+/*
+
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <stdint.h>
+#include <pthread.h>
+
+static uint64_t MyTid() { return (uint64_t)(pthread_self()); }
+static uint64_t MyTid2() { return syscall(sizeof(void*)==4?224:186); }
+*/
+import "C"
 
 // TODO unix/linux only
 func MyTid() uint64 {

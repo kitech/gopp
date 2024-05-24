@@ -37,6 +37,7 @@ func IfElseStr(q bool, tv string, fv string) string {
 	return IfElse2(q, tv, fv)
 }
 
+// 这个好像没有什么用
 func IfThen2[T any](q bool, thens ...T) (v T) {
 	if len(thens) > 0 {
 		return thens[0]

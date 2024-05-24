@@ -2,6 +2,7 @@ package cgopp
 
 /*
 #include <string.h>
+#include <stdint.h>
 */
 import "C"
 import "unsafe"
@@ -27,12 +28,11 @@ func U64ToPtr(v uint64) unsafe.Pointer    { return unsafe.Pointer(uintptr(v)) }
 func U64OfPtr(vptr unsafe.Pointer) uint64 { return uint64(uintptr(vptr)) }
 
 func C2goBool(ok C.int) bool {
-	if ok == 1 {
-		return true
+	if ok == 0 {
+		return false
 	}
-	return false
+	return true
 }
-
 func Go2cBool(ok bool) C.int {
 	if ok {
 		return 1
@@ -40,14 +40,37 @@ func Go2cBool(ok bool) C.int {
 	return 0
 }
 
-//
 type go2cfnty *[0]byte
 
 // 参数怎么传递
+// Go2cfn(cptr)
 func Go2cfnp(fn unsafe.Pointer) *[0]byte {
 	return go2cfnty(fn)
 }
+
+// Go2cfn(C.hello)
 func Go2cfn(fn interface{}) *[0]byte {
 	// assert(reflect.TypeOf(fn).Kind == reflect.Ptrx)
 	return Go2cfnp(fn.(unsafe.Pointer))
+}
+
+// make go compiler happy, without show has unpined go pointer
+func Anyptr2i[T any](v *T) uintptr {
+	return uintptr(unsafe.Pointer(v))
+}
+func Anyptr2ci[T any](v *T) C.uintptr_t {
+	return C.uintptr_t(Anyptr2i(v))
+}
+func Anyptr2cvptr[T any](v *T) *C.void {
+	return (*C.void)(unsafe.Pointer(v))
+}
+
+func Iptr2Any[T any](v uintptr) *T {
+	return (*T)(unsafe.Pointer(v))
+}
+func Ciptr2Any[T any](v C.uintptr_t) *T {
+	return (*T)(unsafe.Pointer((uintptr)(v)))
+}
+func Cvptr2Any[T any](v *C.void) *T {
+	return (*T)(unsafe.Pointer(v))
 }
