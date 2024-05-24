@@ -17,6 +17,10 @@ const (
 	Stderrfd = 2
 )
 
+const NLUnix = "\n"
+const NLWin = "\r\n"
+const NLHttp = NLWin // telnet, ftp, email
+
 func PathExist(p string) bool {
 	if _, err := os.Stat(p); os.IsNotExist(err) {
 		return false

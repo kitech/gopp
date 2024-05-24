@@ -25,6 +25,11 @@ type f80 = [10]byte
 type i128 = [16]uint8
 type u128 = [16]byte
 type vptr = unsafe.Pointer // void pointer
+type usize = uintptr
+
+// exported
+type Voidptr = unsafe.Pointer
+type Usize = uintptr
 
 // TODO how add methods for Any type
 // TODO how add methods for primity string type
@@ -140,6 +145,7 @@ var vFloat32Ty float32
 var vFloat64Ty float64
 var vBoolTy bool
 var vStrTy string
+var vUintptrTy uintptr
 
 var Int8Ty = reflect.TypeOf(vInt8Ty)
 var Uint8Ty = reflect.TypeOf(vUint8Ty)
@@ -177,6 +183,8 @@ var Float32PtrTy = reflect.TypeOf(&vFloat32Ty)
 var Float64PtrTy = reflect.TypeOf(&vFloat64Ty)
 var BoolPtrTy = reflect.TypeOf(&vBoolTy)
 var StrPtrTy = reflect.TypeOf(&vStrTy)
+var UintptrTy = reflect.TypeOf(&vUintptrTy)
+var UsizeTy = reflect.TypeOf(&vUintptrTy)
 
 const ByteTySz = unsafe.Sizeof(byte(0))
 const Int8TySz = strconv.IntSize / 4
@@ -186,6 +194,7 @@ const Int64TySz = Int8TySz * 8
 const Float64TySz = Int8TySz * 8
 const Float32TySz = Int8TySz * 4
 const UintptrTySz = unsafe.Sizeof(uintptr(0))
+const UsizeTySz = unsafe.Sizeof(uintptr(0))
 const BoolTySz = unsafe.Sizeof(true)
 const IntTySz = unsafe.Sizeof(int(0))
 const RuneTySz = unsafe.Sizeof(rune(0))
