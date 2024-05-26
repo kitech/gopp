@@ -11,7 +11,7 @@ type LimitCacherInt LimitCacher[int]
 type LimitCacherStr LimitCacher[string]
 
 type LimitCacher[T any] struct {
-	first bool
+	first int32
 	ch    chan T
 	timeo time.Duration
 	tick  *time.Ticker
@@ -36,7 +36,7 @@ type LimitCacher[T any] struct {
 // notify full or timeo
 func LimitCacherNew[T any, FT func([]T) | func([]T, bool, bool)](max int, timeo time.Duration, notifyfn FT) *LimitCacher[T] {
 	me := &LimitCacher[T]{}
-	me.first = true
+	me.first = 1
 	me.ch = make(chan T, max*3)
 	me.Maxcnt = max
 	me.eventfnx = notifyfn
@@ -46,8 +46,7 @@ func LimitCacherNew[T any, FT func([]T) | func([]T, bool, bool)](max int, timeo 
 }
 
 func (me *LimitCacher[T]) Add(v T) {
-	if me.first {
-		me.first = false
+	if atomic.CompareAndSwapInt32(&me.first, 1, 0) {
 		go me.readtickproc()
 	}
 	me.ch <- v
