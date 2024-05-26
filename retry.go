@@ -76,6 +76,7 @@ func NewExponentialBackOff() *ExponentialBackOff {
 	return this
 }
 func (this *ExponentialBackOff) Reset() {
+	// this.ntimes = 0
 	this.initialInterval = 100
 	this.maxInterval = this.initialInterval * 50
 	this.maxElapsedTime = this.initialInterval * 500
@@ -83,6 +84,12 @@ func (this *ExponentialBackOff) Reset() {
 }
 
 func (this *ExponentialBackOff) Next() (int, time.Duration) {
+	// 首次不要等待
+	if this.ntimes == 0 {
+		n := this.ntimes
+		this.ntimes++
+		return n, 0
+	}
 	v := int(float32(this.initialInterval) * this.multiplier)
 	this.initialInterval = v
 	n := this.ntimes
@@ -136,8 +143,8 @@ func (this *RandomBackOff) Reset() {
 	// this.maxdur = 30 * time.Second
 }
 func (this *RandomBackOff) Next() (int, time.Duration) {
-	this.ntimes += 1
 	nxtdur := time.Duration(rand.Int63n(int64(this.maxdur-this.mindur))) + this.mindur
+	this.ntimes += 1
 	return this.ntimes, nxtdur
 }
 func (this *RandomBackOff) Count() int { return this.ntimes }
@@ -165,6 +172,7 @@ func backoffByType(botype int) (bkoff RetryBackOff) {
 }
 
 type Retryer struct {
+	ratio  int //
 	mode   int
 	boff   RetryBackOff
 	dofnno func(int) error
@@ -175,15 +183,29 @@ func (this *Retryer) setBackOff(boty int) {
 	this.boff = backoffByType(boty)
 }
 
-func NewRetry() *Retryer {
+// 指数递增模式，默认需要自己Sleep()
+// 默认初始100ms，等待间隔按照1.5倍递增，
+// 即第一次100ms，第二次150ms，第三次225ms
+// todo 需要添加个倍率参数
+// usage:
+//
+//	rter := NewRetry() || Retry(1)
+//	time.Sleep(rter.NextWaitOnly())
+func NewRetry(ratio ...int) *Retryer {
 	this := &Retryer{}
+	this.ratio = Firstof(ratio).Int()
+	this.ratio = IfElse2(this.ratio == 0, 1, this.ratio)
 	this.mode = RETRY_GET
 	this.setBackOff(BO_EXPONENTIAL)
 	return this
 }
 
 func (this *Retryer) NextWait() (ntimes int, nwait time.Duration) {
-	return this.boff.Next()
+	ntimes, nwait = this.boff.Next()
+	// log.Println(ntimes, nwait)
+	nwait *= time.Duration(this.ratio)
+	// log.Println(ntimes, nwait)
+	return
 }
 
 func (this *Retryer) NextWaitOnly() time.Duration {
@@ -191,28 +213,52 @@ func (this *Retryer) NextWaitOnly() time.Duration {
 	return nwait
 }
 
-// /
-func NewRetryFn(f func(ntimes int) error) *Retryer {
-	this := NewRetry()
+// 指数递增模式，指定回调函数
+func NewRetryFn(f func(ntimes int) error, ratio ...int) *Retryer {
+	this := NewRetry(ratio...)
 	this.mode = RETRY_FN_WITH_NO
 	this.dofnno = f
 	return this
 }
-
-func NewRetryFnOnly(f func() error) *Retryer {
-	this := NewRetry()
+func NewRetryFnOnly(f func() error, ratio ...int) *Retryer {
+	this := NewRetry(ratio...)
 	this.mode = RETRY_FN
 	this.dofn = f
 	return this
 }
 
-// should block
-// unit base: 1*time.Millisecond, so if want 2s, unit=time.Duration(2000)
-func (this *Retryer) Do(unit time.Duration, ntimes ...int) error {
-	return this.do(this.mode == RETRY_FN_WITH_NO, unit, ntimes...)
+// 指数递增模式，指定回调函数
+// 回调函数返回error!=nil表示重试，nil表示结束重试
+// 对于有返回值的情况，需要自己处理
+// usage:
+//
+//	rter := NewRetryFng(fn)
+//	rter.Do(...)
+func NewRetryFng[FT func(ntimes int) error | func() error](fx FT, ratio ...int) *Retryer {
+
+	var ff = fx // works
+	_ = ff
+
+	switch f := any(fx).(type) {
+	case func(int) error:
+		return NewRetryFn(f, ratio...)
+	case func() error:
+		return NewRetryFnOnly(f, ratio...)
+	default:
+		Panicp2(fx)
+	}
+
+	// return this
+	return nil
 }
 
-func (this *Retryer) do(withno bool, unit time.Duration, ntimes ...int) (err error) {
+// should block
+// unit base: 1*time.Millisecond, so if want 2s, unit=time.Duration(2000)
+func (this *Retryer) Do(ntimes ...int) error {
+	return this.do(this.mode == RETRY_FN_WITH_NO, ntimes...)
+}
+
+func (this *Retryer) do(withno bool, ntimes ...int) (err error) {
 	innern := 0
 	for {
 		if withno {
@@ -223,14 +269,18 @@ func (this *Retryer) do(withno bool, unit time.Duration, ntimes ...int) (err err
 		if err == nil {
 			break
 		} else {
-			if len(ntimes) > 0 && innern > ntimes[0] {
-				err = fmt.Errorf("Exceed max ntimes: %d", ntimes)
+			if len(ntimes) > 0 && innern+1 >= ntimes[0] {
+				err = fmt.Errorf("Exceed max ntimes: %d, %v", ntimes, err)
 				break
 			} else {
 				n, v := this.NextWait()
 				innern = n
-				waitdur := unit * time.Duration(v) / 100
-				time.Sleep(waitdur) // /100 for uniform unit
+				// waitdur := time.Duration(this.ratio) * v
+				waitdur := v
+				// log.Println(innern, waitdur, ntimes, this.ratio)
+				if waitdur != 0 {
+					time.Sleep(waitdur) // /100 for uniform unit
+				}
 			}
 		}
 	}
@@ -242,10 +292,19 @@ func DoTimes(n int, f func(n int)) {
 		f(i)
 	}
 }
-
 func DoTimesOnly(n int, f func()) {
 	for i := 0; i < n; i++ {
 		f()
+	}
+}
+func DoTimesg[FT func(int) | func()](n int, fg FT) {
+	switch ff := any(fg).(type) {
+	case func(int):
+		DoTimes(n, ff)
+	case func():
+		DoTimesOnly(n, ff)
+	default:
+		Panicp2(fg)
 	}
 }
 
@@ -261,6 +320,7 @@ type Retryer2 struct {
 	bkoff    RetryBackOff
 }
 
+// ...
 func NewRetryer2(minwait, maxwait, stepwait time.Duration, steptype int, cycle bool) *Retryer2 {
 	r2 := &Retryer2{}
 	r2.minwait = minwait

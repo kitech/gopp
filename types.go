@@ -28,7 +28,7 @@ type vptr = unsafe.Pointer // void pointer
 type usize = uintptr
 
 // exported
-type Voidptr = unsafe.Pointer
+type Vptr = unsafe.Pointer
 type Usize = uintptr
 
 // TODO how add methods for Any type
@@ -202,31 +202,31 @@ const EmptyStructTySz = unsafe.Sizeof(struct{}{})
 
 // const NilSz = unsafe.Sizeof(nil)
 
-func IsMap(v interface{}) bool {
+func IsMap(v any) bool {
 	return reflect.TypeOf(v).Kind() == reflect.Map
 }
 
-func IsArray(v interface{}) bool {
+func IsArray(v any) bool {
 	return reflect.TypeOf(v).Kind() == reflect.Array
 }
 
-func IsSlice(v interface{}) bool {
+func IsSlice(v any) bool {
 	return reflect.TypeOf(v).Kind() == reflect.Slice
 }
 
-func IsChan(v interface{}) bool {
+func IsChan(v any) bool {
 	return reflect.TypeOf(v).Kind() == reflect.Chan
 }
 
-func IsFunc(v interface{}) bool {
+func IsFunc(v any) bool {
 	return reflect.TypeOf(v).Kind() == reflect.Func
 }
 
-func IsStruct(v interface{}) bool {
+func IsStruct(v any) bool {
 	return reflect.TypeOf(v).Kind() == reflect.Struct
 }
 
-func IsPtr(v interface{}) bool {
+func IsPtr(v any) bool {
 	return reflect.TypeOf(v).Kind() == reflect.Ptr
 }
 
@@ -251,26 +251,41 @@ func Capof(vx any) int {
 	return -1
 }
 
+// 可以避免nil check
 // 还是喜欢这种写法的！
 // Lastof(vx).Str()
 func Lastof(vx any) (rv Any) {
-	if Lenof(vx) <= 0 {
-		return
+	return lastorfirstof(false, vx)
+}
+
+// 可以避免nil check
+// 还是喜欢这种写法的！
+// Firstof(vx).Str()
+func Firstof(vx any) (rv Any) {
+	return lastorfirstof(true, vx)
+}
+
+// 还是喜欢这种写法的！
+// Lastof(vx).Str()
+func lastorfirstof(first bool, vx any) (rv Any) {
+	if vx == nil || Lenof(vx) <= 0 {
+		return ToAny(0)
 	}
 	tv := reflect.ValueOf(vx)
 	ty := tv.Type()
 
+	idx := IfElse2(first, 0, Lenof(vx)-1)
 	switch ty.Kind() {
 	case reflect.Slice, reflect.Array:
-		ev := tv.Index(tv.Len() - 1)
+		ev := tv.Index(idx)
 		rv = ToAny(ev.Interface())
 
 	case reflect.String:
-		ev := tv.Index(tv.Len() - 1)
+		ev := tv.Index(idx)
 		rv = ToAny(ev.Interface())
 
 	case reflect.Map:
-		ek := tv.MapKeys()[0]
+		ek := tv.MapKeys()[idx]
 		ev := tv.MapIndex(ek)
 		rv = ToAny(ev.Interface())
 	}
