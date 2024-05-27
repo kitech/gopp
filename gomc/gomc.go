@@ -155,8 +155,22 @@ func mcget(pkgpath string) {
 		log.Println("package not found in cache", pkgpath)
 		return
 	} else if len(res) > 1 {
-		log.Println("too many packages found in cache", res)
-		return
+		// exact equal
+		res2 := map[string]map[string]string{}
+		gopp.Mapdo(res, func(i int, kx, vx any) map[any]any {
+			if kx.(string) == pkgpath {
+				res2[kx.(string)] = vx.(map[string]string)
+				// return map[any]any{kx.(string): vx.(map[string]string)}
+				return nil
+			}
+			return nil
+		})
+		log.Println(res2)
+		if gopp.Lenof(res2) > 1 {
+			log.Println("too many packages found in cache", res2)
+			return
+		}
+		res = res2
 	}
 	gopp.Mapdo(res, func(idx int, kx, vx any) []any {
 		log.Printf("found %d/%d vc.%d %v %v\n", idx, len(res), gopp.Lenof(vx), kx, vx)
@@ -222,6 +236,7 @@ func mclistcache() {
 	})
 }
 
+// contains match, not exact match
 func mclistcacheall(word string) (pkgvers map[string]map[string]string) {
 	log.Println("walking", moddldir, "...")
 	var zipdirs []string
