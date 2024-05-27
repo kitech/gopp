@@ -17,7 +17,10 @@ import (
 #include <pthread.h>
 
 static uint64_t MyTid() { return (uint64_t)(pthread_self()); }
+// macos warning depcreated syscall
 static uint64_t MyTid2() { return syscall(sizeof(void*)==4?224:186); }
+// macos
+// static uint64_t MyTid3() { return kdebug_signpost(SYS_kdebug_trace); }
 */
 import "C"
 
