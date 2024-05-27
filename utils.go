@@ -238,3 +238,29 @@ func InTest() bool {
 	}
 	return testing.Short()
 }
+
+// string, int*, float*, pointer, map, slice, chan
+func Empty(vx any) (bv bool) {
+	ty := reflect.TypeOf(vx)
+	val := reflect.ValueOf(vx)
+
+	switch ty.Kind() {
+	case reflect.Slice, reflect.Array:
+		bv = val.IsNil() || val.Len() == 0
+	case reflect.Map:
+		bv = val.IsNil() || val.Len() == 0
+	case reflect.Chan:
+		bv = val.IsNil() || val.Len() == 0
+	case reflect.String:
+		bv = val.Len() == 0
+	case reflect.Pointer, reflect.UnsafePointer:
+		bv = val.IsNil()
+	default:
+		if Isnumtype(ty) {
+			bv = val.Equal(reflect.Zero(ty))
+		} else {
+
+		}
+	}
+	return
+}

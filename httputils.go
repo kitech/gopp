@@ -1,13 +1,18 @@
 package gopp
 
 import (
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"reflect"
+	"slices"
+	"strings"
+	"time"
 )
 
 const (
@@ -65,9 +70,40 @@ func HttpBearerAuthKV(user, pass string) (string, string) {
 	encval := base64.StdEncoding.EncodeToString([]byte(val))
 	return "Authorization", fmt.Sprintf("Bearer %s", encval)
 }
+func HttpBearerAuthToken(token string) (string, string) {
+	return "Authorization", fmt.Sprintf("Bearer %s", token)
+}
 func HttpBearerAuthLine(user, pass string) string {
 	k, v := HttpBearerAuthKV(user, pass)
 	return fmt.Sprintf("%v: %v", k, v)
+}
+
+// parse range: bytes=87458121-97175688
+func HttpRangeParse(v string) (int64, int64, error) {
+
+	return -1, -1, nil
+}
+func HttpRangeParseMust(v string) (int64, int64) {
+	b, e, err := HttpRangeParse(v)
+	ErrPrint(err, v)
+	return b, e
+}
+func HttpRangeReq(bpos, epos int64) (v string) {
+	v = fmt.Sprintf("range: bytes=%v-%v", bpos, epos)
+	return
+}
+func HttpRangeResp(bpos, epos, tlen int64) (v string) {
+	// Content-Range: bytes 42-1233/1234
+	v = fmt.Sprintf("Content-Range: bytes %v-%v/%v", bpos, epos, tlen)
+	return
+}
+func HttpRangeParseReq(v string) (int64, int64, int64, error) {
+	return -1, -1, -1, nil
+}
+
+func Httpcode2err(code int) error {
+	err := fmt.Errorf("%v %v", code, http.StatusText(code))
+	return err
 }
 
 func HttpRespRaw(w http.ResponseWriter, code int, v []byte, cctype string, headers map[string]string) error {
@@ -110,17 +146,46 @@ func HttpRespXml(w http.ResponseWriter, code int, data any, headers map[string]s
 	return err
 }
 
-// parse bytes=87458121-97175688
-func HttpRangeParse(v string) (int64, int64, error) {
+// opt: timeout, nokeepalive. skipverify, nohttp2, noredir
+func HttpClientSetoptLite(htcli *http.Client) *http.Client {
+	tpx := htcli.Transport
+	var tp *http.Transport
+	if tpx != nil {
+		// http.DefaultTransport
+		tp = tpx.(*http.Transport)
+	} else {
+		tp = &http.Transport{}
+	}
+	tp.DisableKeepAlives = true
 
-	return -1, -1, nil
+	var tlscfg *tls.Config = tp.TLSClientConfig
+	if tlscfg == nil {
+		tlscfg = &tls.Config{InsecureSkipVerify: true}
+		tp.TLSClientConfig = tlscfg
+	}
+	tp.MaxConnsPerHost = 0
+	tp.MaxIdleConns = 1
+	tp.MaxIdleConnsPerHost = 1
+	tp.IdleConnTimeout = 1 * time.Millisecond
+	tp.ForceAttemptHTTP2 = false
+	htcli.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse
+	}
+
+	_ = http.DefaultMaxIdleConnsPerHost
+	// htcli.CloseIdleConnections()
+	HttpClientEnvProxy(htcli)
+	return htcli
 }
-func HttpRangeParseMust(v string) (int64, int64) {
 
-	return -1, -1
-}
-
-func Httpcodetoerr(code int) error {
-	err := fmt.Errorf("%v %v", code, http.StatusText(code))
-	return err
+func FindEvnProxy() string {
+	envpxys := []string{"http_proxy", "https_proxy", "socks_proxy", "socks4_proxy", "socks5_proxy"}
+	for _, line := range os.Environ() {
+		pos := strings.Index(line, "=")
+		name := strings.ToLower(line[:pos])
+		if slices.Contains(envpxys, name) {
+			return line[:pos+1]
+		}
+	}
+	return ""
 }
