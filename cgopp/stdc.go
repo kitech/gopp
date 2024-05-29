@@ -12,7 +12,6 @@ import "C"
 
 import (
 	"reflect"
-	"strings"
 	"unsafe"
 
 	"github.com/kitech/gopp"
@@ -20,29 +19,33 @@ import (
 
 // std c library functions
 // 这么封装一次，引用的包不需要再显式的引入"C"包。让CGO代码转换不传播到引用的代码中
-func Cmemcpy()                 {}
-func Cfree(ptr unsafe.Pointer) { C.free(ptr) }
-func Cfree2(ptr *C.char)       { Cfree(unsafe.Pointer(ptr)) }
-func Cfree3(ptrx interface{}) {
-	// support types: uintptr, *foo._Ctype_char, unsafe.Pointer
-	switch ptr := ptrx.(type) {
+func Cmemcpy()                  {}
+func cfree_voidptr(ptr voidptr) { C.free(ptr) }
+func Cfree[T unsafe.Pointer | uintptr | *C.char | *C.uchar | *C.schar | *C.uintptr_t](ptrx T) {
+	var ptry = any(ptrx)
+	switch ptr := ptry.(type) {
 	case unsafe.Pointer:
-		Cfree(ptr)
+		cfree_voidptr(ptr)
 	case uintptr:
-		Cfree(unsafe.Pointer(ptr))
+		p := (voidptr(ptr))
+		cfree_voidptr(p)
+	case *C.char:
+		p := (voidptr(ptr))
+		cfree_voidptr(p)
+	case *C.schar:
+		p := (voidptr(ptr))
+		cfree_voidptr(p)
+	case *C.uchar:
+		p := (voidptr(ptr))
+		cfree_voidptr(p)
+	case C.uintptr_t:
+		p := (voidptr(usize(ptr)))
+		cfree_voidptr(p)
 	default:
-		refty := reflect.TypeOf(ptrx)
-		refval := reflect.ValueOf(ptrx)
-		// *somepkg._Ctype_char
-		if strings.Count(refty.String(), "*") > 0 &&
-			strings.HasSuffix(refty.String(), "._Ctype_char") {
-			ptr2 := unsafe.Pointer(refval.Pointer())
-			Cfree(ptr2)
-		} else {
-			panic("unimpl " + refty.String())
-		}
+		panic("unimpl " + reflect.TypeOf(ptry).String())
 	}
 }
+
 func Calloc()   {}
 func CMemset()  {}
 func CMemZero() {}

@@ -1,7 +1,4 @@
-package main
-
-// dont modify main
-
+package cgopp
 
 import "unsafe"
 

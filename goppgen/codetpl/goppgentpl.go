@@ -1,7 +1,4 @@
-package main
-
-// dont modify main
-
+package gencodetpl
 
 import "unsafe"
 
@@ -58,4 +55,3 @@ func anyptr2uptrc[T any](p *T) cuptr {
 }
 
 // end cgo
-

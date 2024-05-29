@@ -2,9 +2,9 @@ package gopp
 
 import "github.com/cheekybits/genny/generic"
 
-//go:generate genny -in=$GOFILE -out=expand_gen.go gen "expType=BUILTINS"
+// // nogo : generate genny -in=$GOFILE -out=expand_gen.go gen "expType=BUILTINS"
 
-///// go:generate genny -in=$GOFILE -out=$GOFILE.gen.go gen "KeyType=string,int ValueType=string,int"
+// /// nogo : generate genny -in=$GOFILE -out=$GOFILE.gen.go gen "KeyType=string,int ValueType=string,int"
 
 type expType generic.Type
 
