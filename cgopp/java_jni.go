@@ -20,7 +20,7 @@ import (
 
 // or set CGO_LDFLAGS
 // #cgo LDFLAGS: -ljava -ljvm
-#cgo LDFLAGS: -ljli
+// #cgo LDFLAGS: -ljli
 
 const char*tstargs[] = {
 	"-Xmx128m", "-Xms16m",
@@ -37,9 +37,10 @@ const (
 	JNI_VERSION_1_2 = C.JNI_VERSION_1_2
 	JNI_VERSION_1_4 = C.JNI_VERSION_1_4
 	JNI_VERSION_1_6 = C.JNI_VERSION_1_6
-	JNI_VERSION_1_8 = C.JNI_VERSION_1_8
-	JNI_VERSION_9   = C.JNI_VERSION_9
-	JNI_VERSION_10  = C.JNI_VERSION_10
+	// below android not have
+	// JNI_VERSION_1_8 = C.JNI_VERSION_1_8
+	// JNI_VERSION_9   = C.JNI_VERSION_9
+	// JNI_VERSION_10  = C.JNI_VERSION_10
 )
 
 func RunOnJVM[FT func(vm, env, ctx uintptr) error |

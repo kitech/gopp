@@ -44,7 +44,7 @@ func JNI_OnLoad(vm JavaVM, x uintptr) int {
 	gopp.NilPrint(jenv, "some error occus", voidptr(vm))
 
 	// Jenv.FindClass("java/lang/String")
-	return JNI_VERSION_1_8
+	return JNI_VERSION_1_6
 }
 
 // 一般执行不到这个回调的

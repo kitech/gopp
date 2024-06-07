@@ -24,7 +24,7 @@ int create_java_exe(const char* clsname, const char* funcname, const char** args
 	jstring         jstr;
 	jobjectArray    main_args;
 
-	vm_args.version  = JNI_VERSION_1_8;
+	vm_args.version  = JNI_VERSION_1_6;
 	vm_args.nOptions = 0;
     vm_args.ignoreUnrecognized = JNI_TRUE;
     // JNI_GetDefaultJavaVMInitArgs(&vm_args);
@@ -55,7 +55,8 @@ int create_java_exe(const char* clsname, const char* funcname, const char** args
     // todo crash [0.441s][info][class,load] java.lang.invoke.LambdaForm$MH/0x000000016e01a400 source: __JVM_LookupDefineClass__
     // It means a location URL was not included in the CodeSource in the ProtectionDomain when defineClass was called by the ClassLoader. This could be because the class was dynamically generated, but it could also be because the ClassLoader simply didn't provide the information when it defined the class.
 
-	res = JNI_CreateJavaVM(&vm, (void **)&env, &vm_args);
+    // 这个函数在 libjli中，而android上为什么没有吗？
+	// res = JNI_CreateJavaVM(&vm, (void **)&env, &vm_args);
 	if (res != JNI_OK) {
 		printf("Failed to create Java VM: %d, vm: %p\n", res, vm);
 		return res;
@@ -101,7 +102,7 @@ int create_java_exe(const char* clsname, const char* funcname, const char** args
 
 JNIEnv* getjavaenvbyjavavm(JavaVM *vm) {
     JNIEnv* env = NULL;
-    jint rv = (*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_8);
+    jint rv = (*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_6);
     // find_class(env, "java/lang/String");
     // jintsz=4
     // printf("jintsz=%d, voidptrsz=%d\n", sizeof(jint), sizeof(void*));
