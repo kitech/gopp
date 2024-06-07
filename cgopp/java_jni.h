@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+extern int create_java_exe(const char*, const char*, const char**);
+
 extern void* getjavaenvbyjavavm(void*);
 
 extern /*jclass*/void* find_class(/*JNIEnv**/uintptr_t jni_env, const char* class_name);

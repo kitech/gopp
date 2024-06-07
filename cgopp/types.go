@@ -27,19 +27,20 @@ func IntAsFloat32(v uint64) (n float32) {
 func U64ToPtr(v uint64) unsafe.Pointer    { return unsafe.Pointer(uintptr(v)) }
 func U64OfPtr(vptr unsafe.Pointer) uint64 { return uint64(uintptr(vptr)) }
 
-func C2goBool(ok C.int) bool {
+func C2goBool(ok cint) bool {
 	if ok == 0 {
 		return false
 	}
 	return true
 }
-func Go2cBool(ok bool) C.int {
+func Go2cBool(ok bool) cint {
 	if ok {
 		return 1
 	}
 	return 0
 }
 
+// C结构体成员函数指针，在cgo里就成这个类型了
 type go2cfnty *[0]byte
 
 // 参数怎么传递

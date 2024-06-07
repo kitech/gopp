@@ -11,7 +11,3 @@ import "C"
 func print_android(args ...any) {
 
 }
-
-func RunonAndroidvm() {
-
-}

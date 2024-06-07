@@ -3,9 +3,46 @@ package cgopp
 /*
 #include <string.h>
 #include <stdlib.h>
+
+static void carr_set_item(char** pp, int idx, char*p)
+{ pp[idx] = p; }
+static char* carr_get_item(char** pp, int idx)
+{ return pp[idx]; }
+
 */
 import "C"
-import "unsafe"
+import (
+	"math"
+	"unsafe"
+
+	"github.com/kitech/gopp"
+)
+
+func StringSliceToCCharPP(ss []string) unsafe.Pointer {
+	var tp *C.char
+	p := C.calloc(C.size_t(len(ss)+1), C.size_t(unsafe.Sizeof(tp)))
+	var pp **C.char = (**C.char)(p)
+
+	for i, _ := range ss {
+		s := C.CString(ss[i])
+		C.carr_set_item(pp, C.int(i), s)
+		C.carr_set_item(pp, C.int(i+1), nil)
+	}
+
+	return p
+}
+func CCharPPToStringSlice(charpp unsafe.Pointer) []string {
+	ss := []string{}
+	var pp **C.char = (**C.char)(charpp)
+	for i := 0; i < math.MaxInt32; i++ {
+		p := C.carr_get_item(pp, C.int(i))
+		if p == nil {
+			break
+		}
+		ss = append(ss, C.GoString(p))
+	}
+	return ss
+}
 
 // x64
 // note: C.int != go int
@@ -91,4 +128,79 @@ func GoStrArr2c(arr []string) uintptr {
 	rv := C.calloc(1, C.ulong(sz))
 	C.memcpy(rv, unsafe.Pointer(&pv[0]), C.ulong(sz))
 	return uintptr(rv)
+}
+
+func AddrAdd(addr voidptr, n usize) voidptr {
+	rv := voidptr(usize(addr) + n)
+	return rv
+}
+
+type gostrin struct {
+	ptr *C.char
+	len usize
+	cap usize
+}
+
+// note nocopy
+func StrtoCharpRef(s *string) charptr {
+	gopp.FalsePrint(StrIsNilTail(s), "not safe case, gostring not null terminated")
+	sp := (*gostrin)(voidptr(s))
+	return (charptr)(sp.ptr)
+}
+
+// note nocopy
+func StrtoVptrRef(s *string) vptr {
+	gopp.FalsePrint(StrIsNilTail(s), "not safe case, gostring not null terminated")
+	sp := (*gostrin)(voidptr(s))
+	return (vptr)(sp.ptr)
+}
+
+func StrIsNilTail(s *string) bool {
+	sp := (*gostrin)(voidptr(s))
+	if false {
+		(*sp.ptr) = 0
+	}
+	idx := sp.len
+	// log.Println(idx, ch, sp.ptr, AddrAdd(voidptr(sp.ptr), 1))
+	if sp.ptr != nil {
+		p1 := (*[1 << 16]byte)(voidptr(sp.ptr))[: sp.len+1 : sp.len+1]
+		// log.Println(1<<16, sp.len, reflect.TypeOf(p1), len(p1))
+		return p1[idx] == 0
+		// log.Println(p1)
+	}
+	return true
+}
+
+// note: 不能处理常量字符串。最大64KB
+func StrNilTail(s *string) {
+	sp := (*gostrin)(voidptr(s))
+	if false {
+		(*sp.ptr) = 0
+	}
+	idx := sp.len
+	// log.Println(idx, ch, sp.ptr, AddrAdd(voidptr(sp.ptr), 1))
+	if sp.ptr != nil {
+		p1 := (*[1 << 20]byte)(voidptr(sp.ptr))[: sp.len+1 : sp.len+1]
+		// log.Println(1<<16, sp.len, reflect.TypeOf(p1), len(p1))
+		// log.Println(p1[idx])
+		if p1[idx] != 0 {
+			p1[idx] = 0
+		}
+		// log.Println(p1)
+	}
+}
+
+// note: 不能处理常量字符串。最大64KB
+func StrAltChar(s *string, idx int, ch byte) {
+	sp := (*gostrin)(voidptr(s))
+	if false {
+		(*sp.ptr) = 0
+	}
+	// log.Println(idx, ch, sp.ptr, AddrAdd(voidptr(sp.ptr), 1))
+	if sp.ptr != nil {
+		p1 := (*[1 << 20]byte)(voidptr(sp.ptr))[:sp.len:sp.len]
+		// log.Println(1<<16, sp.len, reflect.TypeOf(p1), len(p1))
+		p1[idx] = ch
+		// log.Println(p1)
+	}
 }
