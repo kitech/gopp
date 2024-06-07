@@ -103,10 +103,12 @@ JNIEnv* getjavaenvbyjavavm(JavaVM *vm) {
     JNIEnv* env = NULL;
     jint rv = (*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_8);
     // find_class(env, "java/lang/String");
+    // jintsz=4
+    // printf("jintsz=%d, voidptrsz=%d\n", sizeof(jint), sizeof(void*));
     return env;
 }
 
-jclass find_class(JNIEnv *env, const char* class_name) {
+jclass find_classddd(JNIEnv *env, const char* class_name) {
     jclass clazz = (*env)->FindClass(env, class_name);
     if (clazz == NULL) {
         (*env)->ExceptionClear(env);
@@ -118,7 +120,7 @@ jclass find_class(JNIEnv *env, const char* class_name) {
     return clazz;
 }
 
-const char* getCString(uintptr_t jni_env, uintptr_t ctx, jstring str) {
+const char* getCStringddd(uintptr_t jni_env, uintptr_t ctx, jstring str) {
     JNIEnv *env = (JNIEnv*)jni_env;
 
     const char *chars = (*env)->GetStringUTFChars(env, str, NULL);
@@ -128,15 +130,15 @@ const char* getCString(uintptr_t jni_env, uintptr_t ctx, jstring str) {
     return copy;
 }
 
-const char* androidName(uintptr_t java_vm, uintptr_t jni_env, uintptr_t ctx) {
+const char* androidNameddd(uintptr_t java_vm, uintptr_t jni_env, uintptr_t ctx) {
     JNIEnv *env = (JNIEnv*)jni_env;
 
     // look up odel from build class 
-    jclass buildClass = find_class(env, "android/os/Build");
+    jclass buildClass = find_classddd(env, "android/os/Build");
     jfieldID modelFieldID = (*env)->GetStaticFieldID(env, buildClass, "MODEL", "Ljava/lang/String:");
     jstring model = (*env)->GetStaticObjectField(env, buildClass, modelFieldID);
 
     // convert to a C string 
-    return getCString(jni_env, ctx, model);
+    return getCStringddd(jni_env, ctx, model);
 }
 

@@ -3,7 +3,6 @@ package cgopp
 import (
 	"fmt"
 	"log"
-	"unsafe"
 
 	"github.com/kitech/gopp"
 	mobinit "github.com/kitech/gopp/internal/mobileinit"
@@ -24,53 +23,14 @@ import (
 #cgo LDFLAGS: -ljli
 
 const char*tstargs[] = {
-	"-Xmx128m", "-Xsx16m",
+	"-Xmx128m", "-Xms16m",
 NULL,
 };
-
-void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void* arg3, void* arg4) {
-	printf("fnptr=%p,argc=%d,arg0=%p\n", fnptr, argc, arg0);
-	typedef void* (*fnargc0)() ;
-	fnargc0 fn0 = fnptr;
-	typedef void* (*fnargc1)(void*) ;
-	fnargc1 fn1 = fnptr;
-	typedef void* (*fnargc2)(void*, void*) ;
-	fnargc2 fn2 = fnptr;
-	typedef void* (*fnargc3)(void*, void*, void*) ;
-	fnargc3 fn3 = fnptr;
-	typedef void* (*fnargc4)(void*, void*, void*, void*) ;
-	fnargc4 fn4 = fnptr;
-
-	void* retptr = 0;
-	switch (argc) {
-	case 0:
-		retptr = fn0();
-		break;
-	case 1:
-		retptr = fn1(arg0);
-		break;
-	case 2:
-		retptr = fn2(arg0, arg1);
-		break;
-	case 3:
-		retptr = fn3(arg0, arg1, arg2);
-		break;
-	case 4:
-		retptr = fn4(arg0, arg1, arg2, arg3);
-		break;
-	}
-
-	return retptr;
-}
 
 */
 import "C"
 
 // see Running native Android code in a Fyne app
-
-// extern /*jclass*/void* find_class(/*JNIEnv**/uintptr_t jni_env, const char* class_name);
-// extern const char* getCString(uintptr_t jni_env, uintptr_t ctx, /*jstring*/ void* str);
-// extern const char* androidName(uintptr_t java_vm, uintptr_t jni_env, uintptr_t ctx);
 
 const (
 	JNI_VERSION_1_1 = C.JNI_VERSION_1_1
@@ -82,12 +42,19 @@ const (
 	JNI_VERSION_10  = C.JNI_VERSION_10
 )
 
-func RunOnJVM(fn func(vm, env, ctx uintptr) error) error {
-	return mobinit.RunOnJVM(fn)
-}
-func RunOnJVM2(fn func() error) error {
-	var fn2 = func(vm, env, ctx uintptr) error { return fn() }
-	return mobinit.RunOnJVM(fn2)
+func RunOnJVM[FT func(vm, env, ctx uintptr) error |
+	func() error | func()](fnx FT) error {
+	switch fn := any(fnx).(type) {
+	case func(vm, env, ctx uintptr) error:
+		return mobinit.RunOnJVM(fn)
+	case func() error:
+		var fn2 = func(vm, env, ctx uintptr) error { return fn() }
+		return mobinit.RunOnJVM(fn2)
+	case func():
+		var fn2 = func(vm, env, ctx uintptr) error { fn(); return nil }
+		return mobinit.RunOnJVM(fn2)
+	}
+	return nil
 }
 
 // todo WIP crashing
@@ -110,25 +77,26 @@ func (j JavaVM) Env() JNIEnv {
 	env = JNIEnv(envx)
 	return env
 }
-func (j JNIEnv) Toc() *C.JNIEnv         { return (*C.JNIEnv)(voidptr(j)) }
-func (j JNIEnv) Tocuptr() C.uintptr_t   { return (C.uintptr_t)(j) }
-func (j JNIEnv) Toptr() voidptr         { return voidptr(j) }
-func (j JNIEnv) Toptr2() unsafe.Pointer { return voidptr(j) }
-func (j JNIEnv) String() string         { return fmt.Sprintf("%v", voidptr(j)) }
+func (j JNIEnv) Toc() *C.JNIEnv { return (*C.JNIEnv)(voidptr(j)) }
+func (j JNIEnv) Tocuptr() cuptr { return (cuptr)(j) }
+func (j JNIEnv) Toptr() voidptr { return voidptr(j) }
+func (j JNIEnv) String() string { return fmt.Sprintf("%v", voidptr(j)) }
 
 // cls: "Ljava/lang/String"
 func (je JNIEnv) FindClass(cls string) voidptr {
 	var cls2 = C.CString(cls)
 	defer Cfree(cls2)
-	log.Println(je.Tocuptr(), je, cls)
-	v := C.find_class(je.Tocuptr(), cls2)
+	// log.Println(je.Tocuptr(), je, cls)
+
+	var e2 = (*C.JNIEnv)(voidptr(je))
+	v := Litfficallg((*e2).FindClass, je, cls2)
 	return v
 }
 
 func JniFindClass(cls string) voidptr { return jenv.FindClass(cls) }
 func JniFindClassTS(cls string) voidptr {
 	var rv voidptr
-	err := RunOnJVM2(func() error {
+	err := RunOnJVM(func() error {
 		rv = JniFindClass(cls)
 		return nil
 	})
@@ -141,10 +109,14 @@ func (je JNIEnv) NewStrUTF(s string) voidptr {
 	defer Cfree(s4c)
 
 	var e2 = (*C.JNIEnv)(voidptr(je))
-	rv := C.litfficall(voidptr((*e2).NewStringUTF), cint(2), je.Toptr(), voidptr(s4c), nil, nil, nil)
+	rv := Litfficall(voidptr((*e2).NewStringUTF), je.Toptr(), voidptr(s4c))
+	// rv := C.litfficall(voidptr((*e2).NewStringUTF), cint(2), je.Toptr(), voidptr(s4c), nil, nil, nil)
 	// cannot call non-function (*e2).NewStringUTF (variable of type *[0]byte)
 	// rv := (*e2).NewStringUTF(je.Toptr(), voidptr(s4c))
-	log.Println("fly333", rv, s4c)
+	if false { // compile ok
+		Litfficallg((*e2).NewStringUTF, je, s4c)
+	}
+	// log.Println("fly333", rv, s4c)
 	return rv
 }
 
@@ -156,25 +128,33 @@ func (je JNIEnv) GetStaticMethodID(clsid voidptr, s string, argssig string) void
 	defer Cfree(argssig4c)
 
 	var e2 = (*C.JNIEnv)(voidptr(je))
-	rv := C.litfficall(voidptr((*e2).GetStaticMethodID), cint(4), je.Toptr(), clsid, voidptr(s4c), voidptr(&argssig4c), nil)
+	rv := Litfficall((voidptr((*e2).GetStaticMethodID)), je.Toptr(), clsid, voidptr(s4c), voidptr(&argssig4c))
+	// rv := C.litfficall(voidptr((*e2).GetStaticMethodID), cint(4), je.Toptr(), clsid, voidptr(s4c), voidptr(&argssig4c), nil)
 	// cannot call non-function (*e2).NewStringUTF (variable of type *[0]byte)
 	// rv := (*e2).NewStringUTF(je.Toptr(), voidptr(s4c))
-	log.Println("fly333", rv, s4c)
+	// log.Println("fly333", rv, s4c)
 	return rv
 }
 func (je JNIEnv) CallStaticVoidMethod(clsid, mthid voidptr) {
 	var e2 = (*C.JNIEnv)(voidptr(je))
-	rv := C.litfficall(voidptr((*e2).CallStaticVoidMethod), cint(3), je.Toptr(), clsid, mthid, nil, nil)
+	rv := Litfficall(voidptr((*e2).CallStaticVoidMethod), je.Toptr(), clsid, mthid)
+	// rv := C.litfficall(voidptr((*e2).CallStaticVoidMethod), cint(3), je.Toptr(), clsid, mthid, nil, nil)
 	// cannot call non-function (*e2).NewStringUTF (variable of type *[0]byte)
 	// rv := (*e2).NewStringUTF(je.Toptr(), voidptr(s4c))
-	log.Println("fly333", rv)
+	// log.Println("fly333", rv)
+	gopp.GOUSED(rv)
+}
+func (je JNIEnv) ExceptionClear() {
+	var e2 = (*C.JNIEnv)(voidptr(je))
+	rv := Litfficallg((*e2).ExceptionClear, je)
+	gopp.GOUSED(rv)
 }
 
-func GetCString() {
-	v := C.getCString(0, 0, nil)
+func GetCStringddd() {
+	v := C.getCStringddd(0, 0, nil)
 	log.Println(v)
 }
-func AndroidName() {
-	v := C.androidName(0, 0, 0)
+func AndroidNameddd() {
+	v := C.androidNameddd(0, 0, 0)
 	log.Println(v)
 }
