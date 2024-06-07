@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+extern void* getjavaenvbyjavavm(void*);
+
 extern /*jclass*/void* find_class(/*JNIEnv**/uintptr_t jni_env, const char* class_name);
 extern const char* getCString(uintptr_t jni_env, uintptr_t ctx, /*jstring*/ void* str);
 extern const char* androidName(uintptr_t java_vm, uintptr_t jni_env, uintptr_t ctx);

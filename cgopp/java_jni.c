@@ -14,9 +14,19 @@ jclass find_class(JNIEnv *env, const char* class_name) {
         printf("cannot find %s", class_name);
         return NULL;
     }
+    // printf("find class %s: %p\n", class_name, clazz);
 
     return clazz;
 }
+
+JNIEnv* getjavaenvbyjavavm(JavaVM *vm) {
+    JNIEnv* env = NULL;
+    jint rv = (*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_8);
+    // find_class(env, "java/lang/String");
+    return env;
+}
+
+
 const char* getCString(uintptr_t jni_env, uintptr_t ctx, jstring str) {
     JNIEnv *env = (JNIEnv*)jni_env;
 

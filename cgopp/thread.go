@@ -18,7 +18,7 @@ import (
 
 static uint64_t MyTid() { return (uint64_t)(pthread_self()); }
 // macos warning depcreated syscall
-static uint64_t MyTid2() { return syscall(sizeof(void*)==4?224:186); }
+// static uint64_t MyTid2() { return syscall(sizeof(void*)==4?224:186); }
 // macos
 // static uint64_t MyTid3() { return kdebug_signpost(SYS_kdebug_trace); }
 */
@@ -29,9 +29,9 @@ func MyTid() uint64 {
 	return uint64(C.MyTid())
 }
 
-func MyTid2() uint64 {
-	return uint64(C.MyTid2())
-}
+// func MyTid2() uint64 {
+// 	return uint64(C.MyTid2())
+// }
 
 const PtrSize = 32 << uintptr(^uintptr(0)>>63)
 const IntSize = strconv.IntSize
