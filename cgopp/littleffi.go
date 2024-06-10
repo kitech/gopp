@@ -5,7 +5,7 @@ package cgopp
 #include <stdlib.h>
 
 void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void* arg3, void* arg4) {
-	printf("fnptr=%p,argc=%d,arg0=%p\n", fnptr, argc, arg0);
+	printf("cgopp.C.%s: fnptr=%p,argc=%d,arg0=%p\n", __FUNCTION__, fnptr, argc, arg0);
 	typedef void* (*fnargc0)() ;
 	fnargc0 fn0 = fnptr;
 	typedef void* (*fnargc1)(void*) ;

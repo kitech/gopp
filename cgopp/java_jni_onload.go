@@ -1,3 +1,6 @@
+//go:build usejni
+// +build usejni
+
 package cgopp
 
 import (

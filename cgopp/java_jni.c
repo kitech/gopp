@@ -1,5 +1,9 @@
  /// //  go :build android
 
+//go:build usejni
+// +build usejni
+
+
 #include <jni.h>
 #include <stdbool.h>
 #include <stdlib.h>
