@@ -21,9 +21,8 @@ import (
 // 这么封装一次，引用的包不需要再显式的引入"C"包。让CGO代码转换不传播到引用的代码中
 func Cmemcpy()                  {}
 func cfree_voidptr(ptr voidptr) { C.free(ptr) }
-func Cfree[T unsafe.Pointer | uintptr | *C.char | *C.uchar | *C.schar | *C.uintptr_t](ptrx T) {
-	var ptry = any(ptrx)
-	switch ptr := ptry.(type) {
+func Cfree(ptrx any) {
+	switch ptr := ptrx.(type) {
 	case unsafe.Pointer:
 		cfree_voidptr(ptr)
 	case uintptr:
@@ -42,7 +41,14 @@ func Cfree[T unsafe.Pointer | uintptr | *C.char | *C.uchar | *C.schar | *C.uintp
 		p := (voidptr(usize(ptr)))
 		cfree_voidptr(p)
 	default:
-		panic("unimpl " + reflect.TypeOf(ptry).String())
+		ty := reflect.TypeOf(ptrx)
+		if ty.ConvertibleTo(gopp.VoidpTy()) {
+			tv := reflect.ValueOf(ptrx)
+			p := tv.Convert(gopp.VoidpTy()).Interface().(voidptr)
+			cfree_voidptr(p)
+		} else {
+			panic("unimpl " + reflect.TypeOf(ptrx).String())
+		}
 	}
 }
 

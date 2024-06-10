@@ -204,3 +204,13 @@ func StrAltChar(s *string, idx int, ch byte) {
 		// log.Println(p1)
 	}
 }
+
+func GoString(ptr voidptr) string {
+	return C.GoString((*C.char)(ptr))
+}
+func GoStringN(ptr voidptr, len usize) string {
+	return C.GoStringN((*C.char)(ptr), (C.int)(len))
+}
+func CString(s string) voidptr {
+	return voidptr(C.CString(s))
+}
