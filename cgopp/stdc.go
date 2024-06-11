@@ -12,10 +12,16 @@ import "C"
 
 import (
 	"reflect"
+	"strings"
 	"unsafe"
 
 	"github.com/kitech/gopp"
 )
+
+type GoIface struct {
+	Type voidptr
+	Data voidptr
+}
 
 // std c library functions
 // 这么封装一次，引用的包不需要再显式的引入"C"包。让CGO代码转换不传播到引用的代码中
@@ -46,8 +52,12 @@ func Cfree(ptrx any) {
 			tv := reflect.ValueOf(ptrx)
 			p := tv.Convert(gopp.VoidpTy()).Interface().(voidptr)
 			cfree_voidptr(p)
+		} else if ty.Kind() == reflect.Pointer &&
+			strings.HasSuffix(ty.String(), "._Ctype_char") {
+			var addr = (*GoIface)(voidptr(&ptrx))
+			cfree_voidptr(addr.Data)
 		} else {
-			panic("unimpl " + reflect.TypeOf(ptrx).String())
+			panic("unimpl " + ty.String() + " " + ty.Kind().String())
 		}
 	}
 }
