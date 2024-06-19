@@ -221,6 +221,15 @@ func ErrPrintExcept(err error, except error, args ...any) error {
 	}
 	return err
 }
+func ErrPrintExcept2(err error, except string, args ...any) error {
+	if ErrHave(err, except) {
+		return err
+	}
+	if err != nil {
+		log.Output(2, printq(err, args...))
+	}
+	return err
+}
 
 func ErrFatal(err error, args ...any) {
 	if err != nil {
@@ -253,6 +262,14 @@ func ErrBegin(err error, s string) bool {
 }
 func ErrEnd(err error, s string) bool {
 	return ErrSuffix(err, s)
+}
+
+// safe
+func Errtostr(err error) string {
+	if err != nil {
+		return err.Error()
+	}
+	return ""
 }
 
 func ErrHuman(err error) string {

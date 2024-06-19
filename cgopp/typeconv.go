@@ -12,6 +12,7 @@ static char* carr_get_item(char** pp, int idx)
 */
 import "C"
 import (
+	"log"
 	"math"
 	"unsafe"
 
@@ -142,6 +143,7 @@ type gostrin struct {
 }
 
 // note nocopy
+// 不可靠的，常量字符串失败
 func StrtoCharpRef(s *string) charptr {
 	gopp.FalsePrint(StrIsNilTail(s), "not safe case, gostring not null terminated")
 	sp := (*gostrin)(voidptr(s))
@@ -149,10 +151,19 @@ func StrtoCharpRef(s *string) charptr {
 }
 
 // note nocopy
+// 不可靠的，常量字符串失败
 func StrtoVptrRef(s *string) vptr {
 	gopp.FalsePrint(StrIsNilTail(s), "not safe case, gostring not null terminated")
 	sp := (*gostrin)(voidptr(s))
 	return (vptr)(sp.ptr)
+}
+
+// 常量字符串失败
+func StrChkNilTail(s *string) {
+	v := StrIsNilTail(s)
+	if !v {
+		log.Println("gostr not nil tail", gopp.SubStr(*s, 32))
+	}
 }
 
 func StrIsNilTail(s *string) bool {

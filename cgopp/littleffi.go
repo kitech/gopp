@@ -1,11 +1,21 @@
 package cgopp
 
+import (
+	"log"
+	"reflect"
+
+	"github.com/kitech/gopp"
+
+	"github.com/ebitengine/purego"
+	_ "github.com/ebitengine/purego"
+)
+
 /*
 #include <stdio.h>
 #include <stdlib.h>
 
 void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void* arg3, void* arg4) {
-	printf("cgopp.C.%s: fnptr=%p,argc=%d,arg0=%p\n", __FUNCTION__, fnptr, argc, arg0);
+	// printf("cgopp.C.%s: fnptr=%p,argc=%d,arg0=%p\n", __FUNCTION__, fnptr, argc, arg0);
 	typedef void* (*fnargc0)() ;
 	fnargc0 fn0 = fnptr;
 	typedef void* (*fnargc1)(void*) ;
@@ -41,12 +51,14 @@ void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void
 
 */
 import "C"
-import (
-	"log"
-	"reflect"
 
-	"github.com/kitech/gopp"
-)
+var litfficallfnc func(voidptr, int, voidptr, voidptr, voidptr, voidptr, voidptr) voidptr
+
+func init() {
+	sym, err := purego.Dlsym(purego.RTLD_DEFAULT, "litfficall")
+	gopp.ErrPrint(err)
+	purego.RegisterFunc(&litfficallfnc, sym)
+}
 
 // note: 所有参数必须全是指针类型
 // not support len(args) <= 5
@@ -63,7 +75,8 @@ func Litfficall(fnptrx voidptr, args ...voidptr) voidptr {
 		argv[i] = argx
 	}
 
-	rv := C.litfficall(fnptrx, cint(argc), argv[0], argv[1], argv[2], argv[3], argv[4])
+	//rv := C.litfficall(fnptrx, cint(argc), argv[0], argv[1], argv[2], argv[3], argv[4])
+	rv := litfficallfnc(fnptrx, argc, argv[0], argv[1], argv[2], argv[3], argv[4])
 	return rv
 }
 
@@ -71,7 +84,7 @@ func Litfficall(fnptrx voidptr, args ...voidptr) voidptr {
 // note: 所有参数必须全是指针类型
 // argsx, must can convert to voidptr
 // not support len(args) <= 5
-func Litfficallg[FT voidptr | *[0]byte](fnptrx FT, argsx ...any) voidptr {
+func Litfficallg[FT voidptr | uintptr | *[0]byte](fnptrx FT, argsx ...any) voidptr {
 	if len(argsx) > 4 {
 		log.Println("too many args, max", 5, ", but", len(argsx))
 	}
@@ -80,6 +93,8 @@ func Litfficallg[FT voidptr | *[0]byte](fnptrx FT, argsx ...any) voidptr {
 	switch ptrx := any(fnptrx).(type) {
 	case voidptr:
 		fnptr = ptrx
+	case uintptr:
+		fnptr = voidptr(ptrx)
 	case *[0]byte:
 		fnptr = voidptr(ptrx)
 	}
@@ -113,6 +128,7 @@ func Litfficallg[FT voidptr | *[0]byte](fnptrx FT, argsx ...any) voidptr {
 		}
 	}
 
-	rv := C.litfficall(fnptr, cint(argc), argv[0], argv[1], argv[2], argv[3], argv[4])
+	// rv := C.litfficall(fnptr, cint(argc), argv[0], argv[1], argv[2], argv[3], argv[4])
+	rv := litfficallfnc(fnptr, argc, argv[0], argv[1], argv[2], argv[3], argv[4])
 	return rv
 }

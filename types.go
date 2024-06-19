@@ -284,10 +284,78 @@ func lastorfirstof(first bool, vx any) (rv Any) {
 	return
 }
 
-// todo
-// LastofG[string](vx)
+// todo, LastofG(vx)，这种写法go推导不出来！！！
+// Usage: LastofG[string](vx)
 func LastofG[VT any, T map[any]VT | []VT | string](vx T) (rv VT) {
 	// var s string = LastofG([]string{}) // cannot infer VT
+	var vxty = reflect.TypeOf(vx)
+	switch vxty.Kind() {
+	case reflect.Slice:
+		n := Lenof(vx)
+		if n > 0 {
+			rv = reflect.ValueOf(vx).Index(n - 1).Interface().(VT)
+		}
+	case reflect.Map:
+		n := Lenof(vx)
+		if n > 0 {
+			vo := reflect.ValueOf(vx)
+			keys := vo.MapKeys()
+			rv = vo.MapIndex(keys[len(keys)-1]).Interface().(VT)
+		}
+	case reflect.String:
+		n := Lenof(vx)
+		if n > 0 {
+
+		}
+	}
+	return
+}
+func LastofGv[VT any](vx []VT) (rv VT) {
+	if len(vx) > 0 {
+		rv = vx[len(vx)-1]
+	}
+	return
+}
+func FirstofGv[VT any](vx []VT) (rv VT) {
+	if len(vx) > 0 {
+		rv = vx[0]
+	}
+	return
+}
+func RandofGv[VT any](vx []VT) (rv VT) {
+	if len(vx) > 0 {
+		rv = vx[mrand.Int()%len(vx)]
+	}
+	return
+}
+func LastofGm[T any](vx map[any]T) (rv T) {
+	if len(vx) > 0 {
+		for _, v := range vx {
+			rv = v
+			return
+		}
+	}
+	return
+}
+func FirstofGm[T any](vx map[any]T) (rv T) {
+	if len(vx) > 0 {
+		for _, v := range vx {
+			rv = v
+			return
+		}
+	}
+	return
+}
+func LastofGs(vx string) (rv byte) {
+	if len(vx) > 0 {
+		rv = vx[len(vx)-1]
+	}
+	return
+}
+func FirstofGs(vx string) (rv byte) {
+	if len(vx) > 0 {
+		rv = vx[0]
+	}
 	return
 }
 

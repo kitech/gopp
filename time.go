@@ -129,3 +129,9 @@ func DurandSec(basesec int, rdsec int) time.Duration {
 	}
 	return time.Duration(basesec+rdval) * time.Second
 }
+
+// 写法比较：
+// 1*time.Second
+// gopp.Secondof(1)
+func Secondof(n int) time.Duration  { return time.Second * time.Duration(n) }
+func Msecondof(n int) time.Duration { return time.Millisecond * time.Duration(n) }
