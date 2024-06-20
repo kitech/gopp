@@ -126,7 +126,7 @@ func init() {
 	Assert(justprinterrfd == 2, "why os.Stderr not 2", justprinterrfd)
 }
 
-var justprintoutfn func(s string)
+var justprintoutfn = func(s string) {}
 var justprintoutfnasync bool = false
 
 func SetLogPrintFunc(async bool, fn func(string)) (oldasync bool, oldfn func(string)) {
@@ -151,7 +151,8 @@ func UnsetLogPrintFunc() (oldasync bool, oldfn func(string)) {
 
 // =PackArg?
 func printq(v any, args ...any) string {
-	msg := fmt.Sprintf("%+v", v)
+	ci := GetCallerInfo(3)
+	msg := fmt.Sprintf("%s %+v", ci, v)
 	for _, argx := range args {
 		switch arg := argx.(type) {
 		case string:
@@ -473,6 +474,28 @@ func Panicp2(err interface{}) {
 	}
 }
 
+// ///
+func Trace(args ...any) {
+	s := printq("[TRACE] ", args...)
+	log.Output(2, s)
+}
+func Debug(args ...any) {
+	s := printq("[DEBUG] ", args...)
+	log.Output(2, s)
+}
+func Info(args ...any) {
+	s := printq("[INFO] ", args...)
+	log.Output(2, s)
+}
+func Warn(args ...any) {
+	s := printq("[WARN] ", args...)
+	log.Output(2, s)
+}
+func Fatal(args ...any) {
+	s := printq("[FATAL] ", args...)
+	log.Output(2, s)
+}
+
 // 一般 GetCallerInfo(2)
 // return ` funcName, fileName, lineNo`
 // funcName like pkg1/barfun
@@ -484,12 +507,19 @@ func GetCallerInfo(skip int) (info string) {
 		return
 	}
 	funcName := runtime.FuncForPC(pc).Name()
-	if strings.Count(funcName, "/") > 2 {
+	if strings.Count(funcName, "/") > 1 {
 		pos := strings.LastIndex(funcName, "/")
 		pos = strings.LastIndex(funcName[:pos], "/")
 		funcName = funcName[pos+1:]
 	}
 	fileName := path.Base(file) // The Base function returns the last element of the path
+
+	if !strings.HasSuffix(funcName, ")") {
+		funcName += "()"
+	}
+	if log.Flags()&log.Llongfile != 0 || log.Flags()&log.Lshortfile != 0 {
+		return fmt.Sprintf("%s:", funcName)
+	}
 	// FuncName,FileLine
 	return fmt.Sprintf("%s, %s:%d ", funcName, fileName, lineNo)
 }

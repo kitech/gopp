@@ -243,6 +243,15 @@ func Capof(vx any) int {
 	return -1
 }
 
+// safe mode
+func ValueAt[T any](vx []T, idx int) T {
+	var rv T
+	if idx < len(vx) {
+		rv = vx[idx]
+	}
+	return rv
+}
+
 // 可以避免nil check
 // 还是喜欢这种写法的！
 // Lastof(vx).Str()

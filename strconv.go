@@ -6,6 +6,8 @@ import (
 	"strconv"
 )
 
+var ZeroStr string
+
 func MustInt(s string) int {
 	if len(s) == 0 {
 		return 0
