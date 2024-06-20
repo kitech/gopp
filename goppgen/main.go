@@ -16,12 +16,20 @@ var goppgentpl []byte
 
 // using in go generate, to generate some type alias, little functions
 
-// args "goppgen" <package> [cgo]
+// args "goppgen" <package|genffimtx> [cgo]
 func main() {
 	log.SetFlags(log.Flags() ^ log.Ldate ^ log.Ltime)
 	flag.Parse()
 	log.Println(flag.Args())
 
+	arg0 := flag.Arg(0)
+	if arg0 == "genffimtx" {
+		genfficallmtx()
+	} else {
+		gengoextratypes()
+	}
+}
+func gengoextratypes() {
 	pkgname := flag.Arg(0)
 	cgook := flag.Arg(1) == "cgo"
 	cmtpfx := gopp.IfElse2(cgook, "", "// ")
