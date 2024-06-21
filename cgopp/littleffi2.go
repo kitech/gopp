@@ -17,8 +17,8 @@ import (
 
 // int
 double
-litffi_test1(double a) {
-	printf("%f, %d\n", a, (int)a);
+litffi_test1(double a, void*b, int64_t c) {
+	printf("%f, %d, %p=%d, %d, \n", a, (int)a, b, (int)b, c);
 	return a;
     return (int)(a);
 }
@@ -40,6 +40,7 @@ const (
 // //////////
 // 支持浮点数返回值
 // 支持最大5个参数
+// 支持go string 传递参数，自动转换为charptr。但是C端不要持有该字符串指针，函数调用完成释放掉的
 // 如果没有返回值，使用[int]即可
 // Usage1: FfiCall[float64]()
 // Usage1: FfiCall(FFITY_FLOAT)
@@ -50,9 +51,70 @@ func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
 		rvx = fnv()
 	}
 
+	// 按照长度
 	var tystrs []string
-	for _, arg := range args {
+	for i, arg := range args {
 		ty := reflect.TypeOf(arg)
+		switch ty.Kind() {
+		case reflect.Int:
+			if ty.Size() == 4 {
+				tv := int32(arg.(int))
+				args[i] = tv
+			} else {
+				tv := int64(arg.(int))
+				args[i] = tv
+			}
+			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
+		case reflect.Uint:
+			if ty.Size() == 4 {
+				tv := int32(arg.(int))
+				args[i] = tv
+			} else {
+				tv := int64(arg.(int))
+				args[i] = tv
+			}
+			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
+
+		case reflect.Uintptr:
+			if ty.Size() == 4 {
+				tv := int32(arg.(uintptr))
+				args[i] = tv
+			} else {
+				tv := int64(arg.(uintptr))
+				args[i] = tv
+			}
+			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
+		case reflect.UnsafePointer:
+			if ty.Size() == 4 {
+				tv := int32(uintptr(arg.(voidptr)))
+				args[i] = tv
+			} else {
+				tv := int64(uintptr(arg.(voidptr)))
+				args[i] = tv
+			}
+			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
+
+		case reflect.Uint64:
+			tv := int64(arg.(uint64))
+			args[i] = tv
+			ty = gopp.Int64Ty
+
+		case reflect.String:
+			tv := CString(arg.(string))
+			defer cfree_voidptr(tv)
+			args[i] = voidptr(tv)
+			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
+
+		case reflect.Int16, reflect.Uint16, reflect.Int8, reflect.Uint8:
+			tv := reflect.ValueOf(arg).Convert(gopp.Int32Ty).Interface().(int32)
+			args[i] = tv
+			ty = gopp.Int32Ty
+
+		case reflect.Int32, reflect.Int64: // just fine
+		case reflect.Float64, reflect.Float32:
+		default:
+			gopp.Info(ty.String(), arg)
+		}
 		tystrs = append(tystrs, ty.String())
 	}
 
@@ -63,8 +125,9 @@ func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
 	log.Println(tystrs, tycrc, tystr)
 	var rv = litfficallgenimpl[T](tycrc, uintptr(fnptrx), args...)
 	gopp.GOUSED(rv)
-	var retptr = &rvx
-	*retptr = *((*T)(voidptr(&rv)))
+	// var retptr = &rvx
+	// *retptr = *((*T)(voidptr(&rv)))
+	rvx = rv
 
 	return
 }
@@ -82,10 +145,10 @@ func Dlsym0(name string) voidptr {
 func TestLitfficallz() {
 	sym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi_test1")
 	// log.Println(sym)
-	x := FfiCall[float64](voidptr(sym), float64(123.2345))
+	x := FfiCall[float64](voidptr(sym), float64(123.2345), voidptr(uintptr(3309)), uint64(386))
 	log.Println(x)
 	{
-		x := FfiCall0[float64]("litffi_test1", float64(123.2345))
+		x := FfiCall0[float32]("litffi_test1", float32(123.2345))
 		log.Println(x)
 	}
 }

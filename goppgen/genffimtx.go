@@ -2,12 +2,19 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"slices"
 	"strings"
 
 	"github.com/kitech/gopp"
 )
 
-var ctypes = []string{"int", "int64", "float64", "voidptr", "charptr"}
+// 到8个类型的时候，排列组合就太多了。。。
+// uintptr, usize, charptr => voidptr
+var ctypes = []string{"int32", "int64", "float64",
+	"int32", "int64", "float64",
+	"int32", "int64", "float64",
+}
 
 func genfficallmtx() {
 	filename := "../cgopp/littleffi_gen.go"
@@ -19,6 +26,7 @@ func genfficallmtx() {
 	defer func() {
 		err := gopp.SafeWriteFile(filename, []byte(sb.String()), 0644)
 		gopp.ErrPrint(err)
+		log.Println("line count:", strings.Count(sb.String(), "\n"))
 	}()
 
 	sb.WriteString("func litfficallgenimpl[RETY any](tycrc uint64, fnptrx uintptr, args...any) RETY {\n")
@@ -27,6 +35,44 @@ func genfficallmtx() {
 	// sb.WriteString("switch lenargs {\n")
 	sb.WriteString("switch tycrc {\n")
 
+	var m = map[string][]string{}
+	for i := 0; i < 5; i++ {
+		x := Combination(ctypes, i+1)
+		// log.Println(len(x), x, len(x))
+		for _, y := range x {
+			m[strings.Join(y, "_")] = y
+		}
+	}
+	log.Println(len(m))
+
+	keys := gopp.MapKeys(m)
+	slices.Sort(keys)
+	for i, key := range keys {
+		log.Println(i, key)
+
+		res := m[key]
+		// sb.WriteString("\n")
+		name := arrtoname(res)
+		crcval := gopp.Crc64Str(name)
+		sb.WriteString(fmt.Sprintf("case %d:\n", crcval))
+		sb.WriteString(arrtotypedef(res))
+		sb.WriteString("\n")
+		sb.WriteString(arrtoregfunc(res))
+		sb.WriteString("\n")
+		sb.WriteString(arrtocall(res))
+		sb.WriteString("\n")
+	}
+
+	if true {
+		sb.WriteString("  default:\n")
+		sb.WriteString("  log.Println(\"nocare\", tycrc, len(args), voidptr(fnptrx))\n")
+		sb.WriteString("} // end switch tycrc\n")
+		sb.WriteString("  return rv\n")
+		sb.WriteString("}\n")
+		return
+	}
+
+	// 排列是不重复的，但是这里需要允许重复的
 	for i := 0; i < len(ctypes); i++ {
 		// sb.WriteString(fmt.Sprintf("case %d:\n", i+1))
 		res1 := Combination(ctypes, i+1)

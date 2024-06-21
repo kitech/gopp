@@ -7,1631 +7,1011 @@ import "github.com/ebitengine/purego"
 func litfficallgenimpl[RETY any](tycrc uint64, fnptrx uintptr, args ...any) RETY {
 	var rv RETY
 	switch tycrc {
-	case 2913135854266351616:
-		var fnv func(int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int))
-	case 4906417177782910976:
-		var fnv func(int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64))
 	case 4906417137293123632:
 		var fnv func(float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
 		rv = fnv(args[0].(float64))
-	case 3303529566992870192:
-		var fnv func(voidptr) RETY
+	case 3370978100138164748:
+		var fnv func(float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr))
-	case 3303529680180094784:
-		var fnv func(charptr) RETY
+		rv = fnv(args[0].(float64), args[1].(float64))
+	case 1625390155685093194:
+		var fnv func(float64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr))
-	case 10432896870521055341:
-		var fnv func(int, int64) RETY
+		rv = fnv(args[0].(float64), args[1].(float64), args[2].(float64))
+	case 5938092134339604168:
+		var fnv func(float64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(int64))
-	case 18209049112833628269:
-		var fnv func(int64, int) RETY
+		rv = fnv(args[0].(float64), args[1].(float64), args[2].(int32))
+	case 16726627421087814328:
+		var fnv func(float64, float64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(int))
-	case 9207394733217734689:
-		var fnv func(int, float64) RETY
+		rv = fnv(args[0].(float64), args[1].(float64), args[2].(int32), args[3].(float64))
+	case 3996830784931025512:
+		var fnv func(float64, float64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(float64))
-	case 4037525016094906468:
-		var fnv func(float64, int) RETY
+		rv = fnv(args[0].(float64), args[1].(float64), args[2].(int32), args[3].(int64))
+	case 13061220352138791958:
+		var fnv func(float64, float64, int32, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int))
-	case 1587618363337354017:
-		var fnv func(int, voidptr) RETY
+		rv = fnv(args[0].(float64), args[1].(float64), args[2].(int32), args[3].(int64), args[4].(float64))
+	case 6327319250572308168:
+		var fnv func(float64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(voidptr))
-	case 9121461380041965219:
-		var fnv func(voidptr, int) RETY
+		rv = fnv(args[0].(float64), args[1].(float64), args[2].(int64))
+	case 17274323849696989880:
+		var fnv func(float64, float64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int))
-	case 1587618253186279249:
-		var fnv func(int, charptr) RETY
+		rv = fnv(args[0].(float64), args[1].(float64), args[2].(int64), args[3].(float64))
+	case 6299612324015391767:
+		var fnv func(float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(charptr))
-	case 11149571054909292221:
-		var fnv func(charptr, int) RETY
+		rv = fnv(args[0].(float64), args[1].(int32))
+	case 3194917911032941310:
+		var fnv func(float64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int))
-	case 3370978080484024353:
-		var fnv func(int64, float64) RETY
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(float64))
+	case 5703060069472926288:
+		var fnv func(float64, int32, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(float64))
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(float64), args[3].(float64))
+	case 12627726077792357462:
+		var fnv func(float64, int32, float64, int32) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(float64), args[3].(int32))
+	case 5594258298860399379:
+		var fnv func(float64, int32, float64, int32, float64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(float64), args[3].(int32), args[4].(float64))
+	case 12698876656052539198:
+		var fnv func(float64, int32, float64, int32, int64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(float64), args[3].(int32), args[4].(int64))
+	case 12293069922669431894:
+		var fnv func(float64, int32, float64, int64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(float64), args[3].(int64))
+	case 5348197492168780563:
+		var fnv func(float64, int32, float64, int64, float64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(float64), args[3].(int64), args[4].(float64))
+	case 13348055723535124332:
+		var fnv func(float64, int32, int32) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int32))
+	case 15060114439728310368:
+		var fnv func(float64, int32, int32, float64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int32), args[3].(float64))
+	case 16877667243833489725:
+		var fnv func(float64, int32, int32, int64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int32), args[3].(int64))
+	case 5897171444769977654:
+		var fnv func(float64, int32, int32, int64, float64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int32), args[3].(int64), args[4].(float64))
+	case 13590352901924865900:
+		var fnv func(float64, int32, int64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int64))
+	case 15463697879284885600:
+		var fnv func(float64, int32, int64, float64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int64), args[3].(float64))
+	case 17184301410477425659:
+		var fnv func(float64, int32, int64, float64, float64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int64), args[3].(float64), args[4].(float64))
+	case 6828108578049218202:
+		var fnv func(float64, int32, int64, float64, int32) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int64), args[3].(float64), args[4].(int32))
+	case 6585705846543210138:
+		var fnv func(float64, int32, int64, float64, int64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int64), args[3].(float64), args[4].(int64))
+	case 12582763719507901594:
+		var fnv func(float64, int32, int64, int32) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int64), args[3].(int32))
+	case 2376958524607918764:
+		var fnv func(float64, int32, int64, int32, float64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int64), args[3].(int32), args[4].(float64))
+	case 15806576154887605918:
+		var fnv func(float64, int32, int64, int32, int64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int64), args[3].(int32), args[4].(int64))
+	case 12338038819444030618:
+		var fnv func(float64, int32, int64, int64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int64), args[3].(int64))
+	case 2839227297785410220:
+		var fnv func(float64, int32, int64, int64, float64) RETY
+		purego.RegisterFunc(&fnv, fnptrx)
+
+		rv = fnv(args[0].(float64), args[1].(int32), args[2].(int64), args[3].(int64), args[4].(float64))
 	case 5966082068799308823:
 		var fnv func(float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
 		rv = fnv(args[0].(float64), args[1].(int64))
-	case 5118191938142612257:
-		var fnv func(int64, voidptr) RETY
+	case 3156163424688720638:
+		var fnv func(float64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(voidptr))
-	case 998566109219925464:
-		var fnv func(voidptr, int64) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(float64))
+	case 5474336843164416592:
+		var fnv func(float64, int64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int64))
-	case 5118191914847709009:
-		var fnv func(int64, charptr) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(float64), args[3].(float64))
+	case 15676663025522183116:
+		var fnv func(float64, int64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(charptr))
-	case 993143478043880920:
-		var fnv func(charptr, int64) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(float64), args[3].(int32))
+	case 10085754502232338382:
+		var fnv func(float64, int64, float64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int64))
-	case 5118191991506176268:
-		var fnv func(float64, voidptr) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(float64), args[3].(int32), args[4].(float64))
+	case 12698876656117258638:
+		var fnv func(float64, int64, float64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(voidptr))
-	case 8666563580025805148:
-		var fnv func(voidptr, float64) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(float64), args[3].(int32), args[4].(int64))
+	case 15864424427174235084:
+		var fnv func(float64, int64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(float64))
-	case 5118191859880789372:
-		var fnv func(float64, charptr) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(float64), args[3].(int64))
+	case 10118916872437690318:
+		var fnv func(float64, int64, float64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(charptr))
-	case 8666563660625760861:
-		var fnv func(charptr, float64) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(float64), args[3].(int64), args[4].(float64))
+	case 17887684147924583115:
+		var fnv func(float64, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(float64))
-	case 1264024342512033324:
-		var fnv func(voidptr, charptr) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(int32))
+	case 12083235086036414458:
+		var fnv func(float64, int64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(charptr))
-	case 1264024389360982365:
-		var fnv func(charptr, voidptr) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(int32), args[3].(float64))
+	case 16877667243908573245:
+		var fnv func(float64, int64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(voidptr))
-	case 2211054885833174001:
-		var fnv func(int, int64, float64) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(int32), args[3].(int64))
+	case 5897171444848845702:
+		var fnv func(float64, int64, int32, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(float64))
-	case 7110313033498808263:
-		var fnv func(int, float64, int64) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(int32), args[3].(int64), args[4].(float64))
+	case 18274096514390180555:
+		var fnv func(float64, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(int64))
-	case 5737617402127050481:
-		var fnv func(int64, int, float64) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(int64))
+	case 11541062603845185530:
+		var fnv func(float64, int64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(float64))
-	case 607717147535744692:
-		var fnv func(int64, float64, int) RETY
+		rv = fnv(args[0].(float64), args[1].(int64), args[2].(int64), args[3].(float64))
+	case 4733398028036079616:
+		var fnv func(int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int))
-	case 1294120161901266952:
-		var fnv func(float64, int64, int) RETY
+		rv = fnv(args[0].(int32))
+	case 2977529939112288289:
+		var fnv func(int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(int))
-	case 9047505918902532104:
-		var fnv func(float64, int, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(float64))
+	case 10039399914472759830:
+		var fnv func(int32, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(int64))
-	case 8601972540519784689:
-		var fnv func(int, int64, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(float64))
+	case 9021512218731673951:
+		var fnv func(int32, float64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(voidptr))
-	case 4448640083135211016:
-		var fnv func(int, voidptr, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(float64), args[3].(float64))
+	case 5784005156845595475:
+		var fnv func(int32, float64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(int64))
-	case 2769566881663888881:
-		var fnv func(int64, int, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(float64), args[3].(int32))
+	case 11276262000390523140:
+		var fnv func(int32, float64, float64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(voidptr))
-	case 5688838901008398451:
-		var fnv func(int64, voidptr, int) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(float64), args[3].(int32), args[4].(float64))
+	case 14481478327825891396:
+		var fnv func(int32, float64, float64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(int))
-	case 12813574247508844181:
-		var fnv func(voidptr, int64, int) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(float64), args[3].(int32), args[4].(int64))
+	case 6188959687402007379:
+		var fnv func(int32, float64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(int))
-	case 15972126301297159829:
-		var fnv func(voidptr, int, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(float64), args[3].(int64))
+	case 11233953892465330436:
+		var fnv func(int32, float64, float64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(int64))
-	case 8601972517224885377:
-		var fnv func(int, int64, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(float64), args[3].(int64), args[4].(float64))
+	case 2653614615967471954:
+		var fnv func(int32, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(charptr))
-	case 4444906301819430408:
-		var fnv func(int, charptr, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32))
+	case 3349021946929188709:
+		var fnv func(int32, float64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(int64))
-	case 2769566956482142593:
-		var fnv func(int64, int, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32), args[3].(float64))
+	case 4285431669036016108:
+		var fnv func(int32, float64, int32, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(charptr))
-	case 12311746095700473965:
-		var fnv func(int64, charptr, int) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32), args[3].(float64), args[4].(float64))
+	case 5814607034913152634:
+		var fnv func(int32, float64, int32, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(int))
-	case 757526005966985915:
-		var fnv func(charptr, int64, int) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32), args[3].(float64), args[4].(int32))
+	case 6131319160270773882:
+		var fnv func(int32, float64, int32, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(int))
-	case 7420195229198609083:
-		var fnv func(charptr, int, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32), args[3].(float64), args[4].(int64))
+	case 10692662485627258067:
+		var fnv func(int32, float64, int32, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(int64))
-	case 10446178606185548054:
-		var fnv func(int, float64, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32), args[3].(int32))
+	case 3354994765065157196:
+		var fnv func(int32, float64, int32, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(voidptr))
-	case 12662681584613628230:
-		var fnv func(int, voidptr, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32), args[3].(int32), args[4].(float64))
+	case 15674109259444667491:
+		var fnv func(int32, float64, int32, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(float64))
-	case 13354799327382547965:
-		var fnv func(float64, int, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32), args[3].(int32), args[4].(int64))
+	case 10503669630952096979:
+		var fnv func(int32, float64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(voidptr))
-	case 15116452588859914367:
-		var fnv func(float64, voidptr, int) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32), args[3].(int64))
+	case 2960277787274967628:
+		var fnv func(int32, float64, int32, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(int))
-	case 16518331508533350824:
-		var fnv func(voidptr, float64, int) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32), args[3].(int64), args[4].(float64))
+	case 11322875555404857796:
+		var fnv func(int32, float64, int32, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(int))
-	case 11741994578002848237:
-		var fnv func(voidptr, int, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32), args[3].(int64), args[4].(int32))
+	case 10990365646979350980:
+		var fnv func(int32, float64, int32, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(float64))
-	case 10446178527173510502:
-		var fnv func(int, float64, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int32), args[3].(int64), args[4].(int64))
+	case 2410824856368486738:
+		var fnv func(int32, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(charptr))
-	case 12662681639443780167:
-		var fnv func(int, charptr, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int64))
+	case 3017496101410541413:
+		var fnv func(int32, float64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(float64))
-	case 13354799235770818957:
-		var fnv func(float64, int, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int64), args[3].(float64))
+	case 4586212351943500268:
+		var fnv func(int32, float64, int64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(charptr))
-	case 3883974844702226529:
-		var fnv func(float64, charptr, int) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int64), args[3].(float64), args[4].(float64))
+	case 2738648489419102688:
+		var fnv func(int32, float64, int64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(int))
-	case 6323755006755721659:
-		var fnv func(charptr, float64, int) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int64), args[3].(float64), args[4].(int32))
+	case 2568971855020710368:
+		var fnv func(int32, float64, int64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(int))
-	case 1156697823738866174:
-		var fnv func(charptr, int, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int64), args[3].(float64), args[4].(int64))
+	case 15376406098092573044:
+		var fnv func(int32, float64, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(float64))
-	case 14300484722002779702:
-		var fnv func(int, voidptr, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int64), args[3].(int32))
+	case 6358895716521278934:
+		var fnv func(int32, float64, int64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(charptr))
-	case 14300484742008183111:
-		var fnv func(int, charptr, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int64), args[3].(int32), args[4].(float64))
+	case 15674109259451602275:
+		var fnv func(int32, float64, int64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(voidptr))
-	case 14644746126239657629:
-		var fnv func(voidptr, int, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int64), args[3].(int32), args[4].(int64))
+	case 15043298055341556084:
+		var fnv func(int32, float64, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(charptr))
-	case 5156611318325360497:
-		var fnv func(voidptr, charptr, int) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int64), args[3].(int64))
+	case 6891920261969411542:
+		var fnv func(int32, float64, int64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(int))
-	case 1251902826478221180:
-		var fnv func(charptr, voidptr, int) RETY
+		rv = fnv(args[0].(int32), args[1].(float64), args[2].(int64), args[3].(int64), args[4].(float64))
+	case 1612373000591589808:
+		var fnv func(int32, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(int))
-	case 8773588551704961790:
-		var fnv func(charptr, int, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32))
+	case 6552033577527819620:
+		var fnv func(int32, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(voidptr))
-	case 16591803569810614550:
-		var fnv func(int64, float64, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(float64))
+	case 9907814013011044237:
+		var fnv func(int32, int32, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(voidptr))
-	case 15637417818073446726:
-		var fnv func(int64, voidptr, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(float64), args[3].(float64))
+	case 688398158377360109:
+		var fnv func(int32, int32, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(float64))
-	case 4756811858747589118:
-		var fnv func(float64, int64, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(float64), args[3].(int32))
+	case 15129013966179654985:
+		var fnv func(int32, int32, float64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(voidptr))
-	case 639354777755059975:
-		var fnv func(float64, voidptr, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(float64), args[3].(int32), args[4].(float64))
+	case 11707279153334712717:
+		var fnv func(int32, int32, float64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(int64))
-	case 16880711023353215045:
-		var fnv func(voidptr, float64, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(float64), args[3].(int32), args[4].(int64))
+	case 876757694354922221:
+		var fnv func(int32, int32, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(int64))
-	case 10828768418933611635:
-		var fnv func(voidptr, int64, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(float64), args[3].(int64))
+	case 15451673349931916617:
+		var fnv func(int32, int32, float64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(float64))
-	case 16591803559517529446:
-		var fnv func(int64, float64, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(float64), args[3].(int64), args[4].(float64))
+	case 2740278372808791648:
+		var fnv func(int32, int32, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(charptr))
-	case 15637417872900190791:
-		var fnv func(int64, charptr, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int32))
+	case 8625336419849682651:
+		var fnv func(int32, int32, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(float64))
-	case 4756811865953144206:
-		var fnv func(float64, int64, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int32), args[3].(float64))
+	case 1564254518328894983:
+		var fnv func(int32, int32, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(charptr))
-	case 634081649793632007:
-		var fnv func(float64, charptr, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int32), args[3].(int64))
+	case 4869819987034735493:
+		var fnv func(int32, int32, int32, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(int64))
-	case 16887715486180870213:
-		var fnv func(charptr, float64, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int32), args[3].(int64), args[4].(float64))
+	case 2567083301201516128:
+		var fnv func(int32, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(int64))
-	case 10835345686641257587:
-		var fnv func(charptr, int64, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int64))
+	case 8082000654356266715:
+		var fnv func(int32, int32, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(float64))
-	case 12739595372406996534:
-		var fnv func(int64, voidptr, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int64), args[3].(float64))
+	case 8227273144526009761:
+		var fnv func(int32, int32, int64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(charptr))
-	case 12739595323696855367:
-		var fnv func(int64, charptr, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int64), args[3].(float64), args[4].(float64))
+	case 5512887281359331369:
+		var fnv func(int32, int32, int64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(voidptr))
-	case 18413219247685065475:
-		var fnv func(voidptr, int64, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int64), args[3].(float64), args[4].(int32))
+	case 5271117868550922281:
+		var fnv func(int32, int32, int64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(charptr))
-	case 13062628665344151946:
-		var fnv func(voidptr, charptr, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int64), args[3].(float64), args[4].(int64))
+	case 5841776962842600352:
+		var fnv func(int32, int32, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(int64))
-	case 13064205157523054986:
-		var fnv func(charptr, voidptr, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int64), args[3].(int32))
+	case 3656714514458313759:
+		var fnv func(int32, int32, int64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(int64))
-	case 18415649580393883507:
-		var fnv func(charptr, int64, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int64), args[3].(int32), args[4].(float64))
+	case 9081802351031832850:
+		var fnv func(int32, int32, int64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(voidptr))
-	case 3011820139625431914:
-		var fnv func(float64, voidptr, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int64), args[3].(int32), args[4].(int64))
+	case 6103882942718354336:
+		var fnv func(int32, int32, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(charptr))
-	case 3011820152885281819:
-		var fnv func(float64, charptr, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int64), args[3].(int64))
+	case 3829488473112151071:
+		var fnv func(int32, int32, int64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(voidptr))
-	case 951280892671248413:
-		var fnv func(voidptr, float64, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int32), args[2].(int64), args[3].(int64), args[4].(float64))
+	case 1425174548892959152:
+		var fnv func(int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(charptr))
-	case 3634696496493666108:
-		var fnv func(voidptr, charptr, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64))
+	case 6734903251947896164:
+		var fnv func(int32, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(float64))
-	case 14371278049503924076:
-		var fnv func(charptr, voidptr, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64))
+	case 10205780083590375309:
+		var fnv func(int32, int64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(float64))
-	case 17884815468984000316:
-		var fnv func(charptr, float64, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(float64))
+	case 1083766941474415331:
+		var fnv func(int32, int64, float64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(voidptr))
-	case 14636640998181805801:
-		var fnv func(int, int64, float64, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(float64), args[4].(float64))
+	case 7610794987016650146:
+		var fnv func(int32, int64, float64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(float64), args[3].(voidptr))
-	case 17608338590351527609:
-		var fnv func(int, int64, voidptr, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(float64), args[4].(int32))
+	case 7798415651180346786:
+		var fnv func(int32, int64, float64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(voidptr), args[3].(float64))
-	case 8024764925661492737:
-		var fnv func(int, float64, int64, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(float64), args[4].(int64))
+	case 9168676256716004727:
+		var fnv func(int32, int64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(int64), args[3].(voidptr))
-	case 2702537769743233272:
-		var fnv func(int, float64, voidptr, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(int32))
+	case 1702376102104652180:
+		var fnv func(int32, int64, float64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(voidptr), args[3].(int64))
-	case 14346906268351336378:
-		var fnv func(int, voidptr, float64, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(int32), args[4].(float64))
+	case 12096647006974668605:
+		var fnv func(int32, int64, float64, int32, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(float64), args[3].(int64))
-	case 13481988932804848524:
-		var fnv func(int, voidptr, int64, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(int32), args[4].(int32))
+	case 11707279153253609277:
+		var fnv func(int32, int64, float64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(int64), args[3].(float64))
-	case 13665731125052382233:
-		var fnv func(int64, int, float64, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(int32), args[4].(int64))
+	case 8834618235918589303:
+		var fnv func(int32, int64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(float64), args[3].(voidptr))
-	case 9431883262956932169:
-		var fnv func(int64, int, voidptr, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(int64))
+	case 1169351556656519572:
+		var fnv func(int32, int64, float64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(voidptr), args[3].(float64))
-	case 10667867730075826418:
-		var fnv func(int64, float64, int, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(int64), args[4].(float64))
+	case 16636275431364127386:
+		var fnv func(int32, int64, float64, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int), args[3].(voidptr))
-	case 18200818091515047280:
-		var fnv func(int64, float64, voidptr, int) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(int64), args[4].(int32))
+	case 16391022765718923930:
+		var fnv func(int32, int64, float64, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(voidptr), args[3].(int))
-	case 14439315459998434471:
-		var fnv func(int64, voidptr, float64, int) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(float64), args[3].(int64), args[4].(int64))
+	case 7424021985274106823:
+		var fnv func(int32, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(float64), args[3].(int))
-	case 10353168398714322146:
-		var fnv func(int64, voidptr, int, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32))
+	case 73000727473109313:
+		var fnv func(int32, int64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(int), args[3].(float64))
-	case 17291256451339633324:
-		var fnv func(float64, int64, int, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32), args[3].(float64))
+	case 12728777721209254268:
+		var fnv func(int32, int64, int32, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(int), args[3].(voidptr))
-	case 9757972802585204526:
-		var fnv func(float64, int64, voidptr, int) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32), args[3].(float64), args[4].(float64))
+	case 4193332590484959491:
+		var fnv func(int32, int64, int32, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(voidptr), args[3].(int))
-	case 13761241473902989228:
-		var fnv func(float64, int, int64, voidptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32), args[3].(float64), args[4].(int32))
+	case 4582067125508419843:
+		var fnv func(int32, int64, int32, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(int64), args[3].(voidptr))
-	case 17592510208780945749:
-		var fnv func(float64, int, voidptr, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32), args[3].(float64), args[4].(int64))
+	case 1158033350268647175:
+		var fnv func(int32, int64, int32, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(voidptr), args[3].(int64))
-	case 1455221754820116936:
-		var fnv func(float64, voidptr, int, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32), args[3].(int32))
+	case 4904211611177194805:
+		var fnv func(int32, int64, int32, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(int), args[3].(int64))
-	case 8668142463658979784:
-		var fnv func(float64, voidptr, int64, int) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32), args[3].(int32), args[4].(float64))
+	case 9081807455853543442:
+		var fnv func(int32, int64, int32, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(int64), args[3].(int))
-	case 13169916958323737472:
-		var fnv func(voidptr, int64, float64, int) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32), args[3].(int32), args[4].(int64))
+	case 1564254518220257031:
+		var fnv func(int32, int64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(float64), args[3].(int))
-	case 17369229911724555205:
-		var fnv func(voidptr, int64, int, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32), args[3].(int64))
+	case 4869819986971989301:
+		var fnv func(int32, int64, int32, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(int), args[3].(float64))
-	case 12636635850118288700:
-		var fnv func(voidptr, float64, int64, int) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32), args[3].(int64), args[4].(float64))
+	case 4228457577734014389:
+		var fnv func(int32, int64, int32, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(int64), args[3].(int))
-	case 14061584415883158844:
-		var fnv func(voidptr, float64, int, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32), args[3].(int64), args[4].(int32))
+	case 4542179031464084917:
+		var fnv func(int32, int64, int32, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(int), args[3].(int64))
-	case 15854661066165932787:
-		var fnv func(voidptr, int, float64, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int32), args[3].(int64), args[4].(int64))
+	case 7106711725590975431:
+		var fnv func(int32, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(float64), args[3].(int64))
-	case 11530557003775997637:
-		var fnv func(voidptr, int, int64, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int64))
+	case 475420883727497537:
+		var fnv func(int32, int64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(int64), args[3].(float64))
-	case 14636640987889242777:
-		var fnv func(int, int64, float64, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int64), args[3].(float64))
+	case 13004184974282551676:
+		var fnv func(int32, int64, int64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(float64), args[3].(charptr))
-	case 17608338645177746872:
-		var fnv func(int, int64, charptr, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int64), args[3].(float64), args[4].(float64))
+	case 5512887281304516249:
+		var fnv func(int32, int64, int64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(charptr), args[3].(float64))
-	case 8024764932867570289:
-		var fnv func(int, float64, int64, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int64), args[3].(float64), args[4].(int32))
+	case 5271117868496107161:
+		var fnv func(int32, int64, int64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(int64), args[3].(charptr))
-	case 2707388944850235640:
-		var fnv func(int, float64, charptr, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int64), args[3].(float64), args[4].(int64))
+	case 5841776962733961888:
+		var fnv func(int32, int64, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(charptr), args[3].(int64))
-	case 14340325165508444090:
-		var fnv func(int, charptr, float64, int64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int64), args[3].(int32))
+	case 3656714514395566767:
+		var fnv func(int32, int64, int64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(float64), args[3].(int64))
-	case 13474989430930742156:
-		var fnv func(int, charptr, int64, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int64), args[3].(int32), args[4].(float64))
+	case 9081807455830102290:
+		var fnv func(int32, int64, int64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(int64), args[3].(float64))
-	case 13665731149152587881:
-		var fnv func(int64, int, float64, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int64), args[3].(int32), args[4].(int64))
+	case 6103882942609715872:
+		var fnv func(int32, int64, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(float64), args[3].(charptr))
-	case 9431883186791434056:
-		var fnv func(int64, int, charptr, float64) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int64), args[3].(int64))
+	case 3829488473049404079:
+		var fnv func(int32, int64, int64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(charptr), args[3].(float64))
-	case 10667867741576344706:
-		var fnv func(int64, float64, int, charptr) RETY
+		rv = fnv(args[0].(int32), args[1].(int64), args[2].(int64), args[3].(int64), args[4].(float64))
+	case 4906417177782910976:
+		var fnv func(int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int), args[3].(charptr))
-	case 1781315069896945006:
-		var fnv func(int64, float64, charptr, int) RETY
+		rv = fnv(args[0].(int64))
+	case 3370978080484024353:
+		var fnv func(int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(charptr), args[3].(int))
-	case 8835037422493582516:
-		var fnv func(int64, charptr, float64, int) RETY
+		rv = fnv(args[0].(int64), args[1].(float64))
+	case 10344359016443699734:
+		var fnv func(int64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(float64), args[3].(int))
-	case 4418959907599596785:
-		var fnv func(int64, charptr, int, float64) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(float64))
+	case 8887836021683190111:
+		var fnv func(int64, float64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(int), args[3].(float64))
-	case 17291256581891280604:
-		var fnv func(float64, int64, int, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(float64), args[3].(float64))
+	case 10813681515688308622:
+		var fnv func(int64, float64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(int), args[3].(charptr))
-	case 7153268243585799984:
-		var fnv func(float64, int64, charptr, int) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(float64), args[3].(int32))
+	case 13019102279624773473:
+		var fnv func(int64, float64, float64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(charptr), args[3].(int))
-	case 13761241429300495324:
-		var fnv func(float64, int, int64, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(float64), args[3].(int32), args[4].(float64))
+	case 14481478327932663313:
+		var fnv func(int64, float64, float64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(int64), args[3].(charptr))
-	case 17597502173184477525:
-		var fnv func(float64, int, charptr, int64) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(float64), args[3].(int32), args[4].(int64))
+	case 10643864143801560974:
+		var fnv func(int64, float64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(charptr), args[3].(int64))
-	case 12637184640556893670:
-		var fnv func(float64, charptr, int, int64) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(float64), args[3].(int64))
+	case 12913919698776837985:
+		var fnv func(int64, float64, float64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(int), args[3].(int64))
-	case 14058792887945836006:
-		var fnv func(float64, charptr, int64, int) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(float64), args[3].(int64), args[4].(float64))
+	case 5936738744320564936:
+		var fnv func(int64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(int64), args[3].(int))
-	case 8854838495141618046:
-		var fnv func(charptr, int64, float64, int) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32))
+	case 16730623814730484664:
+		var fnv func(int64, float64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(float64), args[3].(int))
-	case 4408359466827192635:
-		var fnv func(charptr, int64, int, float64) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32), args[3].(float64))
+	case 1416550745470789513:
+		var fnv func(int64, float64, int32, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(int), args[3].(float64))
-	case 7167509982422579138:
-		var fnv func(charptr, float64, int64, int) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32), args[3].(float64), args[4].(float64))
+	case 5814607035007330351:
+		var fnv func(int64, float64, int32, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(int64), args[3].(int))
-	case 1081582468663543746:
-		var fnv func(charptr, float64, int, int64) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32), args[3].(float64), args[4].(int32))
+	case 6131319160364951599:
+		var fnv func(int64, float64, int32, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(int), args[3].(int64))
-	case 1162306098125877261:
-		var fnv func(charptr, int, float64, int64) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32), args[3].(float64), args[4].(int64))
+	case 10692662485546750563:
+		var fnv func(int64, float64, int32, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(float64), args[3].(int64))
-	case 7791932695825388603:
-		var fnv func(charptr, int, int64, float64) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32), args[3].(int32))
+	case 3354994765105318937:
+		var fnv func(int64, float64, int32, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(int64), args[3].(float64))
-	case 11354142551689021897:
-		var fnv func(int, int64, voidptr, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32), args[3].(int32), args[4].(float64))
+	case 15674102538117399651:
+		var fnv func(int64, float64, int32, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(voidptr), args[3].(charptr))
-	case 11354142502978883256:
-		var fnv func(int, int64, charptr, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32), args[3].(int32), args[4].(int64))
+	case 10503669630871589475:
+		var fnv func(int64, float64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(charptr), args[3].(voidptr))
-	case 15192545180767120636:
-		var fnv func(int, voidptr, int64, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32), args[3].(int64))
+	case 2960277787315129369:
+		var fnv func(int64, float64, int32, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(int64), args[3].(charptr))
-	case 10960039176618731125:
-		var fnv func(int, voidptr, charptr, int64) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32), args[3].(int64), args[4].(float64))
+	case 11322868834077589956:
+		var fnv func(int64, float64, int32, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(charptr), args[3].(int64))
-	case 10958180794470356597:
-		var fnv func(int, charptr, voidptr, int64) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32), args[3].(int64), args[4].(int32))
+	case 10990358925652083140:
+		var fnv func(int64, float64, int32, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(voidptr), args[3].(int64))
-	case 15190537884544782476:
-		var fnv func(int, charptr, int64, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int32), args[3].(int64), args[4].(int64))
+	case 6324452932553449160:
+		var fnv func(int64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(int64), args[3].(voidptr))
-	case 16945815057766730553:
-		var fnv func(int64, int, voidptr, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int64))
+	case 17272796296921713592:
+		var fnv func(int64, float64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(voidptr), args[3].(charptr))
-	case 16945815105655540808:
-		var fnv func(int64, int, charptr, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int64), args[3].(float64))
+	case 1690274646241961865:
+		var fnv func(int64, float64, int64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(charptr), args[3].(voidptr))
-	case 16601025892961778578:
-		var fnv func(int64, voidptr, int, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int64), args[3].(float64), args[4].(float64))
+	case 2738648489513283509:
+		var fnv func(int64, float64, int64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(int), args[3].(charptr))
-	case 7697162731422229118:
-		var fnv func(int64, voidptr, charptr, int) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int64), args[3].(float64), args[4].(int32))
+	case 2568971855114891189:
+		var fnv func(int64, float64, int64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(charptr), args[3].(int))
-	case 4323878858165854835:
-		var fnv func(int64, charptr, voidptr, int) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int64), args[3].(float64), args[4].(int64))
+	case 15376406098012067780:
+		var fnv func(int64, float64, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(voidptr), args[3].(int))
-	case 6096794556832446449:
-		var fnv func(int64, charptr, int, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int64), args[3].(int32))
+	case 6358895716561439619:
+		var fnv func(int64, float64, int64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(int), args[3].(voidptr))
-	case 11008064460727827637:
-		var fnv func(voidptr, int64, int, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int64), args[3].(int32), args[4].(float64))
+	case 15674102538059322723:
+		var fnv func(int64, float64, int64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(int), args[3].(charptr))
-	case 1474895768858453337:
-		var fnv func(voidptr, int64, charptr, int) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int64), args[3].(int32), args[4].(int64))
+	case 15043298055261050820:
+		var fnv func(int64, float64, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(charptr), args[3].(int))
-	case 14540894325976543669:
-		var fnv func(voidptr, int, int64, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int64), args[3].(int64))
+	case 6891920262009572227:
+		var fnv func(int64, float64, int64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(int64), args[3].(charptr))
-	case 9440812074358291260:
-		var fnv func(voidptr, int, charptr, int64) RETY
+		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int64), args[3].(int64), args[4].(float64))
+	case 6296116613056906263:
+		var fnv func(int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(charptr), args[3].(int64))
-	case 15587571887627171727:
-		var fnv func(voidptr, charptr, int, int64) RETY
+		rv = fnv(args[0].(int64), args[1].(int32))
+	case 3196851855136799486:
+		var fnv func(int64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(int), args[3].(int64))
-	case 12981836857465096079:
-		var fnv func(voidptr, charptr, int64, int) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(float64))
+	case 5704548185790817104:
+		var fnv func(int64, int32, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(int64), args[3].(int))
-	case 4359325981569288121:
-		var fnv func(charptr, int64, voidptr, int) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(float64), args[3].(float64))
+	case 688398158320897117:
+		var fnv func(int64, int32, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(voidptr), args[3].(int))
-	case 6116668206004687419:
-		var fnv func(charptr, int64, int, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(float64), args[3].(int32))
+	case 15129013966286285596:
+		var fnv func(int64, int32, float64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(int), args[3].(voidptr))
-	case 14078053248893018463:
-		var fnv func(charptr, voidptr, int64, int) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(float64), args[3].(int32), args[4].(float64))
+	case 11707276803143694733:
+		var fnv func(int64, int32, float64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(int64), args[3].(int))
-	case 12620734373632364895:
-		var fnv func(charptr, voidptr, int, int64) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(float64), args[3].(int32), args[4].(int64))
+	case 876757694298459229:
+		var fnv func(int64, int32, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(int), args[3].(int64))
-	case 5706343994531797442:
-		var fnv func(charptr, int, voidptr, int64) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(float64), args[3].(int64))
+	case 15451673350038547228:
+		var fnv func(int64, int32, float64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(voidptr), args[3].(int64))
-	case 427251834312089403:
-		var fnv func(charptr, int, int64, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(float64), args[3].(int64), args[4].(float64))
+	case 2740278372783245152:
+		var fnv func(int64, int32, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(int64), args[3].(voidptr))
-	case 21567107606889343:
-		var fnv func(int, float64, voidptr, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int32))
+	case 8625336419788564587:
+		var fnv func(int64, int32, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(voidptr), args[3].(charptr))
-	case 21567087580742670:
-		var fnv func(int, float64, charptr, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int32), args[3].(float64))
+	case 1564259729914144263:
+		var fnv func(int64, int32, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(charptr), args[3].(voidptr))
-	case 2644490050888878088:
-		var fnv func(int, voidptr, float64, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int32), args[3].(int64))
+	case 4869821795917136773:
+		var fnv func(int64, int32, int32, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(float64), args[3].(charptr))
-	case 2013588879627296553:
-		var fnv func(int, voidptr, charptr, float64) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int32), args[3].(int64), args[4].(float64))
+	case 2567083301175969632:
+		var fnv func(int64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(charptr), args[3].(float64))
-	case 17217741175948889977:
-		var fnv func(int, charptr, voidptr, float64) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int64))
+	case 8082000654295148651:
+		var fnv func(int64, int32, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(voidptr), args[3].(float64))
-	case 15110453848188378921:
-		var fnv func(int, charptr, float64, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int64), args[3].(float64))
+	case 8227273144632624116:
+		var fnv func(int64, int32, int64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(float64), args[3].(voidptr))
-	case 5591428462975306546:
-		var fnv func(float64, int, voidptr, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int64), args[3].(float64), args[4].(float64))
+	case 5512884932250443817:
+		var fnv func(int64, int32, int64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(voidptr), args[3].(charptr))
-	case 5591428405402537027:
-		var fnv func(float64, int, charptr, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int64), args[3].(float64), args[4].(int32))
+	case 5271115519442034729:
+		var fnv func(int64, int32, int64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(charptr), args[3].(voidptr))
-	case 4670706269840767897:
-		var fnv func(float64, voidptr, int, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int64), args[3].(float64), args[4].(int64))
+	case 5841782174427849632:
+		var fnv func(int64, int32, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(int), args[3].(charptr))
-	case 14727561561380758133:
-		var fnv func(float64, voidptr, charptr, int) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int64), args[3].(int32))
+	case 3656716323340715039:
+		var fnv func(int64, int32, int64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(charptr), args[3].(int))
-	case 11147147285879333496:
-		var fnv func(float64, charptr, voidptr, int) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int64), args[3].(int32), args[4].(float64))
+	case 8677377978353537298:
+		var fnv func(int64, int32, int64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(voidptr), args[3].(int))
-	case 17451226266765654010:
-		var fnv func(float64, charptr, int, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int64), args[3].(int32), args[4].(int64))
+	case 6103888154303603616:
+		var fnv func(int64, int32, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(int), args[3].(voidptr))
-	case 8110623998828869890:
-		var fnv func(voidptr, float64, int, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int64), args[3].(int64))
+	case 3829490281994552351:
+		var fnv func(int64, int32, int64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(int), args[3].(charptr))
-	case 18175921307335762158:
-		var fnv func(voidptr, float64, charptr, int) RETY
+		rv = fnv(args[0].(int64), args[1].(int32), args[2].(int64), args[3].(int64), args[4].(float64))
+	case 5964802973282419735:
+		var fnv func(int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(charptr), args[3].(int))
-	case 6423037613678616041:
-		var fnv func(voidptr, int, float64, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int64))
+	case 3154541548188351230:
+		var fnv func(int64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(float64), args[3].(charptr))
-	case 7377353000288553672:
-		var fnv func(voidptr, int, charptr, float64) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(float64))
+	case 5473904250107536208:
+		var fnv func(int64, int64, float64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(charptr), args[3].(float64))
-	case 15696755683923390833:
-		var fnv func(voidptr, charptr, int, float64) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(float64), args[3].(float64))
+	case 9168676256659540935:
+		var fnv func(int64, int64, float64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(int), args[3].(float64))
-	case 11392140062930045236:
-		var fnv func(voidptr, charptr, float64, int) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(float64), args[3].(int32))
+	case 1702376102211284929:
+		var fnv func(int64, int64, float64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(float64), args[3].(int))
-	case 4747637365822169321:
-		var fnv func(charptr, float64, voidptr, int) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(float64), args[3].(int32), args[4].(float64))
+	case 11707276803206901565:
+		var fnv func(int64, int64, float64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(voidptr), args[3].(int))
-	case 2990202922005427563:
-		var fnv func(charptr, float64, int, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(float64), args[3].(int32), args[4].(int64))
+	case 8834618235862125511:
+		var fnv func(int64, int64, float64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(int), args[3].(voidptr))
-	case 8437058978582694206:
-		var fnv func(charptr, voidptr, float64, int) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(float64), args[3].(int64))
+	case 1169351556763152321:
+		var fnv func(int64, int64, float64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(float64), args[3].(int))
-	case 3664068996608094587:
-		var fnv func(charptr, voidptr, int, float64) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(float64), args[3].(int64), args[4].(float64))
+	case 7424021985248559815:
+		var fnv func(int64, int64, int32) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(int), args[3].(float64))
-	case 4580287548440592848:
-		var fnv func(charptr, int, voidptr, float64) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(int32))
+	case 73000727411994609:
+		var fnv func(int64, int64, int32, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(voidptr), args[3].(float64))
-	case 59350079245209984:
-		var fnv func(charptr, int, float64, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(int32), args[3].(float64))
+	case 1564259729987958535:
+		var fnv func(int64, int64, int32, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(float64), args[3].(voidptr))
-	case 4905904386726946175:
-		var fnv func(int64, float64, voidptr, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(int32), args[3].(int64))
+	case 4869821795995555125:
+		var fnv func(int64, int64, int32, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(voidptr), args[3].(charptr))
-	case 4905904341233771022:
-		var fnv func(int64, float64, charptr, voidptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(int32), args[3].(int64), args[4].(float64))
+	case 7106711725565428423:
+		var fnv func(int64, int64, int64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(charptr), args[3].(voidptr))
-	case 6983610325884431880:
-		var fnv func(int64, voidptr, float64, charptr) RETY
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(int64))
+	case 475420883666382833:
+		var fnv func(int64, int64, int64, float64) RETY
 		purego.RegisterFunc(&fnv, fnptrx)
 
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(float64), args[3].(charptr))
-	case 6892879409292949801:
-		var fnv func(int64, voidptr, charptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(charptr), args[3].(float64))
-	case 12297198937874557305:
-		var fnv func(int64, charptr, voidptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(voidptr), args[3].(float64))
-	case 10802662783174179113:
-		var fnv func(int64, charptr, float64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(float64), args[3].(voidptr))
-	case 8411151335409247856:
-		var fnv func(float64, int64, voidptr, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(voidptr), args[3].(charptr))
-	case 8411151381975802113:
-		var fnv func(float64, int64, charptr, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(charptr), args[3].(voidptr))
-	case 4323084780779258693:
-		var fnv func(float64, voidptr, int64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(int64), args[3].(charptr))
-	case 8156454756155771340:
-		var fnv func(float64, voidptr, charptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(charptr), args[3].(int64))
-	case 8159162096578558412:
-		var fnv func(float64, charptr, voidptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(voidptr), args[3].(int64))
-	case 4316643429593087797:
-		var fnv func(float64, charptr, int64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(int64), args[3].(voidptr))
-	case 16164209521351980986:
-		var fnv func(voidptr, float64, int64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(int64), args[3].(charptr))
-	case 12294242308154522931:
-		var fnv func(voidptr, float64, charptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(charptr), args[3].(int64))
-	case 4904618685210124114:
-		var fnv func(voidptr, int64, float64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(float64), args[3].(charptr))
-	case 8886197377604814963:
-		var fnv func(voidptr, int64, charptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(charptr), args[3].(float64))
-	case 3751420033708578375:
-		var fnv func(voidptr, charptr, int64, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(int64), args[3].(float64))
-	case 5191645524155396721:
-		var fnv func(voidptr, charptr, float64, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(float64), args[3].(int64))
-	case 12292929101081589811:
-		var fnv func(charptr, float64, voidptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(voidptr), args[3].(int64))
-	case 16160506474626924234:
-		var fnv func(charptr, float64, int64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(int64), args[3].(voidptr))
-	case 5188820867801450353:
-		var fnv func(charptr, voidptr, float64, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(float64), args[3].(int64))
-	case 3747473909403624263:
-		var fnv func(charptr, voidptr, int64, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(int64), args[3].(float64))
-	case 8882633989939791474:
-		var fnv func(charptr, int64, voidptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(voidptr), args[3].(float64))
-	case 4902130098487105058:
-		var fnv func(charptr, int64, float64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(float64), args[3].(voidptr))
-	case 13518211429013896447:
-		var fnv func(int, int64, float64, voidptr, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(float64), args[3].(voidptr), args[4].(charptr))
-	case 13518211383519705998:
-		var fnv func(int, int64, float64, charptr, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(float64), args[3].(charptr), args[4].(voidptr))
-	case 11485823056774641544:
-		var fnv func(int, int64, voidptr, float64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(voidptr), args[3].(float64), args[4].(charptr))
-	case 11540332128656875689:
-		var fnv func(int, int64, voidptr, charptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(voidptr), args[3].(charptr), args[4].(float64))
-	case 6136012551547171065:
-		var fnv func(int, int64, charptr, voidptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(charptr), args[3].(voidptr), args[4].(float64))
-	case 7666770546045067433:
-		var fnv func(int, int64, charptr, float64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(int64), args[2].(charptr), args[3].(float64), args[4].(voidptr))
-	case 10031058105758040048:
-		var fnv func(int, float64, int64, voidptr, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(int64), args[3].(voidptr), args[4].(charptr))
-	case 10031058152325675137:
-		var fnv func(int, float64, int64, charptr, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(int64), args[3].(charptr), args[4].(voidptr))
-	case 14155302997736987333:
-		var fnv func(int, float64, voidptr, int64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(voidptr), args[3].(int64), args[4].(charptr))
-	case 10285834258008870988:
-		var fnv func(int, float64, voidptr, charptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(voidptr), args[3].(charptr), args[4].(int64))
-	case 10282906601341395020:
-		var fnv func(int, float64, charptr, voidptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(charptr), args[3].(voidptr), args[4].(int64))
-	case 14152808068663420597:
-		var fnv func(int, float64, charptr, int64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(float64), args[2].(charptr), args[3].(int64), args[4].(voidptr))
-	case 2296234699275087418:
-		var fnv func(int, voidptr, float64, int64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(float64), args[3].(int64), args[4].(charptr))
-	case 6130243096207467699:
-		var fnv func(int, voidptr, float64, charptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(float64), args[3].(charptr), args[4].(int64))
-	case 13519708316546959058:
-		var fnv func(int, voidptr, int64, float64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(int64), args[3].(float64), args[4].(charptr))
-	case 9573824665352720883:
-		var fnv func(int, voidptr, int64, charptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(int64), args[3].(charptr), args[4].(float64))
-	case 14663908424956743623:
-		var fnv func(int, voidptr, charptr, int64, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(charptr), args[3].(int64), args[4].(float64))
-	case 13223551164464442353:
-		var fnv func(int, voidptr, charptr, float64, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(voidptr), args[2].(charptr), args[3].(float64), args[4].(int64))
-	case 6131178390412845491:
-		var fnv func(int, charptr, float64, voidptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(float64), args[3].(voidptr), args[4].(int64))
-	case 2290841978056075082:
-		var fnv func(int, charptr, float64, int64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(float64), args[3].(int64), args[4].(voidptr))
-	case 13226358206666432241:
-		var fnv func(int, charptr, voidptr, float64, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(voidptr), args[3].(float64), args[4].(int64))
-	case 14667837002931534535:
-		var fnv func(int, charptr, voidptr, int64, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(voidptr), args[3].(int64), args[4].(float64))
-	case 9568573802215923698:
-		var fnv func(int, charptr, int64, voidptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(int64), args[3].(voidptr), args[4].(float64))
-	case 13513278255516307362:
-		var fnv func(int, charptr, int64, float64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int), args[1].(charptr), args[2].(int64), args[3].(float64), args[4].(voidptr))
-	case 18429728682821330694:
-		var fnv func(int64, int, float64, voidptr, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(float64), args[3].(voidptr), args[4].(charptr))
-	case 18429728697474769015:
-		var fnv func(int64, int, float64, charptr, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(float64), args[3].(charptr), args[4].(voidptr))
-	case 15797517040607046769:
-		var fnv func(int64, int, voidptr, float64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(voidptr), args[3].(float64), args[4].(charptr))
-	case 16464781829439093584:
-		var fnv func(int64, int, voidptr, charptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(voidptr), args[3].(charptr), args[4].(float64))
-	case 1260629510636022528:
-		var fnv func(int64, int, charptr, voidptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(charptr), args[3].(voidptr), args[4].(float64))
-	case 3331553266867288912:
-		var fnv func(int64, int, charptr, float64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(int), args[2].(charptr), args[3].(float64), args[4].(voidptr))
-	case 12832916101654359883:
-		var fnv func(int64, float64, int, voidptr, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int), args[3].(voidptr), args[4].(charptr))
-	case 12832916147411445818:
-		var fnv func(int64, float64, int, charptr, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(int), args[3].(charptr), args[4].(voidptr))
-	case 13789667085293789152:
-		var fnv func(int64, float64, voidptr, int, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(voidptr), args[3].(int), args[4].(charptr))
-	case 3741889349941544460:
-		var fnv func(int64, float64, voidptr, charptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(voidptr), args[3].(charptr), args[4].(int))
-	case 7295141836724979201:
-		var fnv func(int64, float64, charptr, voidptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(charptr), args[3].(voidptr), args[4].(int))
-	case 981826947427406723:
-		var fnv func(int64, float64, charptr, int, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(float64), args[2].(charptr), args[3].(int), args[4].(voidptr))
-	case 10304704554279279995:
-		var fnv func(int64, voidptr, float64, int, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(float64), args[3].(int), args[4].(charptr))
-	case 266499202617099415:
-		var fnv func(int64, voidptr, float64, charptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(float64), args[3].(charptr), args[4].(int))
-	case 12010015064784386448:
-		var fnv func(int64, voidptr, int, float64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(int), args[3].(float64), args[4].(charptr))
-	case 11091957738333662897:
-		var fnv func(int64, voidptr, int, charptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(int), args[3].(charptr), args[4].(float64))
-	case 2763248218191009032:
-		var fnv func(int64, voidptr, charptr, int, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(charptr), args[3].(int), args[4].(float64))
-	case 7031826265403845965:
-		var fnv func(int64, voidptr, charptr, float64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(voidptr), args[2].(charptr), args[3].(float64), args[4].(int))
-	case 13721883930354435216:
-		var fnv func(int64, charptr, float64, voidptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(float64), args[3].(voidptr), args[4].(int))
-	case 15487956131077067026:
-		var fnv func(int64, charptr, float64, int, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(float64), args[3].(int), args[4].(voidptr))
-	case 9987127777136504135:
-		var fnv func(int64, charptr, voidptr, float64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(voidptr), args[3].(float64), args[4].(int))
-	case 14796137779360273666:
-		var fnv func(int64, charptr, voidptr, int, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(voidptr), args[3].(int), args[4].(float64))
-	case 13843890424003634601:
-		var fnv func(int64, charptr, int, voidptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(int), args[3].(voidptr), args[4].(float64))
-	case 18401084831427737081:
-		var fnv func(int64, charptr, int, float64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(int64), args[1].(charptr), args[2].(int), args[3].(float64), args[4].(voidptr))
-	case 14615412150555934932:
-		var fnv func(float64, int64, int, voidptr, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(int), args[3].(voidptr), args[4].(charptr))
-	case 14615412137245951909:
-		var fnv func(float64, int64, int, charptr, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(int), args[3].(charptr), args[4].(voidptr))
-	case 14383740739873550463:
-		var fnv func(float64, int64, voidptr, int, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(voidptr), args[3].(int), args[4].(charptr))
-	case 5417318324863920531:
-		var fnv func(float64, int64, voidptr, charptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(voidptr), args[3].(charptr), args[4].(int))
-	case 2161303412950067614:
-		var fnv func(float64, int64, charptr, voidptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(charptr), args[3].(voidptr), args[4].(int))
-	case 8458838383970368540:
-		var fnv func(float64, int64, charptr, int, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int64), args[2].(charptr), args[3].(int), args[4].(voidptr))
-	case 13577783978422960676:
-		var fnv func(float64, int, int64, voidptr, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(int64), args[3].(voidptr), args[4].(charptr))
-	case 13577783993059689813:
-		var fnv func(float64, int, int64, charptr, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(int64), args[3].(charptr), args[4].(voidptr))
-	case 17521603652622755601:
-		var fnv func(float64, int, voidptr, int64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(voidptr), args[3].(int64), args[4].(charptr))
-	case 13395428667070295448:
-		var fnv func(float64, int, voidptr, charptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(voidptr), args[3].(charptr), args[4].(int64))
-	case 13397287186120809880:
-		var fnv func(float64, int, charptr, voidptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(charptr), args[3].(voidptr), args[4].(int64))
-	case 17523610949432482657:
-		var fnv func(float64, int, charptr, int64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(int), args[2].(charptr), args[3].(int64), args[4].(voidptr))
-	case 16732100428118194776:
-		var fnv func(float64, voidptr, int, int64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(int), args[3].(int64), args[4].(charptr))
-	case 11744119432118431953:
-		var fnv func(float64, voidptr, int, charptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(int), args[3].(charptr), args[4].(int64))
-	case 13347401166204368728:
-		var fnv func(float64, voidptr, int64, int, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(int64), args[3].(int), args[4].(charptr))
-	case 3857367209927945908:
-		var fnv func(float64, voidptr, int64, charptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(int64), args[3].(charptr), args[4].(int))
-	case 10797170367013162082:
-		var fnv func(float64, voidptr, charptr, int64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(charptr), args[3].(int64), args[4].(int))
-	case 17991265759733988450:
-		var fnv func(float64, voidptr, charptr, int, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(voidptr), args[2].(charptr), args[3].(int), args[4].(int64))
-	case 7984599875355808303:
-		var fnv func(float64, charptr, int, voidptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(int), args[3].(voidptr), args[4].(int64))
-	case 2599168174116574422:
-		var fnv func(float64, charptr, int, int64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(int), args[3].(int64), args[4].(voidptr))
-	case 10293581555139680946:
-		var fnv func(float64, charptr, voidptr, int, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(voidptr), args[3].(int), args[4].(int64))
-	case 16330250428052351666:
-		var fnv func(float64, charptr, voidptr, int64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(voidptr), args[3].(int64), args[4].(int))
-	case 2125858501823024212:
-		var fnv func(float64, charptr, int64, voidptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(int64), args[3].(voidptr), args[4].(int))
-	case 8438966947074513366:
-		var fnv func(float64, charptr, int64, int, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(float64), args[1].(charptr), args[2].(int64), args[3].(int), args[4].(voidptr))
-	case 15981629090609294681:
-		var fnv func(voidptr, int64, float64, int, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(float64), args[3].(int), args[4].(charptr))
-	case 5870802020257019061:
-		var fnv func(voidptr, int64, float64, charptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(float64), args[3].(charptr), args[4].(int))
-	case 17611231613426485682:
-		var fnv func(voidptr, int64, int, float64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(int), args[3].(float64), args[4].(charptr))
-	case 14638106174004633235:
-		var fnv func(voidptr, int64, int, charptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(int), args[3].(charptr), args[4].(float64))
-	case 8399929451977893162:
-		var fnv func(voidptr, int64, charptr, int, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(charptr), args[3].(int), args[4].(float64))
-	case 3701286485082905967:
-		var fnv func(voidptr, int64, charptr, float64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int64), args[2].(charptr), args[3].(float64), args[4].(int))
-	case 11977083467836069639:
-		var fnv func(voidptr, float64, int64, int, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(int64), args[3].(int), args[4].(charptr))
-	case 3063648799861952235:
-		var fnv func(voidptr, float64, int64, charptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(int64), args[3].(charptr), args[4].(int))
-	case 17813996985112926727:
-		var fnv func(voidptr, float64, int, int64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(int), args[3].(int64), args[4].(charptr))
-	case 13688450509705449614:
-		var fnv func(voidptr, float64, int, charptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(int), args[3].(charptr), args[4].(int64))
-	case 16618717699668433981:
-		var fnv func(voidptr, float64, charptr, int, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(charptr), args[3].(int), args[4].(int64))
-	case 10005620058939583549:
-		var fnv func(voidptr, float64, charptr, int64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(float64), args[2].(charptr), args[3].(int64), args[4].(int))
-	case 2782229490749957034:
-		var fnv func(voidptr, int, float64, int64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(float64), args[3].(int64), args[4].(charptr))
-	case 7805675134715390243:
-		var fnv func(voidptr, int, float64, charptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(float64), args[3].(charptr), args[4].(int64))
-	case 9429988573750152002:
-		var fnv func(voidptr, int, int64, float64, charptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(int64), args[3].(float64), args[4].(charptr))
-	case 13662977334629309539:
-		var fnv func(voidptr, int, int64, charptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(int64), args[3].(charptr), args[4].(float64))
-	case 17492263205283840599:
-		var fnv func(voidptr, int, charptr, int64, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(charptr), args[3].(int64), args[4].(float64))
-	case 10287019833546040929:
-		var fnv func(voidptr, int, charptr, float64, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(int), args[2].(charptr), args[3].(float64), args[4].(int64))
-	case 5099000898586828313:
-		var fnv func(voidptr, charptr, float64, int, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(float64), args[3].(int), args[4].(int64))
-	case 3078733240262749721:
-		var fnv func(voidptr, charptr, float64, int64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(float64), args[3].(int64), args[4].(int))
-	case 6476335657127078358:
-		var fnv func(voidptr, charptr, int, float64, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(int), args[3].(float64), args[4].(int64))
-	case 2730103089238232544:
-		var fnv func(voidptr, charptr, int, int64, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(int), args[3].(int64), args[4].(float64))
-	case 8425219364170907872:
-		var fnv func(voidptr, charptr, int64, int, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(int64), args[3].(int), args[4].(float64))
-	case 3684915884252444837:
-		var fnv func(voidptr, charptr, int64, float64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(voidptr), args[1].(charptr), args[2].(int64), args[3].(float64), args[4].(int))
-	case 4333666961986149722:
-		var fnv func(charptr, int64, float64, voidptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(float64), args[3].(voidptr), args[4].(int))
-	case 6105171995698366680:
-		var fnv func(charptr, int64, float64, int, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(float64), args[3].(int), args[4].(voidptr))
-	case 635232204771128461:
-		var fnv func(charptr, int64, voidptr, float64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(voidptr), args[3].(float64), args[4].(int))
-	case 5701516949963181256:
-		var fnv func(charptr, int64, voidptr, int, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(voidptr), args[3].(int), args[4].(float64))
-	case 4780231674552532067:
-		var fnv func(charptr, int64, int, voidptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(int), args[3].(voidptr), args[4].(float64))
-	case 9012937291235666995:
-		var fnv func(charptr, int64, int, float64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int64), args[2].(int), args[3].(float64), args[4].(voidptr))
-	case 5177244198117943044:
-		var fnv func(charptr, float64, int64, voidptr, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(int64), args[3].(voidptr), args[4].(int))
-	case 3406109564532290182:
-		var fnv func(charptr, float64, int64, int, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(int64), args[3].(int), args[4].(voidptr))
-	case 13328791355713470946:
-		var fnv func(charptr, float64, voidptr, int64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(voidptr), args[3].(int64), args[4].(int))
-	case 15313347877078528482:
-		var fnv func(charptr, float64, voidptr, int, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(voidptr), args[3].(int), args[4].(int64))
-	case 3789544237747698047:
-		var fnv func(charptr, float64, int, voidptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(int), args[3].(voidptr), args[4].(int64))
-	case 9100592385411940230:
-		var fnv func(charptr, float64, int, int64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(float64), args[2].(int), args[3].(int64), args[4].(voidptr))
-	case 8064915461730624790:
-		var fnv func(charptr, voidptr, float64, int64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(float64), args[3].(int64), args[4].(int))
-	case 258609795792393494:
-		var fnv func(charptr, voidptr, float64, int, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(float64), args[3].(int), args[4].(int64))
-	case 8536288359427978154:
-		var fnv func(charptr, voidptr, int64, float64, int) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(int64), args[3].(float64), args[4].(int))
-	case 3583152468217318383:
-		var fnv func(charptr, voidptr, int64, int, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(int64), args[3].(int), args[4].(float64))
-	case 6968977631315478255:
-		var fnv func(charptr, voidptr, int, int64, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(int), args[3].(int64), args[4].(float64))
-	case 2068593171453928153:
-		var fnv func(charptr, voidptr, int, float64, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(voidptr), args[2].(int), args[3].(float64), args[4].(int64))
-	case 16515644808242987218:
-		var fnv func(charptr, int, float64, voidptr, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(float64), args[3].(voidptr), args[4].(int64))
-	case 12677559926711060011:
-		var fnv func(charptr, int, float64, int64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(float64), args[3].(int64), args[4].(voidptr))
-	case 551831174376210320:
-		var fnv func(charptr, int, voidptr, float64, int64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(voidptr), args[3].(float64), args[4].(int64))
-	case 8911402361097984934:
-		var fnv func(charptr, int, voidptr, int64, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(voidptr), args[3].(int64), args[4].(float64))
-	case 3814388479315590803:
-		var fnv func(charptr, int, int64, voidptr, float64) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(int64), args[3].(voidptr), args[4].(float64))
-	case 841548384036564675:
-		var fnv func(charptr, int, int64, float64, voidptr) RETY
-		purego.RegisterFunc(&fnv, fnptrx)
-
-		rv = fnv(args[0].(charptr), args[1].(int), args[2].(int64), args[3].(float64), args[4].(voidptr))
+		rv = fnv(args[0].(int64), args[1].(int64), args[2].(int64), args[3].(float64))
 	default:
 		log.Println("nocare", tycrc, len(args), voidptr(fnptrx))
 	} // end switch tycrc
