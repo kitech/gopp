@@ -56,34 +56,17 @@ func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
 	for i, arg := range args {
 		ty := reflect.TypeOf(arg)
 		switch ty.Kind() {
-		case reflect.Int:
-			if ty.Size() == 4 {
-				tv := int32(arg.(int))
+		case reflect.Int, reflect.Uint, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+			reflect.Int16, reflect.Uint16, reflect.Int8, reflect.Uint8:
+			if ty.Size() <= 4 {
+				tv := reflect.ValueOf(arg).Convert(gopp.Int32Ty).Interface().(int32)
 				args[i] = tv
 			} else {
-				tv := int64(arg.(int))
-				args[i] = tv
-			}
-			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
-		case reflect.Uint:
-			if ty.Size() == 4 {
-				tv := int32(arg.(int))
-				args[i] = tv
-			} else {
-				tv := int64(arg.(int))
+				tv := reflect.ValueOf(arg).Convert(gopp.Int64Ty).Interface().(int64)
 				args[i] = tv
 			}
 			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
 
-		case reflect.Uintptr:
-			if ty.Size() == 4 {
-				tv := int32(arg.(uintptr))
-				args[i] = tv
-			} else {
-				tv := int64(arg.(uintptr))
-				args[i] = tv
-			}
-			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
 		case reflect.UnsafePointer:
 			if ty.Size() == 4 {
 				tv := int32(uintptr(arg.(voidptr)))
@@ -94,21 +77,11 @@ func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
 			}
 			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
 
-		case reflect.Uint64:
-			tv := int64(arg.(uint64))
-			args[i] = tv
-			ty = gopp.Int64Ty
-
 		case reflect.String:
 			tv := CString(arg.(string))
 			defer cfree_voidptr(tv)
 			args[i] = voidptr(tv)
 			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
-
-		case reflect.Int16, reflect.Uint16, reflect.Int8, reflect.Uint8:
-			tv := reflect.ValueOf(arg).Convert(gopp.Int32Ty).Interface().(int32)
-			args[i] = tv
-			ty = gopp.Int32Ty
 
 		case reflect.Int32, reflect.Int64: // just fine
 		case reflect.Float64, reflect.Float32:
