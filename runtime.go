@@ -8,7 +8,12 @@ import (
 	"reflect"
 	"runtime"
 	"sync"
+
+	_ "unsafe"
 )
+
+//go:linkname mallocgc runtime.mallocgc
+var mallocgc func(int) voidptr
 
 func IsAndroid() bool { return runtime.GOOS == "android" }
 func IsWindows() bool { return runtime.GOOS == "windows" }

@@ -23,9 +23,34 @@ litffi_test1(double a, void*b, int64_t c) {
     return (int)(a);
 }
 
+float
+litffi_test2(float a) {
+	printf("%f\n",a);
+	return a+1;
+}
+
 */
 import "C"
 
+func TestLitfficallz() {
+	sym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi_test1")
+	// sym2, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi_test2")
+	// log.Println(sym)
+	x := FfiCall[float64](voidptr(sym), float64(123.2345), voidptr(uintptr(3309)), uint64(386))
+	log.Println(x)
+	{
+		x := FfiCall0[float32]("litffi_test1", float32(123.2345))
+		log.Println(x)
+	}
+	{
+		v := int32(0)
+		*((*float32)(voidptr(&v))) = 1.23
+		x := FfiCall0[float32]("litffi_test2", v)
+		log.Println(x, v)
+	}
+}
+
+// ///////////
 const (
 	FFITY_NONE = iota
 	FFITY_INT
@@ -113,15 +138,4 @@ func Dlsym0(name string) voidptr {
 	sym, err := purego.Dlsym(purego.RTLD_DEFAULT, name)
 	gopp.ErrPrint(err, name)
 	return voidptr(sym)
-}
-
-func TestLitfficallz() {
-	sym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi_test1")
-	// log.Println(sym)
-	x := FfiCall[float64](voidptr(sym), float64(123.2345), voidptr(uintptr(3309)), uint64(386))
-	log.Println(x)
-	{
-		x := FfiCall0[float32]("litffi_test1", float32(123.2345))
-		log.Println(x)
-	}
 }

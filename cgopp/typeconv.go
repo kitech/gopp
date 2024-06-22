@@ -143,19 +143,27 @@ type gostrin struct {
 }
 
 // note nocopy
-// 不可靠的，常量字符串失败
-func StrtoCharpRef(s *string) charptr {
-	gopp.FalsePrint(StrIsNilTail(s), "not safe case, gostring not null terminated")
-	sp := (*gostrin)(voidptr(s))
-	return (charptr)(sp.ptr)
+
+// 更安全的refc字符串.
+// 但是也还不够安全,有可能是临时变量,必须确保生命周期足够长.
+// 在调用C函数的时候使用,在返回值的时候最好不用.
+// 如果null结尾,则直接返回ref.
+// 如果不是null结尾的,则返回clone版本.但是使用方需要在3秒内使用,否则内存会被自动翻译.
+func StrtoRefc(s *string) voidptr {
+	if StrIsNilTail(s) {
+		sp := (*gostrin)(voidptr(s))
+		return (voidptr)(sp.ptr)
+	}
+	s4c := CStringaf(*s)
+	return s4c
 }
 
 // note nocopy
 // 不可靠的，常量字符串失败
-func StrtoVptrRef(s *string) vptr {
+func StrtoVptrRef(s *string) voidptr {
 	gopp.FalsePrint(StrIsNilTail(s), "not safe case, gostring not null terminated")
 	sp := (*gostrin)(voidptr(s))
-	return (vptr)(sp.ptr)
+	return (voidptr)(sp.ptr)
 }
 
 // 常量字符串失败
@@ -214,14 +222,4 @@ func StrAltChar(s *string, idx int, ch byte) {
 		p1[idx] = ch
 		// log.Println(p1)
 	}
-}
-
-func GoString(ptr voidptr) string {
-	return C.GoString((*C.char)(ptr))
-}
-func GoStringN(ptr voidptr, len usize) string {
-	return C.GoStringN((*C.char)(ptr), (C.int)(len))
-}
-func CString(s string) voidptr {
-	return voidptr(C.CString(s))
 }

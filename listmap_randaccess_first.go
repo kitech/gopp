@@ -3,6 +3,7 @@ package gopp
 import (
 	"fmt"
 	"log"
+	mrand "math/rand"
 	"slices"
 	"sync"
 
@@ -71,11 +72,18 @@ func ListMap0From[KT comparable, VT comparable](m map[KT]VT) *ListMap0[KT, VT] {
 
 /////////
 
-func (me *ListMap0[KT, VT]) Count() int {
-	return len(me.a0)
-}
+func (me *ListMap0[KT, VT]) Count() int { return me.Len() }
 func (me *ListMap0[KT, VT]) Len() int {
-	return len(me.a0)
+	me.mu.RLock()
+	l := len(me.a0)
+	me.mu.RUnlock()
+	return l
+}
+func (me *ListMap0[KT, VT]) lennolock() int {
+	lena0 := len(me.a0)
+	lenm0 := len(me.m0)
+	Assert(lena0 == lena0, "a0/m0 not consistant", lena0, lenm0)
+	return IfElse2(mrand.Int()%2 == 0, lena0, lenm0)
 }
 
 func (me *ListMap0[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
@@ -225,12 +233,21 @@ func (me *ListMap0[KT, VT]) GetIndex(idx int) (rk KT, rv VT, exist bool) {
 		return
 	}
 	me.mu.RLock()
+	rk, rv, exist = me.indexatnolock(idx)
+	me.mu.RUnlock()
+
+	return
+}
+func (me *ListMap0[KT, VT]) indexatnolock(idx int) (rk KT, rv VT, exist bool) {
+	if idx < 0 || idx >= len(me.a0) {
+		return
+	}
+
 	hkey := me.a0[idx]
 	kv := me.m0[hkey]
 	rk = kv.Key
 	rv = kv.Val
 	exist = len(me.a0) == len(me.m0)
-	me.mu.RUnlock()
 
 	return
 }
@@ -621,6 +638,53 @@ func (me *ListMap0[KT, VT]) DelMany(keys ...KT) (rv int) {
 	}
 	me.mu.Unlock()
 
+	return
+}
+
+// /// binsearch, 找到插入位置,保持有序
+// 返回该元素的可插入位置
+func (me *ListMap0[KT, VT]) BinFind(v VT, cmpfn func(v VT, v0 VT, v1 VT) int) (inspos int) {
+	me.mu.RLock()
+	inspos = me.binfindnolock(v, cmpfn)
+	me.mu.RUnlock()
+	return
+}
+func (me *ListMap0[KT, VT]) binfindnolock(v VT, cmpfn func(v VT, v0 VT, v1 VT) int) (inspos int) {
+	inspos = -1
+	begin := 0
+	end := me.lennolock() - 1
+
+	if end == -1 {
+		inspos = 0
+		return
+	}
+
+	var pos int = -1
+	for i := 0; i < 999; i++ {
+		pos = (begin + end) / 2
+		if pos == 0 {
+			inspos = 0
+			goto endfor
+		}
+		_, v0, _ := me.indexatnolock(pos - 1)
+		_, v1, _ := me.indexatnolock(pos)
+
+		// Debug(i, pos, v0, v1, me.lennolock(), begin, end)
+		cmpval := cmpfn(v, v0, v1)
+		switch cmpval {
+		case 0: // v 在两者之间
+			inspos = pos
+			Debug("Fould count/pos", i, pos)
+			goto endfor
+		case 1: // v 比两者大
+			begin = pos
+		case -1: // v 比两者小
+			end = pos
+		default:
+			Warn("Invalid cmpval", cmpval)
+		}
+	}
+endfor:
 	return
 }
 

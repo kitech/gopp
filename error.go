@@ -507,6 +507,10 @@ func GetCallerInfo(skip int) (info string) {
 		return
 	}
 	funcName := runtime.FuncForPC(pc).Name()
+	// pkg.(*struct).method() => method()
+	if pos := strings.LastIndex(funcName, ")."); pos > 0 {
+		funcName = funcName[pos+2:]
+	}
 	if strings.Count(funcName, "/") > 1 {
 		pos := strings.LastIndex(funcName, "/")
 		pos = strings.LastIndex(funcName[:pos], "/")

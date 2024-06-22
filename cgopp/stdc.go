@@ -1,5 +1,14 @@
 package cgopp
 
+import (
+	"reflect"
+	"strings"
+	"time"
+	"unsafe"
+
+	"github.com/kitech/gopp"
+)
+
 /*
 #include <string.h>
 #include <stdlib.h>
@@ -10,14 +19,6 @@ package cgopp
 */
 import "C"
 
-import (
-	"reflect"
-	"strings"
-	"unsafe"
-
-	"github.com/kitech/gopp"
-)
-
 type GoIface struct {
 	Type voidptr
 	Data voidptr
@@ -25,7 +26,10 @@ type GoIface struct {
 
 // std c library functions
 // 这么封装一次，引用的包不需要再显式的引入"C"包。让CGO代码转换不传播到引用的代码中
-func Cmemcpy()                  {}
+func Cmemcpy(dst voidptr, src voidptr, n usize) voidptr {
+	rv := C.memcpy(dst, src, C.size_t(n))
+	return rv
+}
 func cfree_voidptr(ptr voidptr) { C.free(ptr) }
 func Cfree(ptrx any) {
 	switch ptr := ptrx.(type) {
@@ -74,3 +78,22 @@ const CppBoolTySz = gopp.Int8TySz
 // macos not this func
 // let freed memory really given back to OS
 // func MallocTrim() int { return int(C.malloc_trim(0)) }
+
+func GoString(ptr voidptr) string {
+	return C.GoString((*C.char)(ptr))
+}
+func GoStringN(ptr voidptr, len usize) string {
+	return C.GoStringN((*C.char)(ptr), (C.int)(len))
+}
+func CString(s string) voidptr {
+	return voidptr(C.CString(s))
+}
+
+// auto free after timeout
+func CStringaf(s string) voidptr {
+	ptr := voidptr(C.CString(s))
+
+	time.AfterFunc(gopp.DurandSec(3, 5), func() { cfree_voidptr(ptr) })
+
+	return ptr
+}
