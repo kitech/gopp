@@ -372,8 +372,12 @@ func Debugp(args ...any) {
 }
 
 // BUG: panic: reflect: call of reflect.Value.IsNil on uint64 Value
-func NilPrint(v interface{}, args ...any) any {
-	if v == nil {
+func NilPrint(v any, args ...any) any {
+	vref := reflect.ValueOf(v)
+	vty := vref.Type()
+	if v == nil || ((vty.ConvertibleTo(VoidpTy()) ||
+		vty.Kind() == reflect.Slice || vty.Kind() == reflect.Map ||
+		vty.Kind() == reflect.Chan || vty.Kind() == reflect.Func) && vref.IsNil()) {
 		s := printq("CondNil", args...)
 		log.Output(2, s)
 		if justprintoutfn != nil {
@@ -388,6 +392,11 @@ func NilPrint(v interface{}, args ...any) any {
 }
 
 func NilFatal(v any, args ...any) {
+	if v == nil {
+		log.Fatalln(printq("CondNil", args...))
+	}
+}
+func NilPanic(v any, args ...any) {
 	if v == nil {
 		log.Fatalln(printq("CondNil", args...))
 	}
@@ -493,6 +502,10 @@ func Warn(args ...any) {
 }
 func Fatal(args ...any) {
 	s := printq("[FATAL] ", args...)
+	log.Output(2, s)
+}
+func Println(args ...any) {
+	s := printq("[PRINT] ", args...)
 	log.Output(2, s)
 }
 

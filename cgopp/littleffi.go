@@ -110,6 +110,8 @@ func Litfficallg[FT voidptr | uintptr | *[0]byte](fnptrx FT, argsx ...any) voidp
 			argv[i] = vx
 		case *C.char:
 			argv[i] = voidptr(vx)
+		case bool:
+			argv[i] = voidptr(usize(gopp.IfElse2(vx, 1, 0)))
 		default:
 			// try reflect convert
 			var voidptrty = gopp.VoidpTy()

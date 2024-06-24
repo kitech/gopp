@@ -652,32 +652,42 @@ func (me *ListMap0[KT, VT]) BinFind(v VT, cmpfn func(v VT, v0 VT, v1 VT) int) (i
 func (me *ListMap0[KT, VT]) binfindnolock(v VT, cmpfn func(v VT, v0 VT, v1 VT) int) (inspos int) {
 	inspos = -1
 	begin := 0
-	end := me.lennolock() - 1
+	end := me.lennolock()
 
-	if end == -1 {
-		inspos = 0
-		return
-	}
+	// if end == -1 {
+	// 	inspos = 0
+	// 	return
+	// }
 
 	var pos int = -1
-	for i := 0; i < 999; i++ {
+	var iter = 0
+	for iter = 0; iter < 999; iter++ {
 		pos = (begin + end) / 2
 		if pos == 0 {
 			inspos = 0
 			goto endfor
 		}
+		if begin == end && end == me.lennolock() {
+			inspos = end
+			goto endfor
+		}
 		_, v0, _ := me.indexatnolock(pos - 1)
 		_, v1, _ := me.indexatnolock(pos)
 
-		// Debug(i, pos, v0, v1, me.lennolock(), begin, end)
+		if any(v1) == nil {
+			log.Println(me.lennolock(), begin, end, pos)
+		}
+
+		// Debug("i", iter, "pos", pos, "cnt", me.lennolock(), "bgn", begin, "end", end, v0, "v1:", v1)
 		cmpval := cmpfn(v, v0, v1)
+		// Debug("i", iter, "pos", pos, "cnt", me.lennolock(), "bgn", begin, "end", end, v0, "v1:", v1, "cv", cmpval)
 		switch cmpval {
 		case 0: // v 在两者之间
 			inspos = pos
-			Debug("Fould count/pos", i, pos)
+			// Debug("Fould count/pos", iter, pos)
 			goto endfor
 		case 1: // v 比两者大
-			begin = pos
+			begin = pos + 1
 		case -1: // v 比两者小
 			end = pos
 		default:
@@ -685,6 +695,7 @@ func (me *ListMap0[KT, VT]) binfindnolock(v VT, cmpfn func(v VT, v0 VT, v1 VT) i
 		}
 	}
 endfor:
+	TruePrint(inspos == -1, "i", iter, "cnt", me.lennolock(), "bgn", begin, "end", end)
 	return
 }
 
