@@ -59,6 +59,14 @@ func ToStrs(args ...interface{}) (rets []string) {
 	}
 	return
 }
+func ToStrs2(argsx any) (rets []string) {
+	args, ok := argsx.([]any)
+	if !ok {
+		return
+	}
+	rets = ToStrs(args...)
+	return
+}
 
 // support bool, string, *int*, uintptr, unsafe.Pointer, float*
 func Toint(vx any) int {

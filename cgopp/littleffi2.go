@@ -91,6 +91,10 @@ func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
 				args[i] = tv
 			}
 			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
+		case reflect.Bool: // nice, its works
+			tv := int32(Go2cBool(arg.(bool)))
+			args[i] = tv
+			ty = gopp.Int32Ty
 
 		case reflect.UnsafePointer:
 			if ty.Size() == 4 {
@@ -120,7 +124,7 @@ func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
 	var tycrc uint64
 	tycrc = gopp.Crc64Str(tystr)
 
-	log.Println(tystrs, tycrc, tystr)
+	// log.Println(tystrs, tycrc, tystr)
 	var rv = litfficallgenimpl[T](tycrc, uintptr(fnptrx), args...)
 	gopp.GOUSED(rv)
 	// var retptr = &rvx
