@@ -46,6 +46,7 @@ func JNI_OnLoad(vm JavaVM, x uintptr) int {
 	log.Println("jvm", voidptr(jvm), "jenv", voidptr(jenv))
 	gopp.NilPrint(jenv, "some error occus", voidptr(vm))
 
+	JNI_OnLoad_Callback()
 	// Jenv.FindClass("java/lang/String")
 	return JNI_VERSION_1_6
 }
