@@ -26,6 +26,8 @@ void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void
 	fnargc3 fn3 = fnptr;
 	typedef void* (*fnargc4)(void*, void*, void*, void*) ;
 	fnargc4 fn4 = fnptr;
+	typedef void* (*fnargc5)(void*, void*, void*, void*, void*) ;
+	fnargc5 fn5 = fnptr;
 
 	void* retptr = 0;
 	switch (argc) {
@@ -44,6 +46,11 @@ void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void
 	case 4:
 		retptr = fn4(arg0, arg1, arg2, arg3);
 		break;
+	case 5:
+		retptr = fn5(arg0, arg1, arg2, arg3, arg4);
+		break;
+	default:
+		printf("cgopp.C.%s: casedft fnptr=%p,argc=%d,arg0=%p\n", __FUNCTION__, fnptr, argc, arg0);
 	}
 
 	return retptr;
@@ -63,7 +70,7 @@ func init() {
 // note: 所有参数必须全是指针类型
 // not support len(args) <= 5
 func Litfficall(fnptrx voidptr, args ...voidptr) voidptr {
-	if len(args) > 4 {
+	if len(args) > 5 {
 		log.Println("too many args, max", 5, ", but", len(args))
 	}
 	var argc = len(args)
@@ -85,7 +92,7 @@ func Litfficall(fnptrx voidptr, args ...voidptr) voidptr {
 // argsx, must can convert to voidptr
 // not support len(args) <= 5
 func Litfficallg[FT voidptr | uintptr | *[0]byte](fnptrx FT, argsx ...any) voidptr {
-	if len(argsx) > 4 {
+	if len(argsx) > 5 {
 		log.Println("too many args, max", 5, ", but", len(argsx))
 	}
 
