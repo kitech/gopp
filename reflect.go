@@ -60,7 +60,8 @@ const (
 	flagRO          GorefFlag = flagStickyRO | flagEmbedRO
 )
 
-// todo how deal unexport field???
+// todo 可能出现 fatal error: concurrent map read and map write
+// how deal unexport field??? UnsetRO
 // 需要一个更强大的reflect库
 func DeepSizeof(vx any, depth int) (rv int) {
 	valx := reflect.ValueOf(vx)

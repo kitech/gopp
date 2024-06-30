@@ -643,56 +643,53 @@ func (me *ListMap0[KT, VT]) DelMany(keys ...KT) (rv int) {
 
 // /// binsearch, 找到插入位置,保持有序
 // 返回该元素的可插入位置
-func (me *ListMap0[KT, VT]) BinFind(v VT, cmpfn func(v VT, v0 VT, v1 VT) int) (inspos int) {
+func (me *ListMap0[KT, VT]) BinFind(v VT, cmpfn func(v0 VT, v1 VT) int) (inspos int) {
 	me.mu.RLock()
 	inspos = me.binfindnolock(v, cmpfn)
 	me.mu.RUnlock()
 	return
 }
-func (me *ListMap0[KT, VT]) binfindnolock(v VT, cmpfn func(v VT, v0 VT, v1 VT) int) (inspos int) {
+func (me *ListMap0[KT, VT]) binfindnolock(v VT, cmpfn func(v0 VT, v1 VT) int) (inspos int) {
 	inspos = -1
 	begin := 0
 	end := me.lennolock()
 
-	// if end == -1 {
-	// 	inspos = 0
-	// 	return
-	// }
-
-	var pos int = -1
 	var iter = 0
 	for iter = 0; iter < 999; iter++ {
-		pos = (begin + end) / 2
-		if pos == 0 {
-			inspos = 0
-			goto endfor
-		}
-		if begin == end && end == me.lennolock() {
-			inspos = end
-			goto endfor
-		}
-		_, v0, _ := me.indexatnolock(pos - 1)
-		_, v1, _ := me.indexatnolock(pos)
+		pos := (begin + end) / 2
 
+		_, v0, e0 := me.indexatnolock(pos - 1)
+		_, v1, e1 := me.indexatnolock(pos)
+
+		// permit v0 or v1 nil now
 		if any(v1) == nil {
-			log.Println(me.lennolock(), begin, end, pos)
+			// log.Println(me.lennolock(), begin, end, pos)
+		}
+		var cmpval0 int
+		var cmpval1 int
+		if !e0 {
+			cmpval0 = 1
+		} else {
+			cmpval0 = cmpfn(v, v0)
+		}
+		if !e1 {
+			cmpval1 = -1
+		} else {
+			cmpval1 = cmpfn(v, v1)
+		}
+		if cmpval0 < 0 && cmpval1 < 0 {
+			end = pos
+		} else if cmpval0 > 0 && cmpval1 > 0 {
+			begin = pos + 1
+		} else if cmpval0 >= 0 && cmpval1 <= 0 {
+			inspos = pos
+			goto endfor
+		} else {
+			Warn("Invalid cmpval", cmpval0, cmpval1)
 		}
 
 		// Debug("i", iter, "pos", pos, "cnt", me.lennolock(), "bgn", begin, "end", end, v0, "v1:", v1)
-		cmpval := cmpfn(v, v0, v1)
-		// Debug("i", iter, "pos", pos, "cnt", me.lennolock(), "bgn", begin, "end", end, v0, "v1:", v1, "cv", cmpval)
-		switch cmpval {
-		case 0: // v 在两者之间
-			inspos = pos
-			// Debug("Fould count/pos", iter, pos)
-			goto endfor
-		case 1: // v 比两者大
-			begin = pos + 1
-		case -1: // v 比两者小
-			end = pos
-		default:
-			Warn("Invalid cmpval", cmpval)
-		}
+
 	}
 endfor:
 	TruePrint(inspos == -1, "i", iter, "cnt", me.lennolock(), "bgn", begin, "end", end)
