@@ -86,6 +86,20 @@ func (me *ListMap0[KT, VT]) lennolock() int {
 	return IfElse2(mrand.Int()%2 == 0, lena0, lenm0)
 }
 
+func (me *ListMap0[KT, VT]) Clear() {
+	me.mu.Lock()
+	for k := range me.m0 {
+		delete(me.m0, k)
+	}
+	me.a0 = me.a0[:0]
+	if me.reversemap {
+		for k := range me.mr {
+			delete(me.mr, k)
+		}
+	}
+	me.mu.Unlock()
+}
+
 func (me *ListMap0[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
 	hkey := me.hhker.Hash(key)
 

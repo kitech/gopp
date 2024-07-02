@@ -373,8 +373,11 @@ func Debugp(args ...any) {
 
 // BUG: panic: reflect: call of reflect.Value.IsNil on uint64 Value
 func NilPrint(v any, args ...any) any {
+	if v == nil {
+		return v
+	}
 	vref := reflect.ValueOf(v)
-	vty := vref.Type()
+	vty := vref.Type() // panic: reflect: call of reflect.Value.Type on zero Value
 	if v == nil || ((vty.ConvertibleTo(VoidpTy()) ||
 		vty.Kind() == reflect.Slice || vty.Kind() == reflect.Map ||
 		vty.Kind() == reflect.Chan || vty.Kind() == reflect.Func) && vref.IsNil()) {
