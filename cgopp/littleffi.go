@@ -112,6 +112,10 @@ func Litfficallg[FT voidptr | uintptr | *[0]byte](fnptrx FT, argsx ...any) voidp
 		if i > 4 {
 			break
 		}
+		if argx == nil {
+			argv[i] = voidptr(nil)
+			continue
+		}
 		switch vx := argx.(type) {
 		case voidptr:
 			argv[i] = vx

@@ -66,11 +66,28 @@ func Cfree(ptrx any) {
 	}
 }
 
-func Calloc()   {}
-func CMemset()  {}
-func CMemZero() {}
-func CStrcpy()  {}
-func CStrdup()  {}
+func Calloc(c, n int) voidptr {
+	return C.calloc(csizet(c), csizet(n))
+}
+func Memset(ptr voidptr, c, n int) voidptr {
+	return C.memset(ptr, cint(c), csizet(n))
+}
+func MemZero(ptr voidptr, n int) voidptr {
+	return C.memset(ptr, 0, csizet(n))
+}
+func Strcpy() {}
+func Strdup() {}
+
+func Malloc(n int) voidptr {
+	rv := C.malloc(csizet(n))
+	return rv
+}
+
+// 可以用作存储C字符串？
+// 不可以用作存储C++对象，无法调用destructor
+func Mallocgc(n int) voidptr {
+	return mymallocgc(usize(n), nil, true)
+}
 
 const CBoolTySz = gopp.Int32TySz
 const CppBoolTySz = gopp.Int8TySz

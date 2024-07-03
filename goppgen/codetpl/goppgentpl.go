@@ -23,6 +23,7 @@ type voidptr = unsafe.Pointer
 
 // begin cgo
 type cuptr = C.uintptr_t
+type csizet = C.size_t
 type cvptr = *C.void
 type charptr = *C.char
 type ucharptr = *C.uchar

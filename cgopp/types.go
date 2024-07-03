@@ -27,7 +27,7 @@ func IntAsFloat32(v uint64) (n float32) {
 func U64ToPtr(v uint64) unsafe.Pointer    { return unsafe.Pointer(uintptr(v)) }
 func U64OfPtr(vptr unsafe.Pointer) uint64 { return uint64(uintptr(vptr)) }
 
-func C2goBool(ok cint) bool {
+func C2goBool[T cint | int | usize](ok T) bool {
 	if ok == 0 {
 		return false
 	}
