@@ -17,50 +17,39 @@ import (
 
 // int
 double
-litffi_test1(double a, void*b, int64_t c) {
-	printf("%f, %d, %p=%d, %d, \n", a, (int)a, b, (int)b, c);
+litffi2_test1(double a, void*b, int64_t c) {
+	printf("%s: %f, %d, %p=%d, %d, \n", __FUNCTION__, a, (int)a, b, (int)b, c);
 	return a;
     return (int)(a);
 }
 
 float
-litffi_test2(float a) {
-	printf("%f\n",a);
+litffi2_test2(float a) {
+	printf("%s: %f\n", __FUNCTION__, a);
 	return a+1;
 }
 
 */
 import "C"
 
-func TestLitfficallz() {
+func TestLitffi2callz() {
 	sym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi_test1")
 	// sym2, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi_test2")
 	// log.Println(sym)
-	x := FfiCall[float64](voidptr(sym), float64(123.2345), voidptr(uintptr(3309)), uint64(386))
-	log.Println(x)
+	x := Ffi2Call[float64](voidptr(sym), float64(123.2345), voidptr(uintptr(3309)), uint64(386))
+	log.Println("ret1", gopp.IfElse2(x == 123.2345, "OK", "unwant"), x)
 	{
-		x := FfiCall0[float32]("litffi_test1", float32(123.2345))
-		log.Println(x)
+		x := Ffi2Call0[float32]("litffi_test1", float32(123.2345))
+		log.Println("ret2", gopp.IfElse2(x == 123.2345, "OK", "unwant"), x)
 	}
 	{
-		v := int32(0)
-		*((*float32)(voidptr(&v))) = 1.23
-		x := FfiCall0[float32]("litffi_test2", v)
-		log.Println(x, v)
+		v := float32(1.23)
+		x := Ffi2Call0[float32]("litffi_test2", v)
+		log.Println("ret3", gopp.IfElse2(x == 2.23, "OK", "unwant"), x)
 	}
 }
 
 // ///////////
-const (
-	FFITY_NONE = iota
-	FFITY_INT
-	FFITY_INT64
-	FFITY_STRING // charptr
-	FFITY_FLOAT32
-	FFITY_FLOAT64
-	FFITY_POINTER
-	FFITY_USIZE
-)
 
 // //////////
 // 支持浮点数返回值
@@ -68,8 +57,7 @@ const (
 // 支持go string 传递参数，自动转换为charptr。但是C端不要持有该字符串指针，函数调用完成释放掉的
 // 如果没有返回值，使用[int]即可
 // Usage1: FfiCall[float64]()
-// Usage1: FfiCall(FFITY_FLOAT)
-func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
+func Ffi2Call[RETY any, FT voidptr | usize](fnptrx FT, args ...any) (rvx RETY) {
 	var args2 = make([]any, 5)
 	var tystrs = make([]string, 5)
 	for i, arg := range args {
@@ -125,7 +113,7 @@ func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
 	tycrc = gopp.Crc64Str(tystr)
 
 	// log.Println(tystrs, tycrc, tystr)
-	var rv = litfficallgenimpl[T](tycrc, uintptr(fnptrx), args2...)
+	var rv = litfficallgenimpl[RETY](tycrc, uintptr(fnptrx), args2...)
 	gopp.GOUSED(rv)
 	// var retptr = &rvx
 	// *retptr = *((*T)(voidptr(&rv)))
@@ -134,12 +122,7 @@ func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
 	return
 }
 
-func FfiCall0[T any](name string, args ...any) T {
+func Ffi2Call0[T any](name string, args ...any) T {
 	sym := Dlsym0(name)
-	return FfiCall[T](sym, args...)
-}
-func Dlsym0(name string) voidptr {
-	sym, err := purego.Dlsym(purego.RTLD_DEFAULT, name)
-	gopp.ErrPrint(err, name)
-	return voidptr(sym)
+	return Ffi2Call[T](sym, args...)
 }
