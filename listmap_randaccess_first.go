@@ -654,6 +654,18 @@ func (me *ListMap0[KT, VT]) DelMany(keys ...KT) (rv int) {
 
 	return
 }
+func (me *ListMap0[KT, VT]) Indexof(key KT) (rv int) {
+	rv = -1
+	hkey := me.hhker.Hash(key)
+	me.mu.RLock()
+	_, ok := me.m0[hkey]
+	if ok {
+		idx := slices.Index(me.a0, hkey)
+		rv = idx
+	}
+	me.mu.RUnlock()
+	return
+}
 
 // /// binsearch, 找到插入位置,保持有序
 // 返回该元素的可插入位置
