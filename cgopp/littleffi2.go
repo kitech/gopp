@@ -70,14 +70,8 @@ const (
 // Usage1: FfiCall[float64]()
 // Usage1: FfiCall(FFITY_FLOAT)
 func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
-	if len(args) == 0 {
-		var fnv func() T
-		purego.RegisterFunc(&fnv, uintptr(fnptrx))
-		rvx = fnv()
-	}
-
-	// 按照长度
-	var tystrs []string
+	var args2 = make([]any, 5)
+	var tystrs = make([]string, 5)
 	for i, arg := range args {
 		ty := reflect.TypeOf(arg)
 		switch ty.Kind() {
@@ -85,31 +79,31 @@ func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
 			reflect.Int16, reflect.Uint16, reflect.Int8, reflect.Uint8:
 			if ty.Size() <= 4 {
 				tv := reflect.ValueOf(arg).Convert(gopp.Int32Ty).Interface().(int32)
-				args[i] = tv
+				args2[i] = tv
 			} else {
 				tv := reflect.ValueOf(arg).Convert(gopp.Int64Ty).Interface().(int64)
-				args[i] = tv
+				args2[i] = tv
 			}
 			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
 		case reflect.Bool: // nice, its works
 			tv := int32(Go2cBool(arg.(bool)))
-			args[i] = tv
+			args2[i] = tv
 			ty = gopp.Int32Ty
 
 		case reflect.UnsafePointer:
 			if ty.Size() == 4 {
-				tv := int32(uintptr(arg.(voidptr)))
-				args[i] = tv
+				tv := int32(usize(arg.(voidptr)))
+				args2[i] = tv
 			} else {
-				tv := int64(uintptr(arg.(voidptr)))
-				args[i] = tv
+				tv := int64(usize(arg.(voidptr)))
+				args2[i] = tv
 			}
 			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
 
 		case reflect.String:
 			tv := CString(arg.(string))
 			defer cfree_voidptr(tv)
-			args[i] = voidptr(tv)
+			args2[i] = voidptr(tv)
 			ty = gopp.IfElse2(ty.Size() == 4, gopp.Int32Ty, gopp.Int64Ty)
 
 		case reflect.Int32, reflect.Int64: // just fine
@@ -117,15 +111,21 @@ func FfiCall[T any](fnptrx voidptr, args ...any) (rvx T) {
 		default:
 			gopp.Info(ty.String(), arg)
 		}
-		tystrs = append(tystrs, ty.String())
+		tystrs[i] = ty.String()
 	}
+	for i := len(args); i < 5; i++ {
+		tv := int32(0)
+		args2[i] = tv
+		tystrs[i] = gopp.Int32Ty.String()
+	}
+	gopp.FalsePrint(len(tystrs) == 5 && len(args2) == 5, "some error", len(tystrs), len(args))
 
 	var tystr = strings.Join(tystrs, "_")
 	var tycrc uint64
 	tycrc = gopp.Crc64Str(tystr)
 
 	// log.Println(tystrs, tycrc, tystr)
-	var rv = litfficallgenimpl[T](tycrc, uintptr(fnptrx), args...)
+	var rv = litfficallgenimpl[T](tycrc, uintptr(fnptrx), args2...)
 	gopp.GOUSED(rv)
 	// var retptr = &rvx
 	// *retptr = *((*T)(voidptr(&rv)))

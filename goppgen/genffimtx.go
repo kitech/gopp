@@ -9,9 +9,14 @@ import (
 	"github.com/kitech/gopp"
 )
 
+// C 函数有一个特点，可以多传递参数而不影响，那么就不用区分按照参数个数生成一种类型，
+// 全部是5个参数，不足5个的补为int。
+
 // 到8个类型的时候，排列组合就太多了。。。
 // uintptr, usize, charptr => voidptr
 var ctypes = []string{"int32", "int64", "float64",
+	"int32", "int64", "float64",
+	"int32", "int64", "float64",
 	"int32", "int64", "float64",
 	"int32", "int64", "float64",
 }
@@ -36,7 +41,7 @@ func genfficallmtx() {
 	sb.WriteString("switch tycrc {\n")
 
 	var m = map[string][]string{}
-	for i := 0; i < 5; i++ {
+	for i := 4; i < 5; i++ {
 		x := Combination(ctypes, i+1)
 		// log.Println(len(x), x, len(x))
 		for _, y := range x {
