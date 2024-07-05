@@ -96,10 +96,10 @@ const CppBoolTySz = gopp.Int8TySz
 // let freed memory really given back to OS
 // func MallocTrim() int { return int(C.malloc_trim(0)) }
 
-func GoString(ptr voidptr) string {
+func GoString[T voidptr | charptr](ptr T) string {
 	return C.GoString((*C.char)(ptr))
 }
-func GoStringN(ptr voidptr, len usize) string {
+func GoStringN[T voidptr | charptr](ptr T, len usize) string {
 	return C.GoStringN((*C.char)(ptr), (C.int)(len))
 }
 func CString(s string) voidptr {

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func Benchfn(name string, times int, f func()) {
+func Benchfn(f func(), times int, name ...string) {
 	btime := time.Now()
 	for i := 0; i < times; i++ {
 		f()

@@ -17,7 +17,7 @@ import (
 // int
 double
 litffi3_test1(double a, void*b, int64_t c) {
-	printf("%s: %f, %d, %p=%d, %d, \n", __FUNCTION__, a, (int)a, b, (int)b, c);
+	// printf("%s: %f, %d, %p=%ld, %lld, \n", __FUNCTION__, a, (int)a, b, (uintptr_t)b, c);
 	return a;
     return (int)(a);
 }
@@ -34,19 +34,41 @@ import "C"
 func TestLitffi3callz() {
 	sym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
 	// sym2, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi_test2")
-	// log.Println(sym)
-	x := Ffi3Call[float64](voidptr(sym), float64(123.2345), voidptr(uintptr(3309)), uint64(386))
+	log.Println(sym, voidptr(sym))
+	// todo how let go not checkptr, 用 usize传递
+	// -race failed: fatal error: checkptr: pointer arithmetic computed bad pointer value
+	// argp0 := voidptr(usize(3309))
+	// argp0 := voidptr(usize(0)) // ok
+	argp0 := usize(3309)
+	x := Ffi3Call[float64](sym, float64(123.2345), argp0, uint64(386))
 	log.Println("ret1", gopp.IfElse2(x == 123.2345, "OK", "unwant"), x)
 
+	// float**的参数和返回值类型一定要与C函数匹配
 	{
+		// 这个应该也是不支持的，不支持为什么结果正确
 		x := Ffi3Call0[float32]("litffi3_test1", float32(123.2345))
 		log.Println("ret2", gopp.IfElse2(x == 123.2345, "OK", "unwant"), x)
 	}
 	{
+		// 不支持的，返回结果未定义
+		x := Ffi3Call0[float64]("litffi3_test1", float32(123.2345))
+		log.Println("ret3", gopp.IfElse2(gopp.FloatIsZero(x), "OK", "unwant"), x)
+	}
+	{
 		v := float32(1.23)
 		x := Ffi3Call0[float32]("litffi3_test2", v)
-		log.Println("ret3", gopp.IfElse2(x == 2.23, "OK", "unwant"), x)
+		log.Println("ret4", gopp.IfElse2(x == 2.23, "OK", "unwant"), x)
 	}
+}
+
+func BMLitffi3callz() {
+	fnsym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
+
+	gopp.Benchfn(func() {
+		argp0 := usize(3309)
+		x := Ffi3Call[float64](fnsym, float64(123.2345), argp0, uint64(386))
+		_ = x
+	}, 9999, gopp.MyFuncName())
 }
 
 // //////////

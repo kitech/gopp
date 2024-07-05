@@ -1,5 +1,10 @@
 package gopp
 
+import (
+	"runtime"
+	"strings"
+)
+
 // no use???
 // usage: Progn(Retn(f1(...)), Retn(f2(...)), Retn(f3(...)))
 func Progn(args ...interface{}) (rets [][]interface{}) {
@@ -18,4 +23,15 @@ type Retval struct {
 	Ret   interface{}
 	Err   error
 	Extra interface{}
+}
+
+func MyFuncName() string {
+	pc, _, _, _ := runtime.Caller(1)
+	name := runtime.FuncForPC(pc).Name()
+
+	if pos := strings.LastIndex(name, "/"); pos != -1 {
+		name = name[pos+1:]
+	}
+
+	return name
 }

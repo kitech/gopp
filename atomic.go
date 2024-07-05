@@ -1,6 +1,7 @@
 package gopp
 
 import (
+	"reflect"
 	"sync/atomic"
 )
 
@@ -52,3 +53,11 @@ func (this *AtomicBool) Value() uint32 { return atomic.LoadUint32((*uint32)(this
 
 // https://www.jianshu.com/p/72d02353dc7e
 //
+
+func AtomicChknil(vx any) bool {
+	if vx == nil {
+		return true
+	}
+	valx := reflect.ValueOf(vx)
+	return valx.IsNil()
+}

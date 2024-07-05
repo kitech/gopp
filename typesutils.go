@@ -6,6 +6,10 @@ import (
 	"unicode"
 )
 
+func FloatIsZero[T float32 | float64](v T) bool {
+	return v > -0.000001 && v < 0.000001
+}
+
 // see unicode.IsNumber()
 func Isnumtype(ty reflect.Type) bool {
 	switch ty.Kind() {
