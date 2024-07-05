@@ -420,6 +420,11 @@ func ZeroPrint(v any, args ...any) any {
 	}
 	return v
 }
+func ZeroThen(v any, f func()) {
+	if reflect.Zero(reflect.TypeOf(v)).Interface() == v {
+		f()
+	}
+}
 
 // NOT mean: error != nil or bool == false or int == 0 or pointer == nil or string == "" other what?
 func NotPrint(v any, args ...any) any {

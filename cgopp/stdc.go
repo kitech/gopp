@@ -106,6 +106,7 @@ func CString(s string) voidptr {
 	return voidptr(C.CString(s))
 }
 
+// too slow, 480ns/op, C.CString不过 100ns/op
 // auto free after timeout
 func CStringaf(s string) voidptr {
 	ptr := voidptr(C.CString(s))
@@ -113,4 +114,73 @@ func CStringaf(s string) voidptr {
 	time.AfterFunc(gopp.DurandSec(3, 5), func() { cfree_voidptr(ptr) })
 
 	return ptr
+}
+
+// using go's mallocgc version
+func CStringgc(s string) voidptr {
+	ptr := Mallocgc(len(s) + 1)
+
+	slc := GoSlice{ptr, len(s) + 1, len(s) + 1}
+	b := *(*[]byte)(unsafe.Pointer(&slc))
+	copy(b, s)
+	b[len(s)] = 0
+
+	return ptr
+}
+func Gostrdup(s string) string {
+	ptr := CStringgc(s)
+	var rv string
+	o := ((*GoStringIn)((voidptr)(&rv)))
+	o.Ptr = ptr
+	o.Len = usize(len(s))
+	return rv
+}
+
+func CStringgc2(s string) voidptr {
+	ptr := Mallocgc(len(s) + 1)
+	o := (*GoStringIn)((voidptr)(&s))
+	Cmemcpy(ptr, o.Ptr, o.Len)
+
+	return ptr
+}
+
+// typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
+
+type GoSlice struct {
+	Data voidptr
+	Len  int
+	Cap  int
+}
+
+// typedef struct { const char *p; ptrdiff_t n; } _GoString_;
+
+type GoStringIn struct {
+	Ptr voidptr // charptr
+	Len usize
+}
+
+type GortType struct {
+}
+
+// 从cgo生成的临时文件中取得
+// CString converts the Go string s to a C string.
+//
+// The C string is allocated in the C heap using malloc.
+// It is the caller's responsibility to arrange for it to be
+// freed, such as by calling C.free (be sure to include stdlib.h
+// if C.free is needed).
+func _Cfunc_CString_demoo(s string) charptr {
+	if len(s)+1 <= 0 {
+		panic("string too large")
+	}
+	p := _cgo_cmalloc(uint64(len(s) + 1))
+	sliceHeader := struct {
+		p   unsafe.Pointer
+		len int
+		cap int
+	}{p, len(s) + 1, len(s) + 1}
+	b := *(*[]byte)(unsafe.Pointer(&sliceHeader))
+	copy(b, s)
+	b[len(s)] = 0
+	return (charptr)(p)
 }
