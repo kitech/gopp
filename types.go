@@ -152,6 +152,7 @@ var Float32Ty = reflect.TypeOf(vFloat32Ty)
 var Float64Ty = reflect.TypeOf(vFloat64Ty)
 var BoolTy = reflect.TypeOf(vBoolTy)
 var StrTy = reflect.TypeOf(vStrTy)
+var UsizeTy = reflect.TypeOf(vUintptrTy)
 
 var RefKindTys = map[reflect.Kind]reflect.Type{
 	reflect.Int8: Int8Ty, reflect.Uint8: Uint8Ty,
@@ -176,7 +177,6 @@ var Float64PtrTy = reflect.TypeOf(&vFloat64Ty)
 var BoolPtrTy = reflect.TypeOf(&vBoolTy)
 var StrPtrTy = reflect.TypeOf(&vStrTy)
 var UintptrTy = reflect.TypeOf(&vUintptrTy)
-var UsizeTy = reflect.TypeOf(&vUintptrTy)
 
 const ByteTySz = unsafe.Sizeof(byte(0))
 const Int8TySz = strconv.IntSize / 4

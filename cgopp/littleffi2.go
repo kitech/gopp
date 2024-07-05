@@ -63,7 +63,7 @@ func BMLitffi2callz() {
 		argp0 := usize(3309)
 		x := Ffi2Call[float64](fnsym, float64(123.2345), argp0, uint64(386))
 		_ = x
-	}, 9999, gopp.MyFuncName())
+	}, 99999, gopp.MyFuncName())
 }
 
 // ///////////

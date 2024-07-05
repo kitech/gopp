@@ -12,4 +12,5 @@ func TestFCBM2(t *testing.T) {
 }
 func TestFCBM3(t *testing.T) {
 	BMLitffi3callz()
+	BMLitffi3callz2()
 }

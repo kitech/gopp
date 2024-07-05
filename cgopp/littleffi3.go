@@ -63,12 +63,23 @@ func TestLitffi3callz() {
 
 func BMLitffi3callz() {
 	fnsym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
+	argp0 := usize(3309)
 
 	gopp.Benchfn(func() {
-		argp0 := usize(3309)
 		x := Ffi3Call[float64](fnsym, float64(123.2345), argp0, uint64(386))
 		_ = x
-	}, 9999, gopp.MyFuncName())
+	}, 99999, gopp.MyFuncName())
+}
+func BMLitffi3callz2() {
+	fnsym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
+	argp0 := usize(3309)
+
+	cif := FfiCifNew[float64]()
+	cif.Prep(fnsym, float64(123.2345), argp0, uint64(386))
+	gopp.Benchfn(func() {
+		x := cif.Call(fnsym, float64(123.2345), argp0, uint64(386))
+		_ = x
+	}, 99999, gopp.MyFuncName())
 }
 
 // //////////
@@ -84,26 +95,24 @@ func BMLitffi3callz() {
 // 如果没有返回值，使用FfiCall[int]()即可
 // Usage1: FfiCall[float64]()
 func Ffi3Call[RETY any, FT voidptr | usize](fnptrx FT, args ...any) (rvx RETY) {
+	fnty, argtys := fntypebyargs(reflect.TypeOf(rvx), args...)
 
-	rety := reflect.TypeOf(rvx)
-	fnty := fntypebyargs(rety, args...)
+	invals := make([]reflect.Value, len(args))
+	for i, argty := range argtys {
+		if argty.Kind() == reflect.String {
+			// invals[i] = reflect.ValueOf((CStringaf(argx.(string)))
+			invals[i] = reflect.ValueOf(CStringaf(args[i].(string)))
+		} else {
+			invals[i] = reflect.ValueOf(args[i])
+		}
+	}
+
 	fnv := reflect.New(fnty)
 	// log.Println(fnv.UnsafeAddr()) // not works
 	// log.Println(fnv.UnsafePointer()) // works but useless
 	purego.RegisterFunc(fnv.Interface(), usize(fnptrx))
 	gopp.NilPrint(fnv.Interface(), "regfunc failed/nil", fnv, fnv.Interface(), fnty)
 
-	invals := make([]reflect.Value, len(args))
-	for i, argx := range args {
-		v := reflect.ValueOf(argx)
-		ty := v.Type()
-		switch ty.Kind() {
-		case reflect.String:
-			v = reflect.ValueOf(voidptr(CStringaf(argx.(string))))
-		default:
-		}
-		invals[i] = v
-	}
 	outvals := fnv.Elem().Call(invals)
 	// log.Println("fficalldone", outvals)
 	rvx = outvals[0].Interface().(RETY)
@@ -116,7 +125,7 @@ func Ffi3Call0[T any](name string, args ...any) T {
 }
 
 // rety 如果是空，则设置为int
-func fntypebyargs(rety reflect.Type, args ...any) reflect.Type {
+func fntypebyargs(rety reflect.Type, args ...any) (reflect.Type, []reflect.Type) {
 	intys := make([]reflect.Type, len(args))
 	outtys := []reflect.Type{rety}
 
@@ -125,5 +134,5 @@ func fntypebyargs(rety reflect.Type, args ...any) reflect.Type {
 	}
 
 	fnty := reflect.FuncOf(intys, outtys, false)
-	return fnty
+	return fnty, intys
 }

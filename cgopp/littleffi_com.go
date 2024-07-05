@@ -7,6 +7,10 @@ import (
 	"github.com/kitech/gopp"
 )
 
+// 不好，purego只支持arm64,amd64, 不支持arm32,amd32. see purego/func.go:416
+// purego 也没说RegisterFunc的函数是不是threadsafe
+// _ "github.com/ebitengine/purego"
+
 const (
 	FFITY_NONE = iota
 	FFITY_INT
@@ -37,6 +41,7 @@ func TestLitfficallz() {
 	}
 }
 
+// Ffi3 Prep Call 9999 9.54493ms 954ns 1048218 /s
 // Ffi3Call 9999 23.591148ms 2.359µs 423908 /s
 // Ffi2Call 9999 17.42031ms 1.742µs 574052 /s
 func FfiCall[RETY any, FT voidptr | usize](fnptrx FT, args ...any) (rvx RETY) {
@@ -106,8 +111,10 @@ type FfiCif[RETY any] struct {
 	rety   reflect.Type
 	argtys []reflect.Type
 	fnty   reflect.Type
-	// fnv  reflect.Value
-	rvx RETY
+
+	invals []reflect.Value
+	fnv    reflect.Value
+	rvx    RETY
 }
 
 func FfiCifNew[T any]() *FfiCif[T] {
@@ -117,43 +124,46 @@ func FfiCifNew[T any]() *FfiCif[T] {
 }
 
 // check argtype support state
-func (me *FfiCif[T]) Prep(args ...any) error {
-	for _, argx := range args {
-		ty := reflect.TypeOf(argx)
-		me.argtys = append(me.argtys, ty)
-	}
-	me.fnty = fntypebyargs(me.rety, args...)
+func (me *FfiCif[T]) Prep(fnptrx any, args ...any) error {
+	me.fnty, me.argtys = fntypebyargs(me.rety, args...)
+	me.fnv = reflect.New(me.fnty)
+	me.invals = make([]reflect.Value, len(args)) // 这个分配内存影响10%的效率差不多
+
+	var ifv = (*GoIface)((voidptr)(&fnptrx))
+	var fnptr = usize(*((*voidptr)(ifv.Data)))
+	// var fnptr = reflect.ValueOf(fnptrx).Convert(gopp.UsizeTy).Interface().(usize)
+	// switch fn := fnptrx.(type) {
+	// case voidptr:
+	// 	fnptr = usize(fn)
+	// case usize:
+	// 	fnptr = fn
+	// default:
+	// 	gopp.Warn(reflect.TypeOf(fnptrx), len(args), args)
+	// }
+
+	// 这个调用对效率的影响挺大的，可能有20%的次序影响
+	var fnv = me.fnv
+	purego.RegisterFunc(fnv.Interface(), fnptr)
+	gopp.NilPrint(fnv.Interface(), "regfunc failed/nil", fnv, fnv.Interface(), me.fnty)
+
 	return nil
 }
 
 func (me *FfiCif[T]) Call(fnptrx any, args ...any) (rvx T) {
-	gopp.FalsePrint(len(args) == len(me.argtys), "argc not match prep", me.argtys)
-	fnv := reflect.New(me.fnty)
+	gopp.TruePrint(len(args) != len(me.argtys), "argc not match", len(args), len(me.argtys))
 
-	var fnptr usize
-	switch fn := fnptrx.(type) {
-	case voidptr:
-		fnptr = usize(fn)
-	case usize:
-		fnptr = fn
-	default:
-		gopp.Warn(reflect.TypeOf(fnptrx), len(args), args)
-	}
-	purego.RegisterFunc(fnv.Interface(), fnptr)
-	gopp.NilPrint(fnv.Interface(), "regfunc failed/nil", fnv, fnv.Interface(), me.fnty)
-
-	invals := make([]reflect.Value, len(args))
-	for i, argx := range args {
-		v := reflect.ValueOf(argx)
-		ty := v.Type()
-		switch ty.Kind() {
-		case reflect.String:
-			v = reflect.ValueOf(voidptr(CStringaf(argx.(string))))
-		default:
+	// invals := make([]reflect.Value, len(args))
+	invals := me.invals
+	for i, argty := range me.argtys {
+		if argty.Kind() == reflect.String {
+			// invals[i] = reflect.ValueOf((CStringaf(argx.(string)))
+			invals[i] = reflect.ValueOf(CStringaf(args[i].(string)))
+		} else {
+			invals[i] = reflect.ValueOf(args[i])
 		}
-		invals[i] = v
 	}
 
+	fnv := me.fnv
 	outvals := fnv.Elem().Call(invals)
 	// log.Println("fficalldone", outvals)
 	rvx = outvals[0].Interface().(T)
