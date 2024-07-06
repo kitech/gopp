@@ -87,3 +87,12 @@ func calcmemlen_test() {
 	log.Println(rv)
 	log.Println(CalcMemlen(567.890))
 }
+
+func AssignNotempty[T comparable](p *T, v T) bool {
+	var vz T
+	if v != vz && p != nil && v != *p {
+		*p = v
+		return true
+	}
+	return false
+}

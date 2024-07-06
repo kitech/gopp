@@ -82,7 +82,7 @@ func (me *ListMap0[KT, VT]) Len() int {
 func (me *ListMap0[KT, VT]) lennolock() int {
 	lena0 := len(me.a0)
 	lenm0 := len(me.m0)
-	Assert(lena0 == lena0, "a0/m0 not consistant", lena0, lenm0)
+	FalsePrint(lena0 == lena0, "a0/m0 not consistant", lena0, lenm0)
 	return IfElse2(mrand.Int()%2 == 0, lena0, lenm0)
 }
 

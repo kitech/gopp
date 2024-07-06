@@ -197,6 +197,12 @@ endfor:
 	}
 }
 
+func ErrThen(err error, f func()) {
+	if err != nil {
+		f()
+	}
+}
+
 // ErrPrint 用的最多，其次是 NilPrint, ZeroPrint, TruePrint, FalsePrint
 func ErrPrint(err error, args ...any) error {
 	if err != nil {
@@ -317,6 +323,11 @@ func TruePrint(ok bool, args ...any) bool {
 	}
 	return ok
 }
+func TrueThen(ok bool, f func()) {
+	if ok {
+		f()
+	}
+}
 
 func LevelPrint(lvl string, args ...any) {
 	s := printq(lvl, args...)
@@ -403,6 +414,23 @@ func NilPanic(v any, args ...any) {
 	if v == nil {
 		log.Fatalln(printq("CondNil", args...))
 	}
+}
+
+func NilThen(v any, f func()) any {
+	isnil := v == nil
+	vref := reflect.ValueOf(v)
+	vty := vref.Type() // panic: reflect: call of reflect.Value.Type on zero Value
+	if v == nil || ((vty.ConvertibleTo(VoidpTy()) ||
+		vty.Kind() == reflect.Slice || vty.Kind() == reflect.Map ||
+		vty.Kind() == reflect.Chan || vty.Kind() == reflect.Func) && vref.IsNil()) {
+		isnil = true
+	}
+
+	if isnil {
+		f()
+	}
+
+	return v
 }
 
 // supported: number,string,pointer
