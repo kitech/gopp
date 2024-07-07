@@ -131,7 +131,11 @@ func GoStrArr2c(arr []string) uintptr {
 	return uintptr(rv)
 }
 
+// \see unsafe.Add
 func AddrAdd(addr voidptr, n usize) voidptr {
+	if true {
+		return unsafe.Add(addr, n)
+	}
 	rv := voidptr(usize(addr) + n)
 	return rv
 }

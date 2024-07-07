@@ -5,6 +5,14 @@ import (
 	"testing"
 )
 
+func TestMallocgc0(t *testing.T) {
+	// n=0, ok when not panic
+	p := Mallocgc(0)
+	// log.Println(p)
+	if p == nil {
+	}
+}
+
 func TestCStringgc(t *testing.T) {
 	var s = "foo"
 	var cv = CStringgc(s)

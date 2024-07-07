@@ -1,7 +1,9 @@
 package cgopp
 
 import (
+	"log"
 	"reflect"
+	"runtime"
 	"strings"
 	"time"
 	"unsafe"
@@ -83,11 +85,30 @@ func Malloc(n int) voidptr {
 	return rv
 }
 
+func RttypeOf(v any) voidptr {
+	var typtr voidptr = ((*GoIface)(voidptr(&v))).Type
+	return typtr
+}
+
+// *byte's runtime._type instance
+var gobyterttype = RttypeOf(byte(0))
+
 // 可以用作存储C字符串？
 // 不可以用作存储C++对象，无法调用destructor
 func Mallocgc(n int) voidptr {
-	return mymallocgc(usize(n), nil, true)
+	ptr := mymallocgc(usize(n), gobyterttype, true)
+	setPinned(ptr, true)
+	// must a type not unsafe.Pointer
+	runtime.SetFinalizer((*byte)(ptr), func(obj any) {
+		if false {
+			log.Println("dtor", obj, n)
+		}
+	})
+	return ptr
 }
+
+//export cgoppMallocgc
+func cgoppMallocgc(n cint) voidptr { return Mallocgc(int(n)) }
 
 const CBoolTySz = gopp.Int32TySz
 const CppBoolTySz = gopp.Int8TySz
@@ -112,7 +133,6 @@ func CStringaf(s string) voidptr {
 	ptr := voidptr(C.CString(s))
 
 	time.AfterFunc(gopp.DurandSec(3, 5), func() { cfree_voidptr(ptr) })
-
 	return ptr
 }
 
@@ -127,12 +147,18 @@ func CStringgc(s string) voidptr {
 
 	return ptr
 }
+
+// \see strings.Clone
 func Gostrdup(s string) string {
+	if true {
+		return strings.Clone(s)
+	}
 	ptr := CStringgc(s)
 	var rv string
 	o := ((*GoStringIn)((voidptr)(&rv)))
 	o.Ptr = ptr
 	o.Len = usize(len(s))
+
 	return rv
 }
 

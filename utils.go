@@ -140,12 +140,6 @@ func G_FATAL(err error) {
 	}
 }
 
-func G_DEBUG(err error) {
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
 // 去掉返回值中的error
 // 返回值个数不能是变长的
 func NOE(v ...interface{}) interface{} {
