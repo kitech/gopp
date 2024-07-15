@@ -197,9 +197,10 @@ endfor:
 	}
 }
 
-func ErrThen(err error, f func()) {
+func ErrThen(err error, fx any, args ...any) {
 	if err != nil {
-		f()
+		// f()
+		CallFuncx(fx, args...)
 	}
 }
 
@@ -323,9 +324,10 @@ func TruePrint(ok bool, args ...any) bool {
 	}
 	return ok
 }
-func TrueThen(ok bool, f func()) {
+func TrueThen(ok bool, fx any, args ...any) {
 	if ok {
-		f()
+		// f()
+		CallFuncx(fx, args...)
 	}
 }
 
@@ -416,7 +418,7 @@ func NilPanic(v any, args ...any) {
 	}
 }
 
-func NilThen(v any, f func()) any {
+func NilThen(v any, fx any, args ...any) any {
 	isnil := v == nil
 	vref := reflect.ValueOf(v)
 	vty := vref.Type() // panic: reflect: call of reflect.Value.Type on zero Value
@@ -427,7 +429,8 @@ func NilThen(v any, f func()) any {
 	}
 
 	if isnil {
-		f()
+		// f()
+		CallFuncx(fx, args...)
 	}
 
 	return v
@@ -435,7 +438,7 @@ func NilThen(v any, f func()) any {
 
 // supported: number,string,pointer
 func ZeroPrint(v any, args ...any) any {
-	if reflect.Zero(reflect.TypeOf(v)).Interface() == v {
+	if v == nil || reflect.Zero(reflect.TypeOf(v)).Interface() == v {
 		s := printq("CondZero", args...)
 		log.Output(2, s)
 		if justprintoutfn != nil {
@@ -448,9 +451,10 @@ func ZeroPrint(v any, args ...any) any {
 	}
 	return v
 }
-func ZeroThen(v any, f func()) {
-	if reflect.Zero(reflect.TypeOf(v)).Interface() == v {
-		f()
+func ZeroThen(v any, fx any, args ...any) {
+	if v == nil || reflect.Zero(reflect.TypeOf(v)).Interface() == v {
+		// f()
+		CallFuncx(fx, args...)
 	}
 }
 

@@ -71,6 +71,11 @@ func DeepSizeof(vx any, depth int) (rv int) {
 	// log.Println(depth, vty.String(), vty.Size())
 	switch vty.Kind() {
 	case reflect.Pointer:
+		if valx.IsNil() {
+			rv += int(UintptrTySz)
+			break
+		}
+
 		e := valx.Elem().Interface()
 		rv += DeepSizeof(e, depth+1)
 

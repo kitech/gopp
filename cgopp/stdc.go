@@ -148,6 +148,15 @@ func CStringgc(s string) voidptr {
 	return ptr
 }
 
+// C memcpy version
+func CStringgc2(s string) voidptr {
+	ptr := Mallocgc(len(s) + 1)
+	o := (*GoStringIn)((voidptr)(&s))
+	Cmemcpy(ptr, o.Ptr, o.Len)
+
+	return ptr
+}
+
 // \see strings.Clone
 func Gostrdup(s string) string {
 	if true {
@@ -160,14 +169,6 @@ func Gostrdup(s string) string {
 	o.Len = usize(len(s))
 
 	return rv
-}
-
-func CStringgc2(s string) voidptr {
-	ptr := Mallocgc(len(s) + 1)
-	o := (*GoStringIn)((voidptr)(&s))
-	Cmemcpy(ptr, o.Ptr, o.Len)
-
-	return ptr
 }
 
 // typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;

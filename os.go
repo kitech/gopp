@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -93,7 +92,7 @@ func RunCmd(wkdir string, args ...string) ([]string, error) {
 		}
 	}
 
-	log.Println("sh:", wkdir, reargs)
+	// log.Println("sh:", wkdir, reargs)
 	c := exec.Command(args[0], reargs[1:]...)
 	out, err := c.CombinedOutput()
 	ErrPrint(err, wkdir, reargs, string(out))

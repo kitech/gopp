@@ -81,6 +81,9 @@ func main() {
 			break
 		}
 		mcdelete(curpkg)
+
+	case "dmget": // dummy get a package in  any directory
+	case "dminst": // go install package@latest
 	default:
 		log.Println("subcmd not found", subcmd)
 	}

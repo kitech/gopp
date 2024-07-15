@@ -60,7 +60,7 @@ func SliceTyConv(src []int16) []byte {
 	return *((*[]byte)(unsafe.Pointer(srchdr)))
 }
 
-/////
+// ///
 // see funk.Chunk
 func ChunkN(arr interface{}, c int) interface{} {
 	arrv := reflect.ValueOf(arr)
@@ -114,3 +114,5 @@ func IntsDiffeq(arr []int) bool {
 	}
 	return same
 }
+
+func Sliceof[T any](args ...T) []T { return args }
