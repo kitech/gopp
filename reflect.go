@@ -67,6 +67,11 @@ func DeepSizeof(vx any, depth int) (rv int) {
 	valx := reflect.ValueOf(vx)
 	GorefValueUnsetRO(&valx)
 	vty := reflect.TypeOf(vx)
+	if vty == nil {
+		// todo???
+		// log.Println(vx, depth)
+		return 0
+	}
 
 	// log.Println(depth, vty.String(), vty.Size())
 	switch vty.Kind() {

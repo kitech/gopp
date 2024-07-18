@@ -3,6 +3,7 @@ package gopp
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"unicode"
 
@@ -258,4 +259,12 @@ func StrsHaveNocase(ss []string, s string) bool {
 		}
 	}
 	return false
+}
+
+func StrElideMid(s string, wtlen int) string {
+	if len(s) <= wtlen {
+		return s
+	}
+	ns := fmt.Sprintf("%s..%s", s[:wtlen/2], s[len(s)-wtlen/2:])
+	return ns
 }

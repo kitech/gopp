@@ -119,6 +119,12 @@ func RandNumsNodup(min, max int, n int) (rets []int) {
 	return
 }
 
+func RandNum[T int | int32 | int64](base, seed T) (ret T) {
+	v := rand.Int63n(int64(seed))
+	v = v + int64(base)
+	return T(v)
+}
+
 func RandUuid() string {
 	if true {
 		id, err := uuid.NewRandom()

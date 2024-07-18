@@ -93,6 +93,7 @@ func RttypeOf(v any) voidptr {
 // *byte's runtime._type instance
 var gobyterttype = RttypeOf(byte(0))
 
+// note: return ptr is Pinned
 // 可以用作存储C字符串？
 // 不可以用作存储C++对象，无法调用destructor
 func Mallocgc(n int) voidptr {

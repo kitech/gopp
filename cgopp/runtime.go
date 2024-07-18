@@ -41,6 +41,10 @@ func releasem(mp voidptr)
 // go:linkname getg runtime.getg
 // func getg() (gr voidptr)
 
+func SetPin(ptr voidptr, pin bool) {
+	setPinned(ptr, pin)
+}
+
 // 需要关闭的对象的自动处理
 // *os.File, *http.Response
 func Deferx(objx interface{}) {
