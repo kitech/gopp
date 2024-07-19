@@ -47,3 +47,10 @@ func ReadFileMust(filename string) string {
 	ErrPrint(err, filename)
 	return string(bcc)
 }
+
+// Enter works
+func PauseAk() {
+	var c [1]byte
+	n, err := os.Stdin.Read(c[:])
+	ErrPrint(err, n)
+}

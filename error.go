@@ -295,7 +295,7 @@ func ErrHumanShort(err error) string {
 
 func FalsePrint(ok bool, args ...any) bool {
 	if !ok {
-		s := printq("CondFalse", args...)
+		s := printq("False", args...)
 		log.Output(2, s)
 		if justprintoutfn != nil {
 			if justprintoutfnasync {
@@ -311,7 +311,7 @@ func FalsePrint(ok bool, args ...any) bool {
 
 func TruePrint(ok bool, args ...any) bool {
 	if ok {
-		s := printq("CondTrue", args...)
+		s := printq("True", args...)
 		log.Output(2, s)
 		if justprintoutfn != nil {
 			if justprintoutfnasync {
@@ -394,7 +394,7 @@ func NilPrint(v any, args ...any) any {
 	if v == nil || ((vty.ConvertibleTo(VoidpTy()) ||
 		vty.Kind() == reflect.Slice || vty.Kind() == reflect.Map ||
 		vty.Kind() == reflect.Chan || vty.Kind() == reflect.Func) && vref.IsNil()) {
-		s := printq("CondNil", args...)
+		s := printq("Nil", args...)
 		log.Output(2, s)
 		if justprintoutfn != nil {
 			if justprintoutfnasync {
@@ -409,12 +409,12 @@ func NilPrint(v any, args ...any) any {
 
 func NilFatal(v any, args ...any) {
 	if v == nil {
-		log.Fatalln(printq("CondNil", args...))
+		log.Fatalln(printq("Nil", args...))
 	}
 }
 func NilPanic(v any, args ...any) {
 	if v == nil {
-		log.Fatalln(printq("CondNil", args...))
+		log.Fatalln(printq("Nil", args...))
 	}
 }
 
@@ -439,7 +439,7 @@ func NilThen(v any, fx any, args ...any) any {
 // supported: number,string,pointer
 func ZeroPrint(v any, args ...any) any {
 	if v == nil || reflect.Zero(reflect.TypeOf(v)).Interface() == v {
-		s := printq("CondZero", args...)
+		s := printq("Zero", args...)
 		log.Output(2, s)
 		if justprintoutfn != nil {
 			if justprintoutfnasync {

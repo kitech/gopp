@@ -131,8 +131,8 @@ func HttpRespJson(w http.ResponseWriter, code int, v any, headers map[string]str
 
 	jdata, err := json.Marshal(v)
 	ErrPrint(err, reflect.TypeOf(v), v)
-	wn, err := w.Write(jdata)
-	ErrPrint(err, wn, code, reflect.TypeOf(v), len(jdata), SubStr(string(jdata), 64))
+	// wn, err := w.Write(jdata)
+	// ErrPrint(err, wn, code, reflect.TypeOf(v), len(jdata), SubStr(string(jdata), 64))
 
 	return HttpRespRaw(w, code, jdata, HttpCTJson, headers)
 }

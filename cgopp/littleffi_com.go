@@ -94,6 +94,7 @@ func FfiCallVoid0(name string, args ...any) {
 }
 
 func Dlsym0(name string) voidptr {
+	// name := name[1:] // for macos???
 	sym, err := purego.Dlsym(purego.RTLD_DEFAULT, name)
 	gopp.ErrPrint(err, name)
 	gopp.NilPrint(sym, name)

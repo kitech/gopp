@@ -105,6 +105,14 @@ func Ffi3Call[RETY any, FT voidptr | usize](fnptrx FT, args ...any) (rvx RETY) {
 		} else {
 			invals[i] = reflect.ValueOf(args[i])
 		}
+		// hotfix
+		if args[i] == nil {
+			// log.Println("nilrefval", i, invals[i].IsValid(), argty.String())
+			invals[i] = reflect.ValueOf(voidptr(nil))
+		}
+		if !invals[i].IsValid() {
+			log.Println("Invalid refval", i, invals[i].IsValid(), argty.String())
+		}
 	}
 
 	fnv := reflect.New(fnty)
@@ -131,6 +139,10 @@ func fntypebyargs(rety reflect.Type, args ...any) (reflect.Type, []reflect.Type)
 
 	for i, argx := range args {
 		intys[i] = reflect.TypeOf(argx)
+		if argx == nil {
+			// log.Println("nilarg", i)
+			intys[i] = gopp.VoidpTy()
+		}
 	}
 
 	fnty := reflect.FuncOf(intys, outtys, false)
