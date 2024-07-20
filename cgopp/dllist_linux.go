@@ -8,7 +8,13 @@ package cgopp
 import "C"
 
 // this this public use
-func DyldImages() (rets []string) {
+func DyldImagesInc(file string) (rets []string) {
+	panic("not impl")
+	return
+}
+
+// this this public use
+func DyldSymbolsInc(file string) (rets []string) {
 	panic("not impl")
 	return
 }

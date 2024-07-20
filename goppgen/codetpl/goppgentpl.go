@@ -20,6 +20,11 @@ type f64 = float64
 type usize = uintptr
 type vptr = unsafe.Pointer
 type voidptr = unsafe.Pointer
+type u128 = struct {
+	H u64
+	L u64
+}
+type fatptr = u128
 
 // begin cgo
 type cuptr = C.uintptr_t

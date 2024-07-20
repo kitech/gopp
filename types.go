@@ -18,10 +18,31 @@ type u16 = uint16
 type f80 = [10]byte
 type i128 = [16]uint8
 type u128 = [16]byte
+type u128st struct {
+	H u64
+	L u64
+}
 
 // exported
 type Vptr = unsafe.Pointer
 type Usize = uintptr
+type Fatptr = u128st
+type Fatany = u128st
+
+func FatptrAs[T any](v Fatptr) (rv T) {
+	p := (*T)(voidptr(&v))
+	rv = *p
+	return
+}
+
+// todo
+func (v Fatptr) Asany(ty reflect.Kind) (rv any) {
+	switch ty {
+	case reflect.Float64:
+		rv = FatptrAs[float64](v)
+	}
+	return
+}
 
 // TODO how add methods for Any type
 // TODO how add methods for primity string type

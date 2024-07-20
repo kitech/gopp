@@ -18,6 +18,6 @@ func TestDllist0(t *testing.T) {
 }
 
 func TestDllist1(t *testing.T) {
-	vals := DyldImages()
+	vals := DyldImagesInc()
 	log.Println(len(vals), vals, len(vals))
 }

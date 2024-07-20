@@ -82,8 +82,13 @@ func main() {
 		}
 		mcdelete(curpkg)
 
-	case "dmget": // dummy get a package in  any directory
+		// dummy get a package in any directory, but not current dir
+		// dont, change current dir's go.mod/go.sum
+	case "dmget":
 	case "dminst": // go install package@latest
+	// 同步本地开发目录到 mod cache 目录的zip文件，完全离线
+	case "locsync":
+	case "fakelocalproxyserver": // todo
 	default:
 		log.Println("subcmd not found", subcmd)
 	}
