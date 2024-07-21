@@ -21,6 +21,35 @@ func TestMapdo1(t *testing.T) {
 		// log.Println(rv)
 	}
 	{
+		// map n=>0
+		var vec = []string{"http://x1.com", "http://x2.com", "http://x3.com"}
+		var itcnt = 0
+		Mapdo(vec, func(v string) {
+			itcnt++
+			// return v[7:]
+		})
+		if itcnt != len(vec) {
+			t.Error("some err", itcnt, len(vec))
+		}
+		itcnt = 0
+		Mapdo(vec, func(idx int, v string) {
+			itcnt++
+			// return v[7:]
+		})
+		if itcnt != len(vec) {
+			t.Error("some err", itcnt, len(vec))
+		}
+		itcnt = 0
+		Mapdo(vec, func(idx int, v int64) {
+			itcnt++
+			// return v[7:]
+		})
+		if itcnt == len(vec) {
+			t.Error("some err", itcnt, 0)
+		}
+		// log.Println(rv)
+	}
+	{
 		// map 1=>n
 		var vec = []string{"http://x1.com", "http://x2.com", "http://x3.com"}
 		var epval = []any{"x1", "com", "x2", "com", "x3", "com"}

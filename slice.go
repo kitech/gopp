@@ -115,4 +115,5 @@ func IntsDiffeq(arr []int) bool {
 	return same
 }
 
+// 比写 []string{}方便
 func Sliceof[T any](args ...T) []T { return args }

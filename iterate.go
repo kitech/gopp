@@ -105,6 +105,8 @@ func Mapdo(ins any, fx any) (out any) {
 		case func(any) any:
 			out := f(val)
 			outarr = append(outarr, out)
+		case func(any):
+			f(val)
 
 		case func(int, any) []any:
 			out := f(idx, val)
@@ -112,6 +114,8 @@ func Mapdo(ins any, fx any) (out any) {
 		case func(int, any) any:
 			out := f(idx, val)
 			outarr = append(outarr, out)
+		case func(int, any):
+			f(idx, val)
 
 		case func(int, any, any) []any:
 			out := f(idx, key, val)
@@ -119,9 +123,48 @@ func Mapdo(ins any, fx any) (out any) {
 		case func(int, any, any) any:
 			out := f(idx, key, val)
 			outarr = append(outarr, out)
+		case func(int, any, any):
+			f(idx, key, val)
 
 		default:
-			Infop("invalid fxcb", idx, key, infxty)
+			// 处理参数为实际类型的情况
+			if infxty.NumIn() == 1 {
+				if reflect.TypeOf(val) == infxty.In(0) {
+					// ok
+					args := Sliceof(reflect.ValueOf(val))
+					outsx := reflect.ValueOf(fx).Call(args)
+					if outsx != nil {
+						// todo, assign return value
+					}
+					break
+				}
+			} else if infxty.NumIn() == 2 {
+				if reflect.TypeOf(val) == infxty.In(1) &&
+					reflect.TypeOf(idx) == infxty.In(0) {
+					// ok
+					args := Sliceof(reflect.ValueOf(idx), reflect.ValueOf(val))
+					outsx := reflect.ValueOf(fx).Call(args)
+					if outsx != nil {
+						// todo, assign return value
+					}
+					break
+				}
+			} else if infxty.NumIn() == 3 {
+				if reflect.TypeOf(val) == infxty.In(2) &&
+					reflect.TypeOf(key) == infxty.In(1) &&
+					reflect.TypeOf(idx) == infxty.In(0) {
+					// ok
+					args := Sliceof(reflect.ValueOf(idx), reflect.ValueOf(key), reflect.ValueOf(val))
+					outsx := reflect.ValueOf(fx).Call(args)
+					if outsx != nil {
+						// todo, assign return value
+					}
+					break
+				}
+			}
+
+			tylst := fmt.Sprintf("(int?, %v?, %v)", reflect.TypeOf(key), reflect.TypeOf(val))
+			Infop("invalid fxcb", idx, key, infxty, "want", tylst)
 			return false
 		}
 		return true
