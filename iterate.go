@@ -59,6 +59,8 @@ func mapdo2[FT func(int, any, any) map[any]any |
 //
 // 可以n=>n, n=>n+,n=>n-，具有reduce功能，所以不需要单独的reduce
 // 支持可以迭代的类型：结构体，slice，数组，字符串，map
+// todo fx 的参数可以不用any的
+// todo fx 可以没有返回值的
 func Mapdo(ins any, fx any) (out any) {
 	infxty := reflect.TypeOf(fx)
 

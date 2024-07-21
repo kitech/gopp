@@ -177,6 +177,14 @@ func Title(s string) string {
 	return s
 }
 
+// 仅Title第一个字节
+func Untitle(s string) string {
+	if len(s) > 0 {
+		return strings.ToLower(s[:1]) + s[1:]
+	}
+	return s
+}
+
 func IsNumberic(s string) bool {
 	if strings.Count(s, ".") > 1 {
 		return false
