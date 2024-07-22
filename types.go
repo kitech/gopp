@@ -29,10 +29,34 @@ type Usize = uintptr
 type Fatptr = u128st
 type Fatany = u128st
 
+type GoSlice struct {
+	Data voidptr
+	Len  int
+	Cap  int
+}
+
 func FatptrAs[T any](v Fatptr) (rv T) {
 	p := (*T)(voidptr(&v))
 	rv = *p
 	return
+}
+func FatptrOf[T any](vx T) (rv Fatptr) {
+	Copyx(&rv, &vx)
+	return
+}
+
+// 用于结构体和基本数据类型
+// 拷贝长度按照 src 的长度计算，确保dst足够
+func Copyx[DT any, ST any](dst *DT, src *ST) int {
+	dlen := unsafe.Sizeof(*src)
+
+	slc1 := GoSlice{(voidptr)(dst), int(dlen), int(dlen)}
+	b1 := *(*[]byte)(unsafe.Pointer(&slc1))
+
+	slc2 := GoSlice{(voidptr)(dst), int(dlen), int(dlen)}
+	b2 := *(*[]byte)(unsafe.Pointer(&slc2))
+
+	return copy(b1, b2)
 }
 
 // todo
@@ -41,6 +65,26 @@ func (v Fatptr) Asany(ty reflect.Kind) (rv any) {
 	case reflect.Float64:
 		rv = FatptrAs[float64](v)
 	}
+	return
+}
+func (v Fatptr) Ptr() (rv voidptr) {
+	rv = FatptrAs[voidptr](v)
+	return
+}
+func (v Fatptr) Int() (rv int) {
+	rv = FatptrAs[int](v)
+	return
+}
+func (v Fatptr) Int64() (rv int64) {
+	rv = FatptrAs[int64](v)
+	return
+}
+func (v Fatptr) Bool() (rv bool) {
+	rv = FatptrAs[bool](v)
+	return
+}
+func (v Fatptr) Float64() (rv float64) {
+	rv = FatptrAs[float64](v)
 	return
 }
 
