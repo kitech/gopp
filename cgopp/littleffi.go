@@ -82,8 +82,8 @@ func Litfficall(fnptrx voidptr, args ...voidptr) voidptr {
 		argv[i] = argx
 	}
 
-	//rv := C.litfficall(fnptrx, cint(argc), argv[0], argv[1], argv[2], argv[3], argv[4])
-	rv := litfficallfnc(fnptrx, argc, argv[0], argv[1], argv[2], argv[3], argv[4])
+	rv := C.litfficall(fnptrx, cint(argc), argv[0], argv[1], argv[2], argv[3], argv[4])
+	// rv := litfficallfnc(fnptrx, argc, argv[0], argv[1], argv[2], argv[3], argv[4])
 	return rv
 }
 

@@ -18,16 +18,21 @@ type u16 = uint16
 type f80 = [10]byte
 type i128 = [16]uint8
 type u128 = [16]byte
-type u128st struct {
+type U128st struct {
 	H u64
 	L u64
+}
+
+type Fatf64 struct {
+	H f64
+	L f64
 }
 
 // exported
 type Vptr = unsafe.Pointer
 type Usize = uintptr
-type Fatptr = u128st
-type Fatany = u128st
+type Fatptr = U128st
+type Fatany = U128st
 
 type GoSlice struct {
 	Data voidptr
@@ -41,7 +46,9 @@ func FatptrAs[T any](v Fatptr) (rv T) {
 	return
 }
 func FatptrOf[T any](vx T) (rv Fatptr) {
-	Copyx(&rv, &vx)
+	n := Copyx(&rv, &vx)
+	// log.Println(vx, n)
+	FalsePrint(usize(n) == unsafe.Sizeof(vx), "copy error", n, unsafe.Sizeof(vx))
 	return
 }
 
@@ -53,7 +60,7 @@ func Copyx[DT any, ST any](dst *DT, src *ST) int {
 	slc1 := GoSlice{(voidptr)(dst), int(dlen), int(dlen)}
 	b1 := *(*[]byte)(unsafe.Pointer(&slc1))
 
-	slc2 := GoSlice{(voidptr)(dst), int(dlen), int(dlen)}
+	slc2 := GoSlice{(voidptr)(src), int(dlen), int(dlen)}
 	b2 := *(*[]byte)(unsafe.Pointer(&slc2))
 
 	return copy(b1, b2)

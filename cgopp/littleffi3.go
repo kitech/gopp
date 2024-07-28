@@ -85,6 +85,7 @@ func BMLitffi3callz2() {
 // //////////
 // todo 也许还需要做类型转换，像Pointer类型，可能要转换为voidptr
 // todo 实现为prepare，也许可以提高一点效率
+// todo purego传递结构体，成员类型不支持变长类型，int/uintptr/voidptr
 // 支持浮点数返回值
 // 支持primitive类型参数，以及 Pointer/voidptr, C.type
 // 不支持结构体类型，类RECORD类型
@@ -122,7 +123,7 @@ func Ffi3Call[RETY any, FT voidptr | usize](fnptrx FT, args ...any) (rvx RETY) {
 	gopp.NilPrint(fnv.Interface(), "regfunc failed/nil", fnv, fnv.Interface(), fnty)
 
 	outvals := fnv.Elem().Call(invals)
-	// log.Println("fficalldone", outvals)
+	// log.Println("ffi3calldone", outvals, outvals[0].Interface())
 	rvx = outvals[0].Interface().(RETY)
 	return
 }

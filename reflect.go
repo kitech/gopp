@@ -130,3 +130,11 @@ func DeepSizeBygob(vx any) int {
 	ErrPrint(err, reflect.TypeOf(vx))
 	return b.Len()
 }
+
+func IsnilNotyped(v any) bool {
+	return false
+}
+
+func IsnilTyped(v any) bool {
+	return false
+}

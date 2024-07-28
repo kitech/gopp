@@ -8,6 +8,7 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/ebitengine/purego"
 	"github.com/kitech/gopp"
 )
 
@@ -84,6 +85,40 @@ func Malloc(n int) voidptr {
 	rv := C.malloc(csizet(n))
 	return rv
 }
+
+var cmallocfn func(csizet) voidptr
+var ccallocfn func(csizet, csizet) voidptr
+var creallocfn func(voidptr, csizet) voidptr
+var cfreefn func(voidptr)
+var cmemsetfn func(voidptr, cint, csizet) voidptr
+
+func init() {
+	{
+		fnadr, _ := purego.Dlsym(purego.RTLD_DEFAULT, "malloc")
+		purego.RegisterFunc(&cmallocfn, fnadr)
+	}
+	{
+		fnadr, _ := purego.Dlsym(purego.RTLD_DEFAULT, "calloc")
+		purego.RegisterFunc(&ccallocfn, fnadr)
+	}
+	{
+		fnadr, _ := purego.Dlsym(purego.RTLD_DEFAULT, "realloc")
+		purego.RegisterFunc(&creallocfn, fnadr)
+	}
+	{
+		fnadr, _ := purego.Dlsym(purego.RTLD_DEFAULT, "free")
+		purego.RegisterFunc(&cfreefn, fnadr)
+	}
+	{
+		fnadr, _ := purego.Dlsym(purego.RTLD_DEFAULT, "memset")
+		purego.RegisterFunc(&cmemsetfn, fnadr)
+	}
+}
+func Mallocpg(n int) voidptr {
+	rv := cmallocfn(csizet(n))
+	return rv
+}
+func Cfreepg(ptr voidptr) { cfreefn(ptr) }
 
 func RttypeOf(v any) voidptr {
 	var typtr voidptr = ((*GoIface)(voidptr(&v))).Type

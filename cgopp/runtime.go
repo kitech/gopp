@@ -35,6 +35,23 @@ func acquirem() (mp voidptr)
 //go:linkname releasem runtime.releasem
 func releasem(mp voidptr)
 
+type FuncInfo struct {
+	F  voidptr // *_func
+	MD voidptr // datap   *moduledata
+}
+
+//go:linkname Rtfindfunc runtime.findfunc
+func Rtfindfunc(uintptr) FuncInfo
+
+//go:linkname Rtfuncname runtime.funcname
+func Rtfuncname(FuncInfo) string
+
+//go:linkname Rtfuncpkgpath runtime.funcpkgpath
+func Rtfuncpkgpath(FuncInfo) string
+
+//go:linkname Rtfuncfile runtime.funcfile
+func Rtfuncfile(f FuncInfo, fileno int32) string
+
 // this not work for
 // Undefined symbols for architecture x86_64: "_runtime.getg"
 
