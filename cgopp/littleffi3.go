@@ -95,7 +95,7 @@ func BMLitffi3callz2() {
 // go string 转换为 const char*，如果C端要持有该参数所有权，则调用前自己分配char*参数
 // 如果没有返回值，使用FfiCall[int]()即可
 // Usage1: FfiCall[float64]()
-func Ffi3Call[RETY any, FT voidptr | usize](fnptrx FT, args ...any) (rvx RETY) {
+func Ffi3Call[RETY any, FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) (rvx RETY) {
 	fnty, argtys := fntypebyargs(reflect.TypeOf(rvx), args...)
 
 	invals := make([]reflect.Value, len(args))
@@ -119,7 +119,7 @@ func Ffi3Call[RETY any, FT voidptr | usize](fnptrx FT, args ...any) (rvx RETY) {
 	fnv := reflect.New(fnty)
 	// log.Println(fnv.UnsafeAddr()) // not works
 	// log.Println(fnv.UnsafePointer()) // works but useless
-	purego.RegisterFunc(fnv.Interface(), usize(fnptrx))
+	purego.RegisterFunc(fnv.Interface(), usize(voidptr(fnptrx)))
 	gopp.NilPrint(fnv.Interface(), "regfunc failed/nil", fnv, fnv.Interface(), fnty)
 
 	outvals := fnv.Elem().Call(invals)

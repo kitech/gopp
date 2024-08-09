@@ -14,7 +14,7 @@ import (
 #include <stdio.h>
 #include <stdlib.h>
 
-void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void* arg3, void* arg4) {
+void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5) {
 	// printf("cgopp.C.%s: fnptr=%p,argc=%d,arg0=%p\n", __FUNCTION__, fnptr, argc, arg0);
 	typedef void* (*fnargc0)() ;
 	fnargc0 fn0 = fnptr;
@@ -28,6 +28,8 @@ void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void
 	fnargc4 fn4 = fnptr;
 	typedef void* (*fnargc5)(void*, void*, void*, void*, void*) ;
 	fnargc5 fn5 = fnptr;
+	typedef void* (*fnargc6)(void*, void*, void*, void*, void*, void*) ;
+	fnargc6 fn6 = fnptr;
 
 	void* retptr = 0;
 	switch (argc) {
@@ -49,6 +51,9 @@ void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void
 	case 5:
 		retptr = fn5(arg0, arg1, arg2, arg3, arg4);
 		break;
+	case 6:
+		retptr = fn6(arg0, arg1, arg2, arg3, arg4, arg5);
+		break;
 	default:
 		printf("cgopp.C.%s: casedft fnptr=%p,argc=%d,arg0=%p\n", __FUNCTION__, fnptr, argc, arg0);
 	}
@@ -59,7 +64,7 @@ void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void
 */
 import "C"
 
-var litfficallfnc func(voidptr, int, voidptr, voidptr, voidptr, voidptr, voidptr) voidptr
+var litfficallfnc func(voidptr, int, voidptr, voidptr, voidptr, voidptr, voidptr, voidptr) voidptr
 
 func init() {
 	sym, err := purego.Dlsym(purego.RTLD_DEFAULT, "litfficall")
@@ -68,21 +73,21 @@ func init() {
 }
 
 // note: 所有参数必须全是指针类型
-// not support len(args) <= 5
+// not support len(args) <= 6
 func Litfficall(fnptrx voidptr, args ...voidptr) voidptr {
-	if len(args) > 5 {
-		log.Println("too many args, max", 5, ", but", len(args))
+	if len(args) > 6 {
+		log.Println("too many args, max", 6, ", but", len(args))
 	}
 	var argc = len(args)
-	var argv = [5]voidptr{}
+	var argv = [6]voidptr{}
 	for i, argx := range args {
-		if i > 4 {
+		if i > 5 {
 			break
 		}
 		argv[i] = argx
 	}
 
-	rv := C.litfficall(fnptrx, cint(argc), argv[0], argv[1], argv[2], argv[3], argv[4])
+	rv := C.litfficall(fnptrx, cint(argc), argv[0], argv[1], argv[2], argv[3], argv[4], argv[5])
 	// rv := litfficallfnc(fnptrx, argc, argv[0], argv[1], argv[2], argv[3], argv[4])
 	return rv
 }
@@ -90,10 +95,10 @@ func Litfficall(fnptrx voidptr, args ...voidptr) voidptr {
 // \see type go2cfnty
 // note: 所有参数必须全是指针类型
 // argsx, must can convert to voidptr
-// not support len(args) <= 5
+// not support len(args) <= 6
 func Litfficallg[FT voidptr | uintptr | *[0]byte](fnptrx FT, argsx ...any) voidptr {
-	if len(argsx) > 5 {
-		log.Println("too many args, max", 5, ", but", len(argsx))
+	if len(argsx) > 6 {
+		log.Println("too many args, max", 6, ", but", len(argsx))
 	}
 
 	var fnptr voidptr
@@ -107,9 +112,9 @@ func Litfficallg[FT voidptr | uintptr | *[0]byte](fnptrx FT, argsx ...any) voidp
 	}
 
 	var argc = len(argsx)
-	var argv = [5]voidptr{}
+	var argv = [6]voidptr{}
 	for i, argx := range argsx {
-		if i > 4 {
+		if i > 5 {
 			break
 		}
 		if argx == nil {
@@ -142,6 +147,6 @@ func Litfficallg[FT voidptr | uintptr | *[0]byte](fnptrx FT, argsx ...any) voidp
 	}
 
 	// rv := C.litfficall(fnptr, cint(argc), argv[0], argv[1], argv[2], argv[3], argv[4])
-	rv := litfficallfnc(fnptr, argc, argv[0], argv[1], argv[2], argv[3], argv[4])
+	rv := litfficallfnc(fnptr, argc, argv[0], argv[1], argv[2], argv[3], argv[4], argv[5])
 	return rv
 }

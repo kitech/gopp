@@ -18,7 +18,7 @@
 // \see https://nachtimwald.com/2017/06/17/calling-java-from-c/
 // clsname, Main,main,MainKt, ...
 // funcname, main, ...
-int create_java_exe(const char* clsname, const char* funcname, const char** args) {
+int create_java_exe(const char* clsname, const char* funcname, char** args) {
 	JavaVM         *vm = NULL;
 	JNIEnv         *env = NULL;
 	JavaVMInitArgs  vm_args;
@@ -47,7 +47,7 @@ int create_java_exe(const char* clsname, const char* funcname, const char** args
         options[0].optionString    = "-Djava.class.path=....jar";
         for (int i=0; i < argc; i++) {
             options[i].optionString = args[i];
-            printf("arg%d, len=%d, val=%s,\n", i, strlen(args[i]), args[i]);
+            printf("arg%d, len=%d, val=%s,\n", i, (int)strlen(args[i]), args[i]);
         }
         // printf("arg%d, val=%s,\n", i, args[i]);
 
@@ -147,3 +147,11 @@ const char* androidNameddd(uintptr_t java_vm, uintptr_t jni_env, uintptr_t ctx) 
     return getCStringddd(jni_env, ctx, model);
 }
 
+// return char* inreal
+void* cgoppJNIEnvGetStringUTFChars(void *envx, void* inputx) {
+    JNIEnv* env = (JNIEnv*)envx;
+    jstring input = (jstring)inputx;
+    const char *str = (*env)->GetStringUTFChars(env, input, NULL);
+
+    return (void*)str;
+}

@@ -28,7 +28,9 @@ var Jvm JavaVM
 var Jenv JNIEnv
 var jvmtid uint64
 
-func JNIIsLoad() bool { return jvm != 0 }
+func JNIIsLoad() bool  { return jvm != 0 }
+func JVMTid() uint64   { return jvmtid }
+func JNIIsJvmth() bool { return jvmtid == MyTid() }
 
 // see jni.h JNI_OnLoad
 
@@ -39,10 +41,9 @@ func JNI_OnLoad(vm JavaVM, x uintptr) int {
 
 	jvmtid = MyTid()
 	log.Printf("cgopp.JNI_OnLoad %v, %v\n", voidptr(vm), MyTid())
-	jvm = vm
-	Jvm = vm
-	jenv = jvm.Env()
-	Jenv = jenv
+	jvm, Jvm = vm, vm
+	jenv, Jenv = jvm.Env(), jvm.Env()
+
 	log.Println("jvm", voidptr(jvm), "jenv", voidptr(jenv))
 	gopp.NilPrint(jenv, "some error occus", voidptr(vm))
 

@@ -172,7 +172,7 @@ func CStringaf(s string) voidptr {
 	return ptr
 }
 
-// using go's mallocgc version
+// using go's mallocgc version. go memcpy version.
 func CStringgc(s string) voidptr {
 	ptr := Mallocgc(len(s) + 1)
 
@@ -184,7 +184,7 @@ func CStringgc(s string) voidptr {
 	return ptr
 }
 
-// C memcpy version
+// using go's mallocgc version. C memcpy version
 func CStringgc2(s string) voidptr {
 	ptr := Mallocgc(len(s) + 1)
 	o := (*GoStringIn)((voidptr)(&s))

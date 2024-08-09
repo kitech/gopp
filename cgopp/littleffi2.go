@@ -75,7 +75,7 @@ func BMLitffi2callz() {
 // 支持go string 传递参数，自动转换为charptr。但是C端不要持有该字符串指针，函数调用完成释放掉的
 // 如果没有返回值，使用[int]即可
 // Usage1: FfiCall[float64]()
-func Ffi2Call[RETY any, FT voidptr | usize](fnptrx FT, args ...any) (rvx RETY) {
+func Ffi2Call[RETY any, FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) (rvx RETY) {
 	var args2 = make([]any, 5)
 	var tystrs = make([]string, 5)
 	for i, arg := range args {
@@ -139,7 +139,7 @@ func Ffi2Call[RETY any, FT voidptr | usize](fnptrx FT, args ...any) (rvx RETY) {
 	tycrc = gopp.Crc64Str(tystr)
 
 	// log.Println(len(args), tystrs, tycrc, tystr)
-	var rv = litfficallgenimpl[RETY](tycrc, uintptr(fnptrx), args2...)
+	var rv = litfficallgenimpl[RETY](tycrc, uintptr(voidptr(fnptrx)), args2...)
 	gopp.GOUSED(rv)
 	// var retptr = &rvx
 	// *retptr = *((*T)(voidptr(&rv)))

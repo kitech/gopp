@@ -12,7 +12,7 @@ const (
 	PB = 1024 * 1024 * 1024 * 1024 * 1024
 )
 
-func Bytes2Hum[T int64 | uint64 | int](bv T) string {
+func Bytes2Hum[T int64 | uint64 | int | usize](bv T) string {
 	const units = "PTGMKB"
 	var values = [...]uint64{PB, TB, GB, MB, KB, 1}
 

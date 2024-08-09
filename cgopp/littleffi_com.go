@@ -44,7 +44,7 @@ func TestLitfficallz() {
 // Ffi3 Prep Call 9999 9.54493ms 954ns 1048218 /s
 // Ffi3Call 9999 23.591148ms 2.359µs 423908 /s
 // Ffi2Call 9999 17.42031ms 1.742µs 574052 /s
-func FfiCall[RETY any, FT voidptr | usize](fnptrx FT, args ...any) (rvx RETY) {
+func FfiCall[RETY any, FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) (rvx RETY) {
 	switch ffiver {
 	case 1:
 		// rv := Litfficallg(fnptrx, args...)
@@ -61,7 +61,7 @@ func FfiCall[RETY any, FT voidptr | usize](fnptrx FT, args ...any) (rvx RETY) {
 // 涉及的 CPP 的 name resolusion
 func fficallcpp() {}
 
-func FfiCallVoid[FT voidptr | usize](fnptrx FT, args ...any) {
+func FfiCallVoid[FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) {
 	switch ffiver {
 	case 2:
 		Ffi2Call[int](fnptrx, args...)
