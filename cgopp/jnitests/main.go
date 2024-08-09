@@ -105,9 +105,9 @@ func init() {
 
 			rv := cgopp.JNIEnvCallStaticMethod[int](je, x, y)
 			log.Println("rv", rv)
-			gopp.TruePrint(rv != 123, "Err", "want", 123, "but", rv)
-			if rv != 123 {
-				t.Error("want", 123, "but", rv)
+			gopp.TruePrint(rv != 444, "Err", "want", 444, "but", rv)
+			if rv != 444 {
+				t.Error("want", 444, "but", rv)
 			}
 		}
 
