@@ -165,7 +165,7 @@ func (je JNIEnv) CallStaticVoidMethod(clsid, mthid voidptr, args ...any) {
 		switch arg := argx.(type) {
 		case string:
 			tv := je.NewStringUTF(arg)
-			defer je.ReleaseStringUTFChars(tv)
+			defer je.ReleaseStringUTFChars(tv, nil)
 			argv[i+3] = tv
 		case int:
 			argv[i+3] = arg
@@ -205,7 +205,7 @@ func JNIEnvCallStaticMethod[RTY any](je JNIEnv, clsid, mthid voidptr, args ...an
 		switch arg := argx.(type) {
 		case string:
 			tv := je.NewStringUTF(arg)
-			defer je.ReleaseStringUTFChars(tv)
+			defer je.ReleaseStringUTFChars(tv, nil)
 			argv[i+3] = tv
 		case int:
 			tv := arg
@@ -241,6 +241,30 @@ func JNIEnvCallStaticMethod2[RTY any](clsid, mthid voidptr, args ...any) (rvx RT
 	return JNIEnvCallStaticMethod[RTY](je, clsid, mthid, args...)
 }
 
+// https://stackoverflow.com/questions/40004522/how-to-get-values-from-jobject-in-c-using-jni
+
+func (je JNIEnv) GetObjectClass(obj voidptr) voidptr {
+	var e2 = (*C.JNIEnv)(voidptr(je))
+	var fnptr = voidptr((*e2).GetObjectClass)
+	rv := Litfficall(fnptr, je.Toptr(), obj)
+	return rv
+}
+func (je JNIEnv) GetFieldID(clsobj voidptr, a0, a1 string) voidptr {
+	a04c := CStringgc(a0)
+	a14c := CStringgc(a1)
+
+	var e2 = (*C.JNIEnv)(voidptr(je))
+	var fnptr = voidptr((*e2).GetFieldID)
+	rv := Litfficall(fnptr, je.Toptr(), clsobj, a04c, a14c)
+	return rv
+}
+func (je JNIEnv) GetIntField(clsobj voidptr, fidobj voidptr) int {
+	var e2 = (*C.JNIEnv)(voidptr(je))
+	var fnptr = voidptr((*e2).GetIntField)
+	rv := Litfficall(fnptr, je.Toptr(), fidobj)
+	return int(usize(rv))
+}
+
 func (je JNIEnv) ExceptionClear() {
 	var e2 = (*C.JNIEnv)(voidptr(je))
 	rv := Litfficallg((*e2).ExceptionClear, je)
@@ -265,10 +289,10 @@ func (je JNIEnv) NewStringUTF(s string) voidptr {
 	return rv
 }
 
-func (je JNIEnv) ReleaseStringUTFChars(sx voidptr) {
+func (je JNIEnv) ReleaseStringUTFChars(strx voidptr, utfx voidptr) {
 	var e2 = (*C.JNIEnv)(voidptr(je))
 	var fnptr = voidptr((*e2).ReleaseStringUTFChars)
-	rv := Litfficallg(fnptr, je.Toptr(), sx, nil) // 最后一个参数很奇怪
+	rv := Litfficallg(fnptr, je.Toptr(), strx, utfx) // 最后一个参数很奇怪
 	gopp.GOUSED(rv)
 }
 
