@@ -2,6 +2,9 @@
 public class Main {
 
 public native static  void goexpfn1();
+static {
+    System.loadLibrary("hellojvgo");
+}
 
 public static void jvexpfn1() {
     System.out.println("jvexpfn1 called");
@@ -22,10 +25,6 @@ public static int jvexpfn4() {
     int rv = 444;
     System.out.println("jvexpfn4 called: retval:" + rv);
     return rv;
-}
-
-static {
-    System.loadLibrary("hellojvgo");
 }
 
 public static void main(String []args) {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"testing"
 
 	"github.com/kitech/gopp"
@@ -24,15 +25,24 @@ func Java_Main_goexpfn1() {
 	log.Println("heree", C.int(0))
 }
 
+//export Java_MainKt_goexpfn1
+func Java_MainKt_goexpfn1() {
+	log.Println("heree", C.int(0))
+}
+
 func main() {
 
 }
 
 func init() {
 	log.Println("heree")
+	// 没有正确安化testing不会执行的
+	os.Args = append(os.Args, "-test.v=true")
 	testing.Init()
 	t := &testing.T{} // todo
+	t.Error("hahhaha")
 
+	// todo test cgopp.RunOnJvm
 	cgopp.JNI_OnLoad_Callback = func() {
 		log.Println("herere", cgopp.Jenv)
 		je := cgopp.Jenv

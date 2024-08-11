@@ -1,5 +1,4 @@
 
-public external fun goexpfn1();
 
 // 这样的函数签名，与java一致，用JNI应该也一样访问
 // public static MainKt.ktexpfn1glob() !!!
@@ -23,6 +22,31 @@ public fun jvexpfn4() :Int {
     return rv;
 }
 
+
+
+// class loadliber {
+
+    // public external fun goexpfn1();
+
+    //     companion object {
+    //     init {
+    // println("before loadlib...")
+    // System.loadLibrary("hellojvgo");
+    // println("after loadlib...")
+    // }
+// }
+// }
+
+
+
+// Java_MainKt_goexpfn1
+public external fun goexpfn1();
+
+
 fun main() {
-    println("hehhee")
+    System.out.println("okmainkt");
+    System.loadLibrary("hellojvgo");
+    // loadliber()
+    goexpfn1()
+    // loadliber().goexpfn1();
 }

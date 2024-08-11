@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strings"
 
 	"github.com/kitech/gopp"
 	mobinit "github.com/kitech/gopp/internal/mobileinit"
@@ -72,10 +73,12 @@ func RunOnJVM[FT func(vm, env, ctx uintptr) error |
 	}
 	return nil
 }
-func JNIThreadCheck() {
-	if !JNIIsJvmth() {
-		log.Panicln("not on jvm thread:", jvmtid, "but:", MyTid())
+func JNIThreadCheck(label ...any) bool {
+	bv := JNIIsJvmth()
+	if !bv {
+		log.Println(label, "not on jvm thread:", jvmtid, "but:", MyTid())
 	}
+	return bv
 }
 
 // todo WIP crashing
@@ -111,17 +114,27 @@ func (je JNIEnv) GetVersion() int {
 	return int(usize(rv))
 }
 
-// todo 尝试L前缀，尝试把.替换/
+// 尝试L前缀，尝试把.替换/
 // 为什么有时需要前缀L，有时不需要，像Main
 // 使用 javap -s -p Main 查看函数签名信息
 // cls: "Ljava/lang/String"
 func (je JNIEnv) FindClass(cls string) voidptr {
-	var cls4c = CStringgc(cls)
-	// log.Println(je.Tocuptr(), je, cls)
+	cls2 := "L" + cls
+	cls3 := strings.ReplaceAll(cls, ".", "/")
+	cls4 := "L" + cls3
 
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	v := Litfficallg((*e2).FindClass, je.Toptr(), cls4c)
-	return v
+	clsrcs := []string{cls, cls2, cls3, cls4}
+	for _, rc := range clsrcs {
+		var cls4c = CStringgc(rc)
+		// log.Println(je.Tocuptr(), je, rc)
+
+		var e2 = (*C.JNIEnv)(voidptr(je))
+		v := Litfficallg((*e2).FindClass, je.Toptr(), cls4c)
+		if v != nil {
+			return v
+		}
+	}
+	return nil
 }
 
 func JniFindClass(cls string) voidptr { return jenv.FindClass(cls) }
@@ -165,7 +178,6 @@ func (je JNIEnv) CallStaticVoidMethod(clsid, mthid voidptr, args ...any) {
 		switch arg := argx.(type) {
 		case string:
 			tv := je.NewStringUTF(arg)
-			defer je.ReleaseStringUTFChars(tv, nil)
 			argv[i+3] = tv
 		case int:
 			argv[i+3] = arg
@@ -205,7 +217,6 @@ func JNIEnvCallStaticMethod[RTY any](je JNIEnv, clsid, mthid voidptr, args ...an
 		switch arg := argx.(type) {
 		case string:
 			tv := je.NewStringUTF(arg)
-			defer je.ReleaseStringUTFChars(tv, nil)
 			argv[i+3] = tv
 		case int:
 			tv := arg
@@ -280,6 +291,7 @@ func (je JNIEnv) ExceptionCheck() bool {
 	return rv != nil
 }
 
+// 这个生成的object不需要自己释放
 func (je JNIEnv) NewStringUTF(s string) voidptr {
 	s4c := CStringgc(s)
 
@@ -290,6 +302,7 @@ func (je JNIEnv) NewStringUTF(s string) voidptr {
 }
 
 func (je JNIEnv) ReleaseStringUTFChars(strx voidptr, utfx voidptr) {
+	// JNI DETECTED ERROR IN APPLICATION: non-nullable argument was NULL
 	var e2 = (*C.JNIEnv)(voidptr(je))
 	var fnptr = voidptr((*e2).ReleaseStringUTFChars)
 	rv := Litfficallg(fnptr, je.Toptr(), strx, utfx) // 最后一个参数很奇怪
@@ -297,16 +310,19 @@ func (je JNIEnv) ReleaseStringUTFChars(strx voidptr, utfx voidptr) {
 }
 
 func (je JNIEnv) GetStringUTFChars(sx voidptr) string {
+	var copyed uint8
 	var e2 = (*C.JNIEnv)(voidptr(je))
 	var fnptr = voidptr((*e2).GetStringUTFChars)
-	rv := Litfficallg(fnptr, je.Toptr(), sx, nil)
-	gopp.GOUSED(rv)
+	rv := Litfficallg(fnptr, je.Toptr(), sx, voidptr(&copyed))
+	gopp.GOUSED(rv, copyed)
+	defer je.ReleaseStringUTFChars(sx, rv)
+
 	return GoString(rv)
 }
 func (je JNIEnv) GetStringUTFLength(sx voidptr) int {
 	var e2 = (*C.JNIEnv)(voidptr(je))
 	var fnptr = voidptr((*e2).GetStringUTFLength)
-	rv := Litfficallg(fnptr, je.Toptr(), sx, nil)
+	rv := Litfficallg(fnptr, je.Toptr(), sx)
 	gopp.GOUSED(rv)
 	return int(usize(rv))
 }
