@@ -4,6 +4,7 @@ import (
 	"log"
 	"math"
 	"reflect"
+	// "golang.org/x/exp/constraints"
 )
 
 func Abs[T int | int64 | int32 | float32 | float64](vx T) T {
@@ -172,4 +173,33 @@ func Min(arr interface{}) interface{} {
 	}
 
 	return retv.Interface()
+}
+
+type Minmaxer[T Ordered] struct {
+	Min    T
+	Max    T
+	inited bool
+}
+
+func NewMinmaxer[T Ordered]() *Minmaxer[T] {
+	me := &Minmaxer[T]{}
+	return me
+}
+
+func (me *Minmaxer[T]) Input(v T) {
+	if me.inited {
+		// why syntax not work???
+		if v > me.Max {
+			me.Max = v
+		} else if v < me.Min {
+			me.Min = v
+		}
+	} else {
+		me.inited = true
+		me.Min, me.Max = v, v
+	}
+}
+
+func (me *Minmaxer[T]) Get() (T, T) {
+	return me.Min, me.Max
 }

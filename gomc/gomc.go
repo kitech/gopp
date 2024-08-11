@@ -26,6 +26,7 @@ import (
 // $GOPATH/pkg/mod
 var moddir = os.Getenv("HOME") + "/go/pkg/mod"
 var moddldir = moddir + "/cache/download"
+var dltmpdir = os.Getenv("HOME") + "/bprog/dmgoget"
 
 var getpkg = "github.com/kitech/gopp"
 var verbose bool
@@ -35,7 +36,9 @@ var showhelp bool
 // get pkgpath, // like go get, but offline first, then online
 // list regexp, // only current workdir go.mod
 // search regexp // in cachedir, downloaded
+// dltmp pkgpath, // it's go get, but in our dltmpdir, not current dir
 func main() {
+
 	log.SetFlags(log.Flags() ^ log.Ldate ^ log.Ltime)
 	defer func() { log.Println("Used", time.Since(gopp.StartTime)) }()
 	flag.BoolVar(&verbose, "v", true, "verbose")
@@ -86,7 +89,9 @@ func main() {
 		// dont, change current dir's go.mod/go.sum
 	case "dmget":
 	case "dminst": // go install package@latest
-	// 同步本地开发目录到 mod cache 目录的zip文件，完全离线
+	// todo 同步本地开发目录到 mod cache 目录的zip文件，完全离线
+	case "dltmp":
+		mcdltmpget(curpkg)
 	case "locsync":
 	case "fakelocalproxyserver": // todo
 	default:
@@ -411,4 +416,9 @@ func mainttt() {
 	bcc, err = mfo.Format()
 	gopp.ErrPrint(err)
 	log.Println(string(bcc)) // ok
+}
+
+func mcdltmpget(curpkg string) {
+	err := gopp.RunCmdSout(nil, dltmpdir, "go get -v", curpkg)
+	gopp.ErrPrint(err, curpkg)
 }

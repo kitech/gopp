@@ -1,13 +1,16 @@
 package gopp
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+	"sync"
 )
 
 const (
@@ -88,7 +91,7 @@ func RunCmd(wkdir string, args ...string) ([]string, error) {
 	for _, c := range args {
 		res := safeSplit(c)
 		if len(res) != 0 {
-			reargs = append(reargs, c)
+			reargs = append(reargs, res...)
 		}
 	}
 
@@ -97,6 +100,68 @@ func RunCmd(wkdir string, args ...string) ([]string, error) {
 	out, err := c.CombinedOutput()
 	ErrPrint(err, wkdir, reargs, string(out))
 	return strings.Split(strings.TrimSpace(string(out)), "\n"), err
+}
+
+// 不需要等待执行完成就能输出
+func RunCmdSout(outfn func(buf []byte), wkdir string, args ...string) error {
+	if outfn == nil {
+		outfn = func(buf []byte) { println(string(buf)) }
+	}
+	if len(wkdir) > 0 {
+		cdir, err := os.Getwd()
+		ErrPrint(err)
+		err = os.Chdir(wkdir)
+		ErrPrint(err, wkdir, args)
+		defer os.Chdir(cdir)
+		if err != nil {
+			return err
+		}
+	}
+
+	// try resplit
+	reargs := []string{}
+	for _, c := range args {
+		res := safeSplit(c)
+		if len(res) != 0 {
+			reargs = append(reargs, res...)
+		}
+	}
+
+	log.Printf("Runit: %d %+#v\n", len(reargs), reargs)
+	c := exec.Command(reargs[0], reargs[1:]...)
+	errfp, err := c.StderrPipe()
+	ErrPrint(err)
+	outfp, err := c.StdoutPipe()
+	ErrPrint(err)
+
+	err = c.Start()
+	ErrPrint(err)
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		sc := bufio.NewScanner(errfp)
+		for sc.Scan() {
+			txt := sc.Text()
+			txt = "E: " + txt
+			outfn([]byte(txt))
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		sc := bufio.NewScanner(outfp)
+		for sc.Scan() {
+			txt := sc.Text()
+			txt = "O: " + txt
+			outfn([]byte(txt))
+		}
+	}()
+
+	wg.Wait()
+
+	return err
 }
 
 // maybe comment: this code does not work if the quoted string does not have spaces.
