@@ -2,6 +2,7 @@
 public class Main {
 
 public native static  void goexpfn1();
+public native static  void goexploop();
 static {
     System.loadLibrary("hellojvgo");
 }
@@ -30,7 +31,9 @@ public static int jvexpfn4() {
 public static void main(String []args) {
     System.out.println("okmain");
     // jvexpfn1();
-    Main.goexpfn1();
+    // Main.goexpfn1();
+    // Main.goexploop();
+    System.out.println("donemain");
 }
 }
 

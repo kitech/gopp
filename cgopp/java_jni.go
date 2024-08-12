@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"runtime"
 	"strings"
 
 	"github.com/kitech/gopp"
@@ -59,6 +60,7 @@ type Jbool = uint8
 
 // jobject, jclass, jstring, jarray... = voidptr
 
+// 似乎这个不管用
 func RunOnJVM[FT func(vm, env, ctx uintptr) error |
 	func() error | func()](fnx FT) error {
 	switch fn := any(fnx).(type) {
@@ -73,6 +75,8 @@ func RunOnJVM[FT func(vm, env, ctx uintptr) error |
 	}
 	return nil
 }
+
+// 这个check是在go空间执行的不准确
 func JNIThreadCheck(label ...any) bool {
 	bv := JNIIsJvmth()
 	if !bv {
@@ -83,6 +87,9 @@ func JNIThreadCheck(label ...any) bool {
 
 // todo WIP crashing
 func JavaExe(clsname, funcname string, args ...string) int {
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	// var args2 = []string{"-Xsx32m", "-Xmx128m"}
 	var args2 = args
 	var argspp = StringSliceToCCharPP(args2)
@@ -129,7 +136,8 @@ func (je JNIEnv) FindClass(cls string) voidptr {
 		// log.Println(je.Tocuptr(), je, rc)
 
 		var e2 = (*C.JNIEnv)(voidptr(je))
-		v := Litfficallg((*e2).FindClass, je.Toptr(), cls4c)
+		// v := Litfficallg((*e2).FindClass, je.Toptr(), cls4c)
+		v := FfiCall[voidptr]((*e2).FindClass, je.Toptr(), cls4c)
 		if v != nil {
 			return v
 		}
@@ -160,10 +168,13 @@ func (je JNIEnv) GetStaticMethodID(clsid voidptr, mthname string, argssig string
 
 	var e2 = (*C.JNIEnv)(voidptr(je))
 	var fnptr = voidptr((*e2).GetStaticMethodID)
-	rv := Litfficall(fnptr, je.Toptr(), clsid, s4c, argssig4c)
+	// rv := Litfficall(fnptr, je.Toptr(), clsid, s4c, argssig4c)
+	rv := FfiCall[voidptr](fnptr, je.Toptr(), clsid, s4c, argssig4c)
 	je.ExceptionCheck()
 	return rv
 }
+
+type Void int
 
 // support string/int/todo
 // 这个应该使用的少
@@ -220,7 +231,8 @@ func JNIEnvCallStaticMethod[RTY any](je JNIEnv, clsid, mthid voidptr, args ...an
 			argv[i+3] = tv
 		case int:
 			tv := arg
-			argv[i+3] = voidptr(usize(tv))
+			// argv[i+3] = voidptr(usize(tv))
+			argv[i+3] = tv // fixsome gostack pointer check
 		default:
 			log.Println("Nocat", reflect.TypeOf(argx), argx)
 		}
@@ -235,11 +247,16 @@ func JNIEnvCallStaticMethod[RTY any](je JNIEnv, clsid, mthid voidptr, args ...an
 		rv2 := je.GetStringUTFChars(rvp)
 		rvx = any(rv2).(RTY)
 	case int:
+		log.Println(rvx, clsid, mthid, len(argv), argv)
 		fnptr = (*e2).CallStaticIntMethod
 		rvx = FfiCall[RTY](fnptr, argv...)
 	case float64:
 		fnptr = (*e2).CallStaticDoubleMethod
 		rvx = FfiCall[RTY](fnptr, argv...)
+	case Void:
+		log.Println(rvx, clsid, mthid, len(argv), argv)
+		fnptr = (*e2).CallStaticVoidMethod
+		FfiCall[RTY](fnptr, argv...)
 	default:
 		log.Println("Nocat", reflect.TypeOf(any(rvx)))
 	}
@@ -286,9 +303,20 @@ func (je JNIEnv) ExceptionCheck() bool {
 	var fnptr = (voidptr((*e2).ExceptionCheck))
 	rv := Litfficallg(fnptr, je.Toptr())
 	if rv != nil {
-		log.Println("Some error", rv, usize(rv))
+		log.Println("Some error", rv, usize(rv), MyTid())
+		je.ExceptionDescribe()
+		JNIThreadCheck()
+		panic(rv)
 	}
 	return rv != nil
+}
+func (je JNIEnv) ExceptionDescribe() {
+	var e2 = (*C.JNIEnv)(voidptr(je))
+	var fnptr = (voidptr((*e2).ExceptionDescribe))
+	rv := Litfficallg(fnptr, je.Toptr())
+	if rv != nil {
+		log.Println("Some error", rv, usize(rv))
+	}
 }
 
 // 这个生成的object不需要自己释放

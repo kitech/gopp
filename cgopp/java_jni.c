@@ -18,11 +18,12 @@
 // \see https://nachtimwald.com/2017/06/17/calling-java-from-c/
 // clsname, Main,main,MainKt, ...
 // funcname, main, ...
+
 int create_java_exe(const char* clsname, const char* funcname, char** args) {
 	JavaVM         *vm = NULL;
 	JNIEnv         *env = NULL;
 	JavaVMInitArgs  vm_args;
-	jint            res;
+	jint            res = -1;
 	jclass          cls;
 	jmethodID       mid;
 	jstring         jstr;
@@ -42,7 +43,7 @@ int create_java_exe(const char* clsname, const char* funcname, char** args) {
         }
         JavaVMOption options[argc];
 
-    if (1) {
+    if (0) {
 
         options[0].optionString    = "-Djava.class.path=....jar";
         for (int i=0; i < argc; i++) {

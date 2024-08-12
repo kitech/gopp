@@ -16,17 +16,17 @@ import (
 #include <stdint.h>
 #include <pthread.h>
 
-static uint64_t MyTid() { return (uint64_t)(pthread_self()); }
+static uintptr_t MyTid() { return (uintptr_t)pthread_self(); }
 // macos warning depcreated syscall
-// static uint64_t MyTid2() { return syscall(sizeof(void*)==4?224:186); }
+// static uintptr_t MyTid2() { return syscall(sizeof(void*)==4?224:186); }
 // macos
-// static uint64_t MyTid3() { return kdebug_signpost(SYS_kdebug_trace); }
+// static uintptr_t MyTid3() { return kdebug_signpost(SYS_kdebug_trace); }
 */
 import "C"
 
 // TODO unix/linux only
-func MyTid() uint64 {
-	return uint64(C.MyTid())
+func MyTid() usize {
+	return usize(C.MyTid())
 }
 
 // func MyTid2() uint64 {
@@ -41,12 +41,16 @@ var archs = map[int]uintptr{
 	32: 224, 64: 186,
 }
 
-func MyTid3() uint64 {
+// todo macos not work
+func MyTid3() usize {
 	r1, r2, err := syscall.Syscall(archs[PtrSize], 0, 0, 0)
+	if err != 0 && runtime.GOOS == "darwin" {
+		panic("notimpl " + runtime.GOOS + " " + err.Error())
+	}
 	if false {
 		log.Println(r1, r2, err)
 	}
-	return uint64(r1)
+	return usize(r1)
 }
 
 func GoID() int {

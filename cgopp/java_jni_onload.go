@@ -26,14 +26,14 @@ var jvm JavaVM  // C.JavaVM*
 var jenv JNIEnv // C.JNIEnv*
 var Jvm JavaVM
 var Jenv JNIEnv
-var jvmtid uint64
+var jvmtid usize
 
 func JNIIsLoad() bool  { return jvm != 0 }
-func JVMTid() uint64   { return jvmtid }
+func JVMTid() usize    { return jvmtid }
 func JNIIsJvmth() bool { return jvmtid == MyTid() }
 
 // see jni.h JNI_OnLoad
-
+//
 //export JNI_OnLoad
 func JNI_OnLoad(vm JavaVM, x uintptr) int {
 	// log.Println("hello", vm, x)
@@ -44,7 +44,7 @@ func JNI_OnLoad(vm JavaVM, x uintptr) int {
 	jvm, Jvm = vm, vm
 	jenv, Jenv = jvm.Env(), jvm.Env()
 
-	log.Println("jvm", voidptr(jvm), "jenv", voidptr(jenv))
+	log.Println("jvm", voidptr(jvm), "jenv", voidptr(jenv), "tid", jvmtid)
 	gopp.NilPrint(jenv, "some error occus", voidptr(vm))
 
 	JNI_OnLoad_Callback()
