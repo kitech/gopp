@@ -28,6 +28,14 @@ type Jweak = usize
 type JfieldID = usize
 type JmethodID = usize
 
+// jni没有查看类型的函数！！！
+// jvalue 类型?
+type Jany usize
+
+func (me Jany) Tostr() string {
+	return ""
+}
+
 // note: 只支持基础类型和String
 // todo 还有些分号没有处理好，结尾有的有分号有的没分号
 func Goargs2JvSignature(rv any, args ...any) string {

@@ -1,5 +1,5 @@
-//go:build usejni
-// +build usejni
+// //goddd:build usejni
+// // +buildddd usejni
 
 package cgopp
 
@@ -7,7 +7,6 @@ import (
 	"log"
 
 	"github.com/kitech/gopp"
-	mobinit "github.com/kitech/gopp/internal/mobileinit"
 	cmap "github.com/orcaman/concurrent-map/v2"
 )
 
@@ -20,27 +19,27 @@ import (
 */
 import "C"
 
-type JavaVM uintptr
-type JNIEnv uintptr
+type JavaVM usize
+type JNIEnv usize
 
 var jvm JavaVM    // C.JavaVM*
 var jenvmt JNIEnv // C.JNIEnv*
 var Jvm JavaVM
 
 // var Jenvmt JNIEnv // main jvm thread env
-var jvmmttid uintptr
+var jvmmttid usize
 
-func JNIIsLoad() bool   { return jvm != 0 }
-func JVMmtTid() uintptr { return jvmmttid }
-func JNIIsJvmth() bool  { return jvmmttid == MyTid() }
-func JNIEnvmt() JNIEnv  { return jenvmt }
+func JNIIsLoad() bool  { return jvm != 0 }
+func JVMmtTid() usize  { return jvmmttid }
+func JNIIsJvmth() bool { return jvmmttid == MyTid() }
+func JNIEnvmt() JNIEnv { return jenvmt }
 
 // see jni.h JNI_OnLoad
 //
 //export JNI_OnLoad
-func JNI_OnLoad(vm JavaVM, reserved uintptr) int {
+func JNI_OnLoad(vm JavaVM, reserved usize) int {
 	// log.Println("hello", vm, reserved)
-	mobinit.SetCurrentContext(voidptr(vm), 0)
+	mobinitSetCurrentContext(voidptr(vm), 0)
 
 	jvmmttid = MyTid()
 	log.Printf("cgopp.JNI_OnLoad %v, %v\n", voidptr(vm), MyTid())
@@ -59,9 +58,16 @@ func JNI_OnLoad(vm JavaVM, reserved uintptr) int {
 // 一般执行不到这个回调的
 
 //export JNI_OnUnload
-func JNI_OnUnload(vm JavaVM, reserved uintptr) {
+func JNI_OnUnload(vm JavaVM, reserved usize) {
 	log.Printf("cgopp.JNI_OnUnload %v\n", voidptr(vm))
 }
+
+// set in java_jnicw.go
+var jnimemfninit func(jvm JavaVM, je JNIEnv)
+var mobinitSetCurrentContext func(voidptr, usize)
+var mobinitRunOnJVM func(func(vm, env, ctx usize) error) error
+var JNI_VERSION_1_6 int // dont change
+var getJavaVMEnvByc func(jvmx usize) usize
 
 func jnimtclsesinit(je JNIEnv) {
 	names := jnimtclses.Keys()

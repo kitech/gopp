@@ -1,7 +1,5 @@
-////
-
-//go:build usejni
-// +build usejni
+// //goddd:build usejni
+// // +buildddd usejni
 
 package cgopp
 
@@ -12,22 +10,21 @@ import (
 	"strings"
 
 	"github.com/kitech/gopp"
-	mobinit "github.com/kitech/gopp/internal/mobileinit"
 )
 
 // 似乎这个不管用，是因为忽略了参数中的env，这个env是和当前线程绑定的
 // 在不能保证线程是否为JVM线程时，使用参数中的JNIEnv变量
-func RunOnJVM[FT func(vm, env, ctx uintptr) error |
+func RunOnJVM[FT func(vm, env, ctx usize) error |
 	func(env usize) error | func(env usize)](fnx FT) error {
 	switch fn := any(fnx).(type) {
-	case func(vm, env, ctx uintptr) error:
-		return mobinit.RunOnJVM(fn)
+	case func(vm, env, ctx usize) error:
+		return mobinitRunOnJVM(fn)
 	case func(usize) error:
-		var fn2 = func(vm, env, ctx uintptr) error { return fn(env) }
-		return mobinit.RunOnJVM(fn2)
+		var fn2 = func(vm, env, ctx usize) error { return fn(env) }
+		return mobinitRunOnJVM(fn2)
 	case func(usize):
-		var fn2 = func(vm, env, ctx uintptr) error { fn(env); return nil }
-		return mobinit.RunOnJVM(fn2)
+		var fn2 = func(vm, env, ctx usize) error { fn(env); return nil }
+		return mobinitRunOnJVM(fn2)
 	default:
 	}
 	return nil
@@ -40,6 +37,22 @@ func JNIThreadCheck(label ...any) bool {
 		log.Println(label, "not on jvm thread:", jvmmttid, "but:", MyTid())
 	}
 	return bv
+}
+
+func (jvm JavaVM) Env() JNIEnv {
+	if jmf.GetEnv == nil {
+		// maybe not inited
+		var envx = getJavaVMEnvByc(usize(jvm))
+		var env = JNIEnv(envx)
+		return env
+	} else {
+		var iop voidptr
+		rv := FfiCall[int32](jmf.GetEnv, jvm, voidptr(&iop), JNI_VERSION_1_6)
+		if rv != 0 {
+			log.Println("some err", jvm)
+		}
+		return JNIEnv(rv)
+	}
 }
 
 // 这种方式隔离的更彻底，
@@ -94,9 +107,7 @@ func (j JNIEnv) Toptr() voidptr { return voidptr(j) }
 func (j JNIEnv) String() string { return fmt.Sprintf("%v", voidptr(j)) }
 
 func (je JNIEnv) GetVersion() int {
-	var fnptr = je.fnGetVersion()
-	rv := Litfficall(fnptr, je.Toptr())
-	// log.Println(rv)
+	rv := Litfficall(jmf.GetVersion, je.Toptr())
 	return int(usize(rv))
 }
 
@@ -114,7 +125,7 @@ func (je JNIEnv) FindClass(cls string) usize {
 	log.Println(je.Tocuptr(), je, cls)
 
 	// runtime: bad pointer in frame main.getJvmMemory.func1 at 0x400005fea8: 0x25
-	v := FfiCall[usize](je.fnFindClass(), je, usize(cls4c))
+	v := FfiCall[usize](jmf.FindClass, je, usize(cls4c))
 	if v != 0 {
 		return v
 	}
@@ -132,8 +143,7 @@ func (je JNIEnv) GetStaticMethodID(clsid usize, mthname string, argssig string) 
 	var s4c = CStringgc(mthname)
 	var argssig4c = CStringgc(argssig)
 
-	var fnptr = je.fnGetStaticMethodID()
-	rv := FfiCall[usize](fnptr, je, clsid, s4c, argssig4c)
+	rv := FfiCall[usize](jmf.GetStaticMethodID, je, clsid, s4c, argssig4c)
 	je.ExceptionCheck()
 	return rv
 }
@@ -160,17 +170,8 @@ func (je JNIEnv) CallStaticVoidMethod(clsid, mthid usize, args ...any) {
 	}
 
 	log.Println(args, Goargs2JvSignature(Void(0), args...))
-	var fnptr = je.fnCallStaticVoidMethod()
-	rv := FfiCall[int](fnptr, argv[:argc]...)
+	rv := FfiCall[int](jmf.CallStaticVoidMethod, argv[:argc]...)
 	gopp.GOUSED(rv)
-}
-
-// jni没有查看类型的函数！！！
-// jvalue 类型?
-type Jany uintptr
-
-func (me Jany) Tostr() string {
-	return ""
 }
 
 // go的方法不能带模板类型!!!
@@ -205,26 +206,26 @@ func JNIEnvCallStaticMethod[RTY any](je JNIEnv, clsid, mthid usize, args ...any)
 	switch any(rvx).(type) {
 	case string:
 		// rvp := FfiCall[voidptr](je.fnCallStaticObjectMethod(), argv...)
-		rvp := FfiCall[usize](jnimemfn.CallStaticObjectMethod, argv...)
+		rvp := FfiCall[usize](jmf.CallStaticObjectMethod, argv...)
 		rv2 := je.GetStringUTFChars(rvp)
 		rvx = any(rv2).(RTY)
 	case usize:
 		// rvp := FfiCall[voidptr](je.fnCallStaticObjectMethod(), argv...)
-		rvx = FfiCall[RTY](jnimemfn.CallObjectMethod, argv...)
+		rvx = FfiCall[RTY](jmf.CallObjectMethod, argv...)
 	case int, uint: // go的int是变长类型，要按照java的类型调用
 		// log.Println(rvx, clsid, mthid, len(argv), argv)
-		rvx = FfiCall[RTY](je.fnCallStaticIntMethod(), argv...)
+		rvx = FfiCall[RTY](jmf.CallStaticIntMethod, argv...)
 
 	case int64, uint64:
 		// log.Println(rvx, clsid, mthid, len(argv), argv)
-		rvx = FfiCall[RTY](je.fnCallStaticLongMethod(), argv...)
+		rvx = FfiCall[RTY](jmf.CallStaticLongMethod, argv...)
 		// log.Println(rvx, clsid, mthid, len(argv), argv)
 
 	case float64:
-		rvx = FfiCall[RTY](je.fnCallStaticDoubleMethod(), argv...)
+		rvx = FfiCall[RTY](jmf.CallStaticDoubleMethod, argv...)
 	case Void:
 		// log.Println(rvx, clsid, mthid, len(argv), argv)
-		rvx = FfiCall[RTY](je.fnCallStaticVoidMethod(), argv...)
+		rvx = FfiCall[RTY](jmf.CallStaticVoidMethod, argv...)
 	default:
 		log.Println("Nocat", reflect.TypeOf(any(rvx)))
 	}
@@ -237,8 +238,7 @@ func (je JNIEnv) GetMethodID(clsid usize, mthname string, argssig string) usize 
 	var s4c = CStringgc(mthname)
 	var argssig4c = CStringgc(argssig)
 
-	var fnptr = jmf.GetMethodID
-	rv := FfiCall[usize](fnptr, je, clsid, s4c, argssig4c)
+	rv := FfiCall[usize](jmf.GetMethodID, je, clsid, s4c, argssig4c)
 	je.ExceptionCheck()
 	return rv
 }
@@ -271,12 +271,12 @@ func JNIEnvCallMethod[RTY any](je JNIEnv, clsid, mthid usize, args ...any) (rvx 
 	switch any(rvx).(type) {
 	case string:
 		// rvp := FfiCall[voidptr](je.fnCallStaticObjectMethod(), argv...)
-		rvp := FfiCall[usize](jnimemfn.CallObjectMethod, argv...)
+		rvp := FfiCall[usize](jmf.CallObjectMethod, argv...)
 		rv2 := je.GetStringUTFChars(rvp)
 		rvx = any(rv2).(RTY)
 	case usize:
 		// rvp := FfiCall[voidptr](je.fnCallStaticObjectMethod(), argv...)
-		rvx = FfiCall[RTY](jnimemfn.CallObjectMethod, argv...)
+		rvx = FfiCall[RTY](jmf.CallObjectMethod, argv...)
 
 	// case int, uint: // go的int是变长类型，要按照java的类型调用
 	// 	// log.Println(rvx, clsid, mthid, len(argv), argv)
@@ -302,32 +302,27 @@ func JNIEnvCallMethod[RTY any](je JNIEnv, clsid, mthid usize, args ...any) (rvx 
 // https://stackoverflow.com/questions/40004522/how-to-get-values-from-jobject-in-c-using-jni
 
 func (je JNIEnv) GetObjectClass(obj usize) usize {
-	var fnptr = je.fnGetObjectClass()
-	rv := Litfficall(fnptr, je.Toptr(), voidptr(obj))
+	rv := Litfficall(jmf.GetObjectClass, je.Toptr(), voidptr(obj))
 	return usize(rv)
 }
 func (je JNIEnv) GetFieldID(clsobj usize, a0, a1 string) usize {
 	a04c := CStringgc(a0)
 	a14c := CStringgc(a1)
 
-	var fnptr = je.fnGetFieldID()
-	rv := Litfficall(fnptr, je.Toptr(), voidptr(clsobj), a04c, a14c)
+	rv := Litfficall(jmf.GetFieldID, je.Toptr(), voidptr(clsobj), a04c, a14c)
 	return usize(rv)
 }
 func (je JNIEnv) GetIntField(clsobj usize, fidobj usize) int {
-	var fnptr = je.fnGetIntField()
-	rv := Litfficall(fnptr, je.Toptr(), voidptr(fidobj))
+	rv := Litfficall(jmf.GetIntField, je.Toptr(), voidptr(fidobj))
 	return int(usize(rv))
 }
 
 func (je JNIEnv) ExceptionClear() {
-	var fnptr = je.fnExceptionClear()
-	rv := Litfficallg(fnptr, je.Toptr())
+	rv := Litfficallg(jmf.ExceptionClear, je.Toptr())
 	gopp.GOUSED(rv)
 }
 func (je JNIEnv) ExceptionCheck() bool {
-	var fnptr = je.fnExceptionCheck()
-	rv := Litfficallg(fnptr, je.Toptr())
+	rv := Litfficallg(jmf.ExceptionCheck, je.Toptr())
 	if rv != nil {
 		log.Println("Some error", rv, usize(rv), MyTid())
 		je.ExceptionDescribe()
@@ -337,28 +332,24 @@ func (je JNIEnv) ExceptionCheck() bool {
 	return rv != nil
 }
 func (je JNIEnv) ExceptionDescribe() {
-	var fnptr = je.fnExceptionDescribe()
-	rv := Litfficallg(fnptr, je.Toptr())
+	rv := Litfficallg(jmf.ExceptionDescribe, je.Toptr())
 	if rv != nil {
 		log.Println("Some error", rv, usize(rv))
 	}
 }
 
 func (je JNIEnv) NewGlobalRef(obj usize) usize {
-	var fnptr = jmf.NewGlobalRef
-	rv := FfiCall[usize](fnptr, je, obj)
+	rv := FfiCall[usize](jmf.NewGlobalRef, je, obj)
 	if rv == 0 {
 		log.Println("Some error", obj, rv)
 	}
 	return rv
 }
 func (je JNIEnv) DeleteGlobalRef(obj usize) {
-	var fnptr = jmf.DeleteGlobalRef
-	FfiCall[Void](fnptr, je, obj)
+	FfiCall[Void](jmf.DeleteGlobalRef, je, obj)
 }
 func (je JNIEnv) IsSameObject(obj0, obj1 usize) bool {
-	var fnptr = jmf.IsSameObject
-	rv := FfiCall[uint8](fnptr, je, obj0, obj1)
+	rv := FfiCall[uint8](jmf.IsSameObject, je, obj0, obj1)
 	return rv != 0
 }
 
@@ -366,30 +357,26 @@ func (je JNIEnv) IsSameObject(obj0, obj1 usize) bool {
 func (je JNIEnv) NewStringUTF(s string) usize {
 	s4c := CStringgc(s)
 
-	var fnptr = je.fnNewStringUTF()
-	rv := FfiCall[usize](fnptr, je.Toptr(), s4c)
+	rv := FfiCall[usize](jmf.NewStringUTF, je.Toptr(), s4c)
 	return rv
 }
 
 func (je JNIEnv) ReleaseStringUTFChars(strx usize, utfx usize) {
 	// JNI DETECTED ERROR IN APPLICATION: non-nullable argument was NULL
-	var fnptr = je.fnReleaseStringUTFChars()
-	rv := FfiCall[Void](fnptr, je, strx, utfx) // 最后一个参数很奇怪
+	rv := FfiCall[Void](jmf.ReleaseStringUTFChars, je, strx, utfx) // 最后一个参数很奇怪
 	gopp.GOUSED(rv)
 }
 
 func (je JNIEnv) GetStringUTFChars(sx usize) string {
 	var copyed uint8
-	var fnptr = je.fnGetStringUTFChars()
-	rv := FfiCall[voidptr](fnptr, je.Toptr(), sx, usize(voidptr((&copyed))))
+	rv := FfiCall[voidptr](jmf.GetStringUTFChars, je.Toptr(), sx, usize(voidptr((&copyed))))
 	gopp.GOUSED(rv, copyed)
 	defer je.ReleaseStringUTFChars(sx, usize(rv))
 
 	return GoString(rv)
 }
 func (je JNIEnv) GetStringUTFLength(sx usize) int {
-	var fnptr = je.fnGetStringUTFLength()
-	rv := FfiCall[int32](fnptr, je, sx)
+	rv := FfiCall[int32](jmf.GetStringUTFLength, je, sx)
 	gopp.GOUSED(rv)
 	return int(rv)
 }
