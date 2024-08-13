@@ -9,6 +9,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <stdarg.h>
+#include <pthread.h>
+
+
+int cgoppJNIEnvCallStaticMethod(void*vmx, void*jex, uintptr_t pth,
+    char*cls, char*mth, int argc, ...) {
+    
+    va_list arg;
+    va_start(arg, argc);
+
+    va_end(arg);
+
+    return 0;
+}
 
 // helper functions go here 
 

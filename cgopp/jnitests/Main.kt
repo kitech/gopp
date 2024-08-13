@@ -2,16 +2,19 @@
 // 怎么感觉做native还是要java，kotlin莫名问题
 // kotlin 的 String 不一定等于 java 的 String？？？
 // 那也不对，输出的函数签名和java一样的
-/*
-Exception in thread "main" java.lang.NoClassDefFoundError: kotlin/jvm/internal/Intrinsics
-        at MainKt.jvexpfn2(Main.kt)
-*/
+
 
 // 这样的函数签名，与java一致，用JNI应该也一样访问
 // public static MainKt.ktexpfn1glob() !!!
 public fun jvexpfn1() {
     System.out.println("ktexpfn1 called");
 }
+
+// 在go里调用出现这个错误，kt自己还有runtime没有正确初始化？？？
+/*
+Exception in thread "main" java.lang.NoClassDefFoundError: kotlin/jvm/internal/Intrinsics
+        at MainKt.jvexpfn2(Main.kt)
+*/
 public fun jvexpfn2(a0:java.lang.String) {
     // System.out.println("ktexpfn2 called:"+a0);
     println("ktexpfn2 called: $a0")

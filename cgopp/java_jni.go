@@ -51,27 +51,20 @@ const (
 	// JNI_VERSION_10  = C.JNI_VERSION_10
 )
 
-type Jint = int32 // int32_t
-type Jsize = int32
-type Jlong = int64 // int64_t
-type Jbool = uint8
-
-// type Void int // ???
-
-// jobject, jclass, jstring, jarray... = voidptr
-
-// 似乎这个不管用
+// 似乎这个不管用，是因为忽略了参数中的env，这个env是和当前线程绑定的
+// 在不能保证线程是否为JVM线程时，使用参数中的JNIEnv变量
 func RunOnJVM[FT func(vm, env, ctx uintptr) error |
-	func() error | func()](fnx FT) error {
+	func(env usize) error | func(env usize)](fnx FT) error {
 	switch fn := any(fnx).(type) {
 	case func(vm, env, ctx uintptr) error:
 		return mobinit.RunOnJVM(fn)
-	case func() error:
-		var fn2 = func(vm, env, ctx uintptr) error { return fn() }
+	case func(usize) error:
+		var fn2 = func(vm, env, ctx uintptr) error { return fn(env) }
 		return mobinit.RunOnJVM(fn2)
-	case func():
-		var fn2 = func(vm, env, ctx uintptr) error { fn(); return nil }
+	case func(usize):
+		var fn2 = func(vm, env, ctx uintptr) error { fn(env); return nil }
 		return mobinit.RunOnJVM(fn2)
+	default:
 	}
 	return nil
 }
@@ -80,7 +73,7 @@ func RunOnJVM[FT func(vm, env, ctx uintptr) error |
 func JNIThreadCheck(label ...any) bool {
 	bv := JNIIsJvmth()
 	if !bv {
-		log.Println(label, "not on jvm thread:", jvmtid, "but:", MyTid())
+		log.Println(label, "not on jvm thread:", jvmmttid, "but:", MyTid())
 	}
 	return bv
 }
@@ -98,6 +91,67 @@ func JavaExe(clsname, funcname string, args ...string) int {
 	// rv := C.create_java_exe(C.CString("java/lang/String"), C.CString("main"), args4c)
 	rv := C.create_java_exe(C.CString(clsname), C.CString(funcname), args4c)
 	return int(rv)
+}
+
+// /// 这种方式封装可以分离部分依赖C的代码
+func (jvm JavaVM) fnGetEnv() voidptr {
+	return voidptr((*(*C.JavaVM)(voidptr(jvm))).GetEnv)
+}
+func (jvm JavaVM) fnAttachCurrentThread() voidptr {
+	return voidptr((*(*C.JavaVM)(voidptr(jvm))).AttachCurrentThread)
+}
+func (jvm JavaVM) fnDetachCurrentThread() voidptr {
+	return voidptr((*(*C.JavaVM)(voidptr(jvm))).DetachCurrentThread)
+}
+func (jvm JavaVM) fnAttachCurrentThreadAsDaemon() voidptr {
+	return voidptr((*(*C.JavaVM)(voidptr(jvm))).AttachCurrentThreadAsDaemon)
+}
+func (jvm JavaVM) fnDestroyJavaVM() voidptr {
+	return voidptr((*(*C.JavaVM)(voidptr(jvm))).DestroyJavaVM)
+}
+
+func (je JNIEnv) fnGetVersion() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).GetVersion)
+}
+func (je JNIEnv) fnFindClass() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).FindClass)
+}
+func (je JNIEnv) fnGetStaticMethodID() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).GetStaticMethodID)
+}
+func (je JNIEnv) fnCallStaticVoidMethod() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticVoidMethod)
+}
+func (je JNIEnv) fnCallStaticObjectMethod() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticObjectMethod)
+}
+func (je JNIEnv) fnCallStaticIntMethod() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticIntMethod)
+}
+func (je JNIEnv) fnCallStaticLongMethod() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticLongMethod)
+}
+func (je JNIEnv) fnCallStaticFloatMethod() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticFloatMethod)
+}
+func (je JNIEnv) fnCallStaticDoubleMethod() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticDoubleMethod)
+}
+func (je JNIEnv) fnCallStaticBooleanMethod() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticBooleanMethod)
+}
+
+func (je JNIEnv) fnNewStringUTF() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).NewStringUTF)
+}
+func (je JNIEnv) fnGetStringUTFLength() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).GetStringUTFLength)
+}
+func (je JNIEnv) fnGetStringUTFChars() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).GetStringUTFChars)
+}
+func (je JNIEnv) fnReleaseStringUTFChars() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).ReleaseStringUTFChars)
 }
 
 ////
@@ -126,34 +180,20 @@ func (je JNIEnv) GetVersion() int {
 // 使用 javap -s -p Main 查看函数签名信息
 // cls: "Ljava/lang/String"
 func (je JNIEnv) FindClass(cls string) voidptr {
-	cls2 := "L" + cls
-	cls3 := strings.ReplaceAll(cls, ".", "/")
-	cls4 := "L" + cls3
-
-	clsrcs := []string{cls, cls2, cls3, cls4}
-	for _, rc := range clsrcs {
-		var cls4c = CStringgc(rc)
-		// log.Println(je.Tocuptr(), je, rc)
-
-		var e2 = (*C.JNIEnv)(voidptr(je))
-		// v := Litfficallg((*e2).FindClass, je.Toptr(), cls4c)
-		v := FfiCall[voidptr]((*e2).FindClass, je.Toptr(), cls4c)
-		if v != nil {
-			return v
-		}
+	if strings.Count(cls, ".") > 0 {
+		cls = strings.ReplaceAll(cls, ".", "/")
 	}
-	return nil
-}
+	var cls4c = CStringgc(cls)
+	// log.Println(je.Tocuptr(), je, rc)
 
-func JniFindClass(cls string) voidptr { return jenv.FindClass(cls) }
-func JniFindClassTS(cls string) voidptr {
-	var rv voidptr
-	err := RunOnJVM(func() error {
-		rv = JniFindClass(cls)
-		return nil
-	})
-	gopp.ErrPrint(err, cls)
-	return rv
+	var e2 = (*C.JNIEnv)(voidptr(je))
+	// v := Litfficallg((*e2).FindClass, je.Toptr(), cls4c)
+	v := FfiCall[voidptr]((*e2).FindClass, je.Toptr(), cls4c)
+	if v != nil {
+		return v
+	}
+
+	return nil
 }
 
 // s: ???
@@ -173,8 +213,6 @@ func (je JNIEnv) GetStaticMethodID(clsid voidptr, mthname string, argssig string
 	je.ExceptionCheck()
 	return rv
 }
-
-type Void int
 
 // support string/int/todo
 // 这个应该使用的少
@@ -254,7 +292,7 @@ func JNIEnvCallStaticMethod[RTY any](je JNIEnv, clsid, mthid voidptr, args ...an
 		fnptr = (*e2).CallStaticDoubleMethod
 		rvx = FfiCall[RTY](fnptr, argv...)
 	case Void:
-		log.Println(rvx, clsid, mthid, len(argv), argv)
+		// log.Println(rvx, clsid, mthid, len(argv), argv)
 		fnptr = (*e2).CallStaticVoidMethod
 		FfiCall[RTY](fnptr, argv...)
 	default:
@@ -263,10 +301,6 @@ func JNIEnvCallStaticMethod[RTY any](je JNIEnv, clsid, mthid voidptr, args ...an
 	gopp.GOUSED(e2, fnptr)
 
 	return
-}
-func JNIEnvCallStaticMethod2[RTY any](clsid, mthid voidptr, args ...any) (rvx RTY) {
-	var je = jenv
-	return JNIEnvCallStaticMethod[RTY](je, clsid, mthid, args...)
 }
 
 // https://stackoverflow.com/questions/40004522/how-to-get-values-from-jobject-in-c-using-jni

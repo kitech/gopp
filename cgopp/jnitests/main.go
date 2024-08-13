@@ -39,46 +39,45 @@ func Java_MainKt_goexpfn1() {
 }
 
 func main() {
-	log.Println("runexe", runexe)
-	cgopp.JavaExe("Main", "main")
 }
 
 var runexe = false // 0 lib, 1 exe
 func init() {
-
 	exe, _ := os.Executable()
 	runexe = !strings.HasSuffix(exe, "/java")
 	log.Println("heree", "runexe", true)
 
 	// todo test cgopp.RunOnJvm
-	// cgopp.JNI_OnLoad_Callback = func() {
-	// 	log.Println(gopp.MyFuncName(), "tid", cgopp.MyTid())
-	// 	// testfunc()
-	// }
-	if !runexe {
-		go init2()
+	cgopp.JNI_OnLoad_Callback = func() {
+		log.Println(gopp.MyFuncName(), "tid", cgopp.MyTid())
+		// testfunc(uintptr(cgopp.Jenv))
 	}
+
+	go init2()
 }
 func init2() {
 
 	log.Println("looping...")
 	for i := 0; ; i++ {
 		gopp.SleepSec(1)
-		go cgopp.RunOnJVM(func() {
-			testfunc()
+		go cgopp.RunOnJVM(func(jex uintptr) error {
+			testfunc(jex)
+			return nil
 		})
 		gopp.SleepSec(2)
 	}
 }
 
-func testfunc() {
-	log.Println("herere", cgopp.Jenv, "tid", cgopp.MyTid())
+func testfunc(jex uintptr) {
+	log.Println("herere", cgopp.JNIEnvmt(), "tid", cgopp.MyTid())
 	cgopp.JNIThreadCheck()
-	defer log.Println("herere", cgopp.Jenv, "eee=== top -pid", os.Getpid())
-	je := cgopp.Jenv
+	defer log.Println("herere", cgopp.JNIEnvmt(), "eee=== top -pid", os.Getpid())
+	je := cgopp.JNIEnvmt()
+	je = cgopp.JNIEnv(jex)
+	log.Println(cgopp.JNIEnvmt(), je, cgopp.JNIEnvmt() == je)
 	// cls4c := cgopp.CStringgc("LMain")
 	ver := je.GetVersion()
-	log.Println("jvm ver", ver, cgopp.JVMTid(), cgopp.MyTid())
+	log.Println("jvm ver", ver, cgopp.JVMmtTid(), cgopp.MyTid())
 
 	x := je.FindClass("Main")
 	log.Println("jvcls Main", x)
@@ -125,6 +124,19 @@ func testfunc() {
 		rv := cgopp.JNIEnvCallStaticMethod[int](je, x, y)
 		log.Println("rv", rv)
 		gopp.TruePrint(rv != 444, "Err", "want", 444, "but", rv)
+
+	}
+
+	{
+		y := je.GetStaticMethodID(x, "getJvmMemory", "(I)J")
+		log.Println("getJvmMemory", y)
+		gopp.NilPrint(y, "Err")
+
+		rv0 := cgopp.JNIEnvCallStaticMethod[int](je, x, y, 0)
+		rv1 := cgopp.JNIEnvCallStaticMethod[int](je, x, y, 1)
+		rv2 := rv0 - rv1
+		log.Println("rv", rv0, rv1, rv2)
+		// gopp.TruePrint(rv0 != 444, "Err", "want", 444, "but", rv0, rv1)
 
 	}
 

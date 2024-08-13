@@ -19,11 +19,11 @@ static char* lockJNI(JavaVM *vm, uintptr_t* envp, int* attachedp) {
 	}
 
 	*attachedp = 0;
-	switch ((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_6)) {
+	switch ((*vm)->GetEnv(vm, (void**)(void*)&env, JNI_VERSION_1_6)) {
 	case JNI_OK:
 		break;
 	case JNI_EDETACHED:
-		if ((*vm)->AttachCurrentThread(vm, &env, 0) != 0) {
+		if ((*vm)->AttachCurrentThread(vm, (void**)&env, 0) != 0) {
 			return "cannot attach to JVM";
 		}
 		*attachedp = 1;
