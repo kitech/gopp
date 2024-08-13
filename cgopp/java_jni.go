@@ -154,6 +154,33 @@ func (je JNIEnv) fnReleaseStringUTFChars() voidptr {
 	return voidptr((*(*C.JNIEnv)(voidptr(je))).ReleaseStringUTFChars)
 }
 
+func (je JNIEnv) fnGetObjectClass() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).GetObjectClass)
+}
+
+func (je JNIEnv) fnGetFieldID() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).GetFieldID)
+}
+func (je JNIEnv) fnGetIntField() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).GetIntField)
+}
+func (je JNIEnv) fnGetLongField() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).GetLongField)
+}
+
+func (je JNIEnv) fnExceptionCheck() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).ExceptionCheck)
+}
+func (je JNIEnv) fnExceptionOccurred() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).ExceptionOccurred)
+}
+func (je JNIEnv) fnExceptionDescribe() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).ExceptionDescribe)
+}
+func (je JNIEnv) fnExceptionClear() voidptr {
+	return voidptr((*(*C.JNIEnv)(voidptr(je))).ExceptionClear)
+}
+
 ////
 
 func (j JavaVM) Env() JNIEnv {
@@ -168,8 +195,7 @@ func (j JNIEnv) Toptr() voidptr { return voidptr(j) }
 func (j JNIEnv) String() string { return fmt.Sprintf("%v", voidptr(j)) }
 
 func (je JNIEnv) GetVersion() int {
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = (voidptr((*e2).GetVersion))
+	var fnptr = je.fnGetVersion()
 	rv := Litfficall(fnptr, je.Toptr())
 	// log.Println(rv)
 	return int(usize(rv))
@@ -186,9 +212,7 @@ func (je JNIEnv) FindClass(cls string) voidptr {
 	var cls4c = CStringgc(cls)
 	// log.Println(je.Tocuptr(), je, rc)
 
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	// v := Litfficallg((*e2).FindClass, je.Toptr(), cls4c)
-	v := FfiCall[voidptr]((*e2).FindClass, je.Toptr(), cls4c)
+	v := FfiCall[voidptr](je.fnFindClass(), je.Toptr(), cls4c)
 	if v != nil {
 		return v
 	}
@@ -206,9 +230,7 @@ func (je JNIEnv) GetStaticMethodID(clsid voidptr, mthname string, argssig string
 	var s4c = CStringgc(mthname)
 	var argssig4c = CStringgc(argssig)
 
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = voidptr((*e2).GetStaticMethodID)
-	// rv := Litfficall(fnptr, je.Toptr(), clsid, s4c, argssig4c)
+	var fnptr = je.fnGetStaticMethodID()
 	rv := FfiCall[voidptr](fnptr, je.Toptr(), clsid, s4c, argssig4c)
 	je.ExceptionCheck()
 	return rv
@@ -235,14 +257,14 @@ func (je JNIEnv) CallStaticVoidMethod(clsid, mthid voidptr, args ...any) {
 		}
 	}
 
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = (*e2).CallStaticVoidMethod
-	// rv := Litfficallg(fnptr, je.Toptr(), clsid, mthid, a04c)
+	log.Println(args, Goargs2JvSignature(Void(0), args...))
+	var fnptr = je.fnCallStaticVoidMethod()
 	rv := FfiCall[int](fnptr, argv[:argc]...)
 	gopp.GOUSED(rv)
 }
 
 // jni没有查看类型的函数！！！
+// jvalue 类型?
 type Jany uintptr
 
 func (me Jany) Tostr() string {
@@ -276,29 +298,30 @@ func JNIEnvCallStaticMethod[RTY any](je JNIEnv, clsid, mthid voidptr, args ...an
 		}
 	}
 
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr *[0]byte
+	log.Println(args, Goargs2JvSignature(rvx, args...))
+
 	switch any(rvx).(type) {
 	case string:
-		fnptr = (*e2).CallStaticObjectMethod
-		rvp := FfiCall[voidptr](fnptr, argv...)
+		rvp := FfiCall[voidptr](je.fnCallStaticObjectMethod(), argv...)
 		rv2 := je.GetStringUTFChars(rvp)
 		rvx = any(rv2).(RTY)
-	case int:
-		log.Println(rvx, clsid, mthid, len(argv), argv)
-		fnptr = (*e2).CallStaticIntMethod
-		rvx = FfiCall[RTY](fnptr, argv...)
+	case int, uint: // go的int是变长类型，要按照java的类型调用
+		// log.Println(rvx, clsid, mthid, len(argv), argv)
+		rvx = FfiCall[RTY](je.fnCallStaticIntMethod(), argv...)
+
+	case int64, uint64:
+		// log.Println(rvx, clsid, mthid, len(argv), argv)
+		rvx = FfiCall[RTY](je.fnCallStaticLongMethod(), argv...)
+		// log.Println(rvx, clsid, mthid, len(argv), argv)
+
 	case float64:
-		fnptr = (*e2).CallStaticDoubleMethod
-		rvx = FfiCall[RTY](fnptr, argv...)
+		rvx = FfiCall[RTY](je.fnCallStaticDoubleMethod(), argv...)
 	case Void:
 		// log.Println(rvx, clsid, mthid, len(argv), argv)
-		fnptr = (*e2).CallStaticVoidMethod
-		FfiCall[RTY](fnptr, argv...)
+		rvx = FfiCall[RTY](je.fnCallStaticVoidMethod(), argv...)
 	default:
 		log.Println("Nocat", reflect.TypeOf(any(rvx)))
 	}
-	gopp.GOUSED(e2, fnptr)
 
 	return
 }
@@ -306,8 +329,7 @@ func JNIEnvCallStaticMethod[RTY any](je JNIEnv, clsid, mthid voidptr, args ...an
 // https://stackoverflow.com/questions/40004522/how-to-get-values-from-jobject-in-c-using-jni
 
 func (je JNIEnv) GetObjectClass(obj voidptr) voidptr {
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = voidptr((*e2).GetObjectClass)
+	var fnptr = je.fnGetObjectClass()
 	rv := Litfficall(fnptr, je.Toptr(), obj)
 	return rv
 }
@@ -315,26 +337,23 @@ func (je JNIEnv) GetFieldID(clsobj voidptr, a0, a1 string) voidptr {
 	a04c := CStringgc(a0)
 	a14c := CStringgc(a1)
 
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = voidptr((*e2).GetFieldID)
+	var fnptr = je.fnGetFieldID()
 	rv := Litfficall(fnptr, je.Toptr(), clsobj, a04c, a14c)
 	return rv
 }
 func (je JNIEnv) GetIntField(clsobj voidptr, fidobj voidptr) int {
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = voidptr((*e2).GetIntField)
+	var fnptr = je.fnGetIntField()
 	rv := Litfficall(fnptr, je.Toptr(), fidobj)
 	return int(usize(rv))
 }
 
 func (je JNIEnv) ExceptionClear() {
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	rv := Litfficallg((*e2).ExceptionClear, je)
+	var fnptr = je.fnExceptionClear()
+	rv := Litfficallg(fnptr, je)
 	gopp.GOUSED(rv)
 }
 func (je JNIEnv) ExceptionCheck() bool {
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = (voidptr((*e2).ExceptionCheck))
+	var fnptr = je.fnExceptionCheck()
 	rv := Litfficallg(fnptr, je.Toptr())
 	if rv != nil {
 		log.Println("Some error", rv, usize(rv), MyTid())
@@ -345,8 +364,7 @@ func (je JNIEnv) ExceptionCheck() bool {
 	return rv != nil
 }
 func (je JNIEnv) ExceptionDescribe() {
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = (voidptr((*e2).ExceptionDescribe))
+	var fnptr = je.fnExceptionDescribe()
 	rv := Litfficallg(fnptr, je.Toptr())
 	if rv != nil {
 		log.Println("Some error", rv, usize(rv))
@@ -357,24 +375,21 @@ func (je JNIEnv) ExceptionDescribe() {
 func (je JNIEnv) NewStringUTF(s string) voidptr {
 	s4c := CStringgc(s)
 
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = voidptr((*e2).NewStringUTF)
+	var fnptr = je.fnNewStringUTF()
 	rv := Litfficallg(fnptr, je.Toptr(), s4c)
 	return rv
 }
 
 func (je JNIEnv) ReleaseStringUTFChars(strx voidptr, utfx voidptr) {
 	// JNI DETECTED ERROR IN APPLICATION: non-nullable argument was NULL
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = voidptr((*e2).ReleaseStringUTFChars)
+	var fnptr = je.fnReleaseStringUTFChars()
 	rv := Litfficallg(fnptr, je.Toptr(), strx, utfx) // 最后一个参数很奇怪
 	gopp.GOUSED(rv)
 }
 
 func (je JNIEnv) GetStringUTFChars(sx voidptr) string {
 	var copyed uint8
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = voidptr((*e2).GetStringUTFChars)
+	var fnptr = je.fnGetStringUTFChars()
 	rv := Litfficallg(fnptr, je.Toptr(), sx, voidptr(&copyed))
 	gopp.GOUSED(rv, copyed)
 	defer je.ReleaseStringUTFChars(sx, rv)
@@ -382,8 +397,7 @@ func (je JNIEnv) GetStringUTFChars(sx voidptr) string {
 	return GoString(rv)
 }
 func (je JNIEnv) GetStringUTFLength(sx voidptr) int {
-	var e2 = (*C.JNIEnv)(voidptr(je))
-	var fnptr = voidptr((*e2).GetStringUTFLength)
+	var fnptr = je.fnGetStringUTFLength()
 	rv := Litfficallg(fnptr, je.Toptr(), sx)
 	gopp.GOUSED(rv)
 	return int(usize(rv))

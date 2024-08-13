@@ -29,16 +29,17 @@ type JfieldID = voidptr
 type JmethodID = voidptr
 
 // note: 只支持基础类型和String
+// todo 还有些分号没有处理好，结尾有的有分号有的没分号
 func Goargs2JvSignature(rv any, args ...any) string {
 	var sb = strings.Builder{}
 	sb.WriteRune('(')
 
 	// args = append(args, rv)
 	for i, argx := range args {
-		sb.WriteString(Goarg2Jvtype(false, argx))
+		sb.WriteString(Goarg2Jvtype(false, false, argx))
 
 		if i < len(args)-1 {
-			sb.WriteRune(',')
+			sb.WriteRune(';')
 		}
 	}
 
@@ -46,7 +47,7 @@ func Goargs2JvSignature(rv any, args ...any) string {
 	if _, ok := rv.(Void); ok {
 		sb.WriteRune('V')
 	} else {
-		sb.WriteString(Goarg2Jvtype(false, rv))
+		sb.WriteString(Goarg2Jvtype(false, true, rv))
 	}
 
 	return sb.String()
@@ -54,7 +55,7 @@ func Goargs2JvSignature(rv any, args ...any) string {
 
 // full: true, java type name
 // full: false, java sig name
-func Goarg2Jvtype(full bool, argx any) (rv string) {
+func Goarg2Jvtype(full bool, ret bool, argx any) (rv string) {
 	rv = "???"
 
 	ty := reflect.TypeOf(argx)
@@ -63,7 +64,11 @@ func Goarg2Jvtype(full bool, argx any) (rv string) {
 		if full {
 			rv = "java.lang.String"
 		} else {
-			rv = "Ljava/lang/String"
+			if ret {
+				rv = "Ljava/lang/String;"
+			} else {
+				rv = "Ljava/lang/String"
+			}
 		}
 	case reflect.Int: // => jlong, J, or jint I
 		if unsafe.Sizeof(int(0)) == unsafe.Sizeof(int64(0)) {
