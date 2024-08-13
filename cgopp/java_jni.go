@@ -81,7 +81,9 @@ type jnimemfnst struct {
 	ExceptionDescribe voidptr
 	ExceptionClear    voidptr
 
-	NewGlobalRef voidptr
+	NewGlobalRef    voidptr
+	DeleteGlobalRef voidptr
+	IsSameObject    voidptr
 }
 
 var jnimemfn = &jnimemfnst{}
@@ -341,6 +343,7 @@ func (je JNIEnv) ExceptionDescribe() {
 		log.Println("Some error", rv, usize(rv))
 	}
 }
+
 func (je JNIEnv) NewGlobalRef(obj usize) usize {
 	var fnptr = jmf.NewGlobalRef
 	rv := FfiCall[usize](fnptr, je, obj)
@@ -349,27 +352,36 @@ func (je JNIEnv) NewGlobalRef(obj usize) usize {
 	}
 	return rv
 }
+func (je JNIEnv) DeleteGlobalRef(obj usize) {
+	var fnptr = jmf.DeleteGlobalRef
+	FfiCall[Void](fnptr, je, obj)
+}
+func (je JNIEnv) IsSameObject(obj0, obj1 usize) bool {
+	var fnptr = jmf.IsSameObject
+	rv := FfiCall[uint8](fnptr, je, obj0, obj1)
+	return rv != 0
+}
 
 // 这个生成的object不需要自己释放
 func (je JNIEnv) NewStringUTF(s string) usize {
 	s4c := CStringgc(s)
 
 	var fnptr = je.fnNewStringUTF()
-	rv := Litfficallg(fnptr, je.Toptr(), s4c)
-	return usize(rv)
+	rv := FfiCall[usize](fnptr, je.Toptr(), s4c)
+	return rv
 }
 
 func (je JNIEnv) ReleaseStringUTFChars(strx usize, utfx usize) {
 	// JNI DETECTED ERROR IN APPLICATION: non-nullable argument was NULL
 	var fnptr = je.fnReleaseStringUTFChars()
-	rv := Litfficallg(fnptr, je.Toptr(), strx, utfx) // 最后一个参数很奇怪
+	rv := FfiCall[Void](fnptr, je, strx, utfx) // 最后一个参数很奇怪
 	gopp.GOUSED(rv)
 }
 
 func (je JNIEnv) GetStringUTFChars(sx usize) string {
 	var copyed uint8
 	var fnptr = je.fnGetStringUTFChars()
-	rv := Litfficallg(fnptr, je.Toptr(), sx, usize(voidptr((&copyed))))
+	rv := FfiCall[voidptr](fnptr, je.Toptr(), sx, usize(voidptr((&copyed))))
 	gopp.GOUSED(rv, copyed)
 	defer je.ReleaseStringUTFChars(sx, usize(rv))
 
@@ -377,7 +389,7 @@ func (je JNIEnv) GetStringUTFChars(sx usize) string {
 }
 func (je JNIEnv) GetStringUTFLength(sx usize) int {
 	var fnptr = je.fnGetStringUTFLength()
-	rv := Litfficallg(fnptr, je.Toptr(), voidptr(sx))
+	rv := FfiCall[int32](fnptr, je, sx)
 	gopp.GOUSED(rv)
-	return int(usize(rv))
+	return int(rv)
 }

@@ -60,42 +60,48 @@ func JavaExe(clsname, funcname string, args ...string) int {
 func jnimemfninit(jvm JavaVM, je JNIEnv) {
 	mf := jnimemfn
 
-	mf.GetEnv = voidptr((*(*C.JavaVM)(voidptr(jvm))).GetEnv)
-	mf.AttachCurrentThread = voidptr((*(*C.JavaVM)(voidptr(jvm))).AttachCurrentThread)
-	mf.DetachCurrentThread = voidptr((*(*C.JavaVM)(voidptr(jvm))).DetachCurrentThread)
-	mf.AttachCurrentThreadAsDaemon = voidptr((*(*C.JavaVM)(voidptr(jvm))).AttachCurrentThreadAsDaemon)
-	mf.DestroyJavaVM = voidptr((*(*C.JavaVM)(voidptr(jvm))).DestroyJavaVM)
+	vmc := *(*C.JavaVM)(voidptr(jvm))
+	mf.GetEnv = voidptr(vmc.GetEnv)
+	mf.AttachCurrentThread = voidptr(vmc.AttachCurrentThread)
+	mf.DetachCurrentThread = voidptr(vmc.DetachCurrentThread)
+	mf.AttachCurrentThreadAsDaemon = voidptr(vmc.AttachCurrentThreadAsDaemon)
+	mf.DestroyJavaVM = voidptr(vmc.DestroyJavaVM)
 
-	mf.FindClass = voidptr((*(*C.JNIEnv)(voidptr(je))).FindClass)
-	mf.GetStaticMethodID = voidptr((*(*C.JNIEnv)(voidptr(je))).GetStaticMethodID)
-	mf.CallStaticObjectMethod = voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticObjectMethod)
-	mf.CallStaticVoidMethod = voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticVoidMethod)
-	mf.CallStaticIntMethod = voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticIntMethod)
-	mf.CallStaticLongMethod = voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticLongMethod)
-	mf.CallStaticFloatMethod = voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticFloatMethod)
-	mf.CallStaticDoubleMethod = voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticDoubleMethod)
-	mf.CallStaticBooleanMethod = voidptr((*(*C.JNIEnv)(voidptr(je))).CallStaticBooleanMethod)
-	mf.GetMethodID = voidptr((*(*C.JNIEnv)(voidptr(je))).GetMethodID)
-	mf.CallObjectMethod = voidptr((*(*C.JNIEnv)(voidptr(je))).CallObjectMethod)
+	jec := *(*C.JNIEnv)(voidptr(je))
+	mf.FindClass = voidptr(jec.FindClass)
+	mf.GetStaticMethodID = voidptr(jec.GetStaticMethodID)
+	mf.CallStaticObjectMethod = voidptr(jec.CallStaticObjectMethod)
+	mf.CallStaticVoidMethod = voidptr(jec.CallStaticVoidMethod)
+	mf.CallStaticIntMethod = voidptr(jec.CallStaticIntMethod)
+	mf.CallStaticLongMethod = voidptr(jec.CallStaticLongMethod)
+	mf.CallStaticFloatMethod = voidptr(jec.CallStaticFloatMethod)
+	mf.CallStaticDoubleMethod = voidptr(jec.CallStaticDoubleMethod)
+	mf.CallStaticBooleanMethod = voidptr(jec.CallStaticBooleanMethod)
+	mf.GetMethodID = voidptr(jec.GetMethodID)
+	mf.CallObjectMethod = voidptr(jec.CallObjectMethod)
 
-	mf.NewStringUTF = voidptr((*(*C.JNIEnv)(voidptr(je))).NewStringUTF)
-	mf.GetStringUTFLength = voidptr((*(*C.JNIEnv)(voidptr(je))).GetStringUTFLength)
-	mf.GetStringUTFChars = voidptr((*(*C.JNIEnv)(voidptr(je))).GetStringUTFChars)
-	mf.ReleaseStringUTFChars = voidptr((*(*C.JNIEnv)(voidptr(je))).ReleaseStringUTFChars)
+	mf.NewStringUTF = voidptr(jec.NewStringUTF)
+	mf.GetStringUTFLength = voidptr(jec.GetStringUTFLength)
+	mf.GetStringUTFChars = voidptr(jec.GetStringUTFChars)
+	mf.ReleaseStringUTFChars = voidptr(jec.ReleaseStringUTFChars)
 
-	mf.GetObjectClass = voidptr((*(*C.JNIEnv)(voidptr(je))).GetObjectClass)
-	mf.GetFieldID = voidptr((*(*C.JNIEnv)(voidptr(je))).GetFieldID)
-	mf.GetIntField = voidptr((*(*C.JNIEnv)(voidptr(je))).GetIntField)
-	mf.GetLongField = voidptr((*(*C.JNIEnv)(voidptr(je))).GetLongField)
+	mf.GetObjectClass = voidptr(jec.GetObjectClass)
+	mf.GetFieldID = voidptr(jec.GetFieldID)
+	mf.GetIntField = voidptr(jec.GetIntField)
+	mf.GetLongField = voidptr(jec.GetLongField)
 
-	mf.ExceptionCheck = voidptr((*(*C.JNIEnv)(voidptr(je))).ExceptionCheck)
-	mf.ExceptionOccurred = voidptr((*(*C.JNIEnv)(voidptr(je))).ExceptionOccurred)
-	mf.ExceptionDescribe = voidptr((*(*C.JNIEnv)(voidptr(je))).ExceptionDescribe)
-	mf.ExceptionClear = voidptr((*(*C.JNIEnv)(voidptr(je))).ExceptionClear)
+	mf.ExceptionCheck = voidptr(jec.ExceptionCheck)
+	mf.ExceptionOccurred = voidptr(jec.ExceptionOccurred)
+	mf.ExceptionDescribe = voidptr(jec.ExceptionDescribe)
+	mf.ExceptionClear = voidptr(jec.ExceptionClear)
 
-	mf.NewGlobalRef = voidptr((*(*C.JNIEnv)(voidptr(je))).NewGlobalRef)
+	mf.NewGlobalRef = voidptr(jec.NewGlobalRef)
+	mf.DeleteGlobalRef = voidptr(jec.DeleteGlobalRef)
+	mf.IsSameObject = voidptr(jec.IsSameObject)
+
 }
 
+// deprecated
 // /// 这种方式封装可以分离部分依赖C的代码
 func (jvm JavaVM) fnGetEnv() voidptr {
 	return voidptr((*(*C.JavaVM)(voidptr(jvm))).GetEnv)
