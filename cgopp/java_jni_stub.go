@@ -19,14 +19,14 @@ type Jlong = int64 // int64_t
 type Jbool = uint8
 type Jbyte = int8
 type Jshort = int16
-type Jclass = voidptr
-type Jobject = voidptr
-type Jstring = voidptr
-type Jarray = voidptr
-type Jthrowable = voidptr
-type Jweak = voidptr
-type JfieldID = voidptr
-type JmethodID = voidptr
+type Jclass = usize
+type Jobject = usize
+type Jstring = usize
+type Jarray = usize
+type Jthrowable = usize
+type Jweak = usize
+type JfieldID = usize
+type JmethodID = usize
 
 // note: 只支持基础类型和String
 // todo 还有些分号没有处理好，结尾有的有分号有的没分号
