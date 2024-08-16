@@ -99,8 +99,10 @@ func jnimemfninitimpl(jvm JavaVM, je JNIEnv) {
 
 	mf.GetObjectClass = voidptr(jec.GetObjectClass)
 	mf.GetFieldID = voidptr(jec.GetFieldID)
+	mf.GetObjectField = voidptr(jec.GetObjectField)
 	mf.GetIntField = voidptr(jec.GetIntField)
 	mf.GetLongField = voidptr(jec.GetLongField)
+	mf.GetDoubleField = voidptr(jec.GetDoubleField)
 
 	mf.ExceptionCheck = voidptr(jec.ExceptionCheck)
 	mf.ExceptionOccurred = voidptr(jec.ExceptionOccurred)

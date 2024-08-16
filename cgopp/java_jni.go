@@ -86,8 +86,10 @@ type jnimemfnst struct {
 
 	GetObjectClass voidptr
 	GetFieldID     voidptr
+	GetObjectField voidptr
 	GetIntField    voidptr
 	GetLongField   voidptr
+	GetDoubleField voidptr
 
 	ExceptionCheck    voidptr
 	ExceptionOccurred voidptr
@@ -312,9 +314,24 @@ func (je JNIEnv) GetFieldID(clsobj usize, a0, a1 string) usize {
 	rv := Litfficall(jmf.GetFieldID, je.Toptr(), voidptr(clsobj), a04c, a14c)
 	return usize(rv)
 }
+
+func (je JNIEnv) GetObjectField(clsobj usize, fidobj usize) usize {
+	rv := Litfficall(jmf.GetObjectField, je.Toptr(), voidptr(fidobj))
+	return usize(rv)
+}
 func (je JNIEnv) GetIntField(clsobj usize, fidobj usize) int {
 	rv := Litfficall(jmf.GetIntField, je.Toptr(), voidptr(fidobj))
 	return int(usize(rv))
+}
+func (je JNIEnv) GetLongField(clsobj usize, fidobj usize) int64 {
+	rv := Litfficall(jmf.GetLongField, je.Toptr(), voidptr(fidobj))
+	return int64(usize(rv))
+}
+func (je JNIEnv) GetDoubleField(clsobj usize, fidobj usize) float64 {
+	// rv := Litfficall(jmf.GetDoubleField, je.Toptr(), voidptr(fidobj))
+	// return int64(usize(rv))
+	rv := FfiCall[float64](jmf.GetDoubleField, je, fidobj)
+	return rv
 }
 
 func (je JNIEnv) ExceptionClear() {

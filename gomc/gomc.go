@@ -419,6 +419,7 @@ func mainttt() {
 }
 
 func mcdltmpget(curpkg string) {
+	log.Println("Workdir:", dltmpdir)
 	err := gopp.RunCmdSout(nil, dltmpdir, "go get -v", curpkg)
 	gopp.ErrPrint(err, curpkg)
 }
