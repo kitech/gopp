@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"strings"
 	"unsafe"
+
+	"github.com/kitech/gopp"
 )
 
 // not need usejni tag
@@ -34,6 +36,44 @@ type Jany usize
 
 func (me Jany) Tostr() string {
 	return ""
+}
+
+func JNICallstm[RTY any](je JNIEnv, cls, mth string, sigt string, args ...any) (rv RTY) {
+	rv = jnicallmthany[RTY](je, cls, mth, sigt, false, 0, args...)
+	return
+}
+
+func JNICalldym[RTY any](je JNIEnv, cls, mth string, sigt string, thiso usize, args ...any) (rv RTY) {
+	rv = jnicallmthany[RTY](je, cls, mth, sigt, true, thiso, args...)
+	return
+}
+
+func jnicallmthany[RTY any](je JNIEnv, cls, mth string, sigt string, isstatic bool, thiso usize, args ...any) (rv RTY) {
+	clsid := je.FindClass2(cls)
+	gopp.ZeroPrint(clsid, "cannot find class", cls)
+	if clsid == 0 {
+		return
+	}
+	var mthid usize
+	if isstatic {
+		mthid = je.GetStaticMethodID(clsid, mth, sigt)
+	} else {
+		mthid = je.GetMethodID(clsid, mth, sigt)
+	}
+	gopp.ZeroPrint(mthid, "cannot find method", cls, mth, sigt)
+	if mthid == 0 {
+		return
+	}
+
+	if isstatic {
+		rv = JNIEnvCallStaticMethod[RTY](je, clsid, mthid, args...)
+	} else {
+		gopp.ZeroPrint(thiso, "this is nil to crash")
+		nargs := append(gopp.Sliceof(any(thiso)), args...)
+		rv = JNIEnvCallMethod[RTY](je, clsid, mthid, nargs...)
+	}
+
+	return
 }
 
 // note: 只支持基础类型和String

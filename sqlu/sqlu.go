@@ -37,6 +37,19 @@ const (
 var lastsqlitefile string = os.Getenv("HOME") + "/fedyui.db3"
 var lastsqlitecon *sql.DB
 
+func GenScanVars(coltys []*sql.ColumnType) []any {
+	var valvars = make([]any, len(coltys))
+
+	for j := 0; j < len(coltys); j++ {
+		colty := coltys[j]
+		// colname := colnames[j]
+		rv := ValuepByColumnType(colty)
+		// log.Println(i, j, colname, rv)
+		valvars[j] = rv.Interface()
+	}
+
+	return valvars
+}
 func ValuepByColumnType(cty *sql.ColumnType) reflect.Value {
 	rtype := cty.ScanType()
 	// log.Println(rtype, rtype.String())
@@ -96,53 +109,113 @@ func Rows2Spjson(rows *sql.Rows) *spjson.Json {
 	return jso
 }
 
+// todo support struct field tag, gorm, json
+// Rows2Structs
+func Rows2Struct[T any](rows *sql.Rows) (res []*T, err error) {
+	coltys, err := rows.ColumnTypes()
+	colnames, err := rows.Columns()
+	if err != nil {
+		return
+	}
+
+	valvars := GenScanVars(coltys)
+
+	for i := 0; rows.Next(); i++ {
+		// log.Println(i)
+
+		err = rows.Scan(valvars...)
+		gopp.ErrPrint(err, i, valvars)
+		// log.Println(i, valvars, reflect.TypeOf(valvars[0]))
+
+		var rowx T
+		var rowvx = reflect.ValueOf(any(&rowx))
+		for j := 0; j < len(coltys); j++ {
+			fname := gopp.Title(colnames[j])
+			fldo := rowvx.Elem().FieldByName(fname)
+			// log.Println(j, fname, fldo.IsValid(), coltys[j])
+			if !fldo.IsValid() {
+				return nil, fmt.Errorf("Invalid field %v %v", j, fname)
+			}
+
+			vv := valvars[j]
+			tv := SqlField2Typed[reflect.Value](vv)
+			if tv.Type().AssignableTo(fldo.Type()) {
+				fldo.Set(tv)
+			} else if tv.Type().ConvertibleTo(fldo.Type()) {
+				fldo.Set(tv.Convert(fldo.Type()))
+			} else {
+				log.Println("wtf", tv.Type(), fldo.Type())
+			}
+		}
+		res = append(res, &rowx)
+	}
+	// log.Println(retrows)
+
+	return
+}
+
+// vv *sql.Nullxxx
+func SqlField2Typed[T gopp.Any | reflect.Value | *spjson.Json](vv any) (rv T) {
+	var tv any
+
+	switch v := vv.(type) {
+	case *sql.NullString:
+		// log.Println(i, j, v.String)
+		tv = v.String
+	case *sql.NullFloat64:
+		tv = v.Float64
+	case *sql.NullByte:
+		tv = v.Byte
+	case *sql.NullBool:
+		tv = v.Bool
+	case *sql.NullTime:
+		tv = v.Time
+	case *sql.NullInt64:
+		tv = v.Int64
+	case *sql.NullInt32:
+		tv = v.Int32
+	case *sql.NullInt16:
+		tv = v.Int16
+	default:
+		log.Println("wtelse", reflect.TypeOf(vv))
+	}
+
+	switch any(rv).(type) {
+	case gopp.Any:
+		rv = any(gopp.AnyOf(tv)).(T)
+	case reflect.Value:
+		rv = any(reflect.ValueOf(tv)).(T)
+	case *spjson.Json:
+		log.Println("todo")
+	}
+
+	return
+}
+
 // Rows2Assoc
 func Rows2Table(rows *sql.Rows) SqlRows {
 	var retrows = SqlRows{}
 
 	coltys, err := rows.ColumnTypes()
 	colnames, err := rows.Columns()
+	if err != nil {
+		return nil
+	}
+
+	valvars := GenScanVars(coltys)
+
 	for i := 0; rows.Next(); i++ {
 		// log.Println(i)
-		var valvars []any
-
-		retrow := map[string]gopp.Any{}
-
-		for j := 0; j < len(coltys); j++ {
-			colty := coltys[j]
-			// colname := colnames[j]
-			rv := ValuepByColumnType(colty)
-			// log.Println(i, j, colname, rv)
-			valvars = append(valvars, rv.Interface())
-		}
 
 		err = rows.Scan(valvars...)
 		gopp.ErrPrint(err, i, valvars)
 		// log.Println(i, valvars, reflect.TypeOf(valvars[0]))
 
+		retrow := map[string]gopp.Any{}
 		for j := 0; j < len(coltys); j++ {
 			vv := valvars[j]
-			switch v := vv.(type) {
-			case *sql.NullString:
-				// log.Println(i, j, v.String)
-				retrow[colnames[j]] = gopp.ToAny(v.String)
-			case *sql.NullFloat64:
-				retrow[colnames[j]] = gopp.ToAny(v.Float64)
-			case *sql.NullByte:
-				retrow[colnames[j]] = gopp.ToAny(v.Byte)
-			case *sql.NullBool:
-				retrow[colnames[j]] = gopp.ToAny(v.Bool)
-			case *sql.NullTime:
-				retrow[colnames[j]] = gopp.ToAny(v.Time)
-			case *sql.NullInt64:
-				retrow[colnames[j]] = gopp.ToAny(v.Int64)
-			case *sql.NullInt32:
-				retrow[colnames[j]] = gopp.ToAny(v.Int32)
-			case *sql.NullInt16:
-				retrow[colnames[j]] = gopp.ToAny(v.Int16)
-			default:
-				log.Println("wtelse", i, j, reflect.TypeOf(vv))
-			}
+			tv := SqlField2Typed[gopp.Any](vv)
+			retrow[colnames[j]] = tv
 		}
 		// log.Println(i, retrow)
 		retrows = append(retrows, retrow)
@@ -155,20 +228,13 @@ func Rows2Each(rows *sql.Rows, f func(rc int, row map[string]any)) {
 
 	coltys, err := rows.ColumnTypes()
 	colnames, err := rows.Columns()
+	valvars := GenScanVars(coltys)
+
 	for i := 0; rows.Next(); i++ {
 		// log.Println(i)
-		var valvars []any
 
 		retrow := map[string]gopp.Any{}
 		retarr := []any{}
-
-		for j := 0; j < len(coltys); j++ {
-			colty := coltys[j]
-			// colname := colnames[j]
-			rv := ValuepByColumnType(colty)
-			// log.Println(i, j, colname, rv)
-			valvars = append(valvars, rv.Interface())
-		}
 
 		err = rows.Scan(valvars...)
 		gopp.ErrPrint(err, i, valvars)
@@ -176,37 +242,9 @@ func Rows2Each(rows *sql.Rows, f func(rc int, row map[string]any)) {
 
 		for j := 0; j < len(coltys); j++ {
 			vv := valvars[j]
-			switch v := vv.(type) {
-
-			case *sql.NullString:
-				// log.Println(i, j, v.String)
-				retrow[colnames[j]] = gopp.ToAny(v.String)
-				retarr = append(retarr, v.String)
-			case *sql.NullFloat64:
-				retrow[colnames[j]] = gopp.ToAny(v.Float64)
-				retarr = append(retarr, v.Float64)
-			case *sql.NullByte:
-				retrow[colnames[j]] = gopp.ToAny(v.Byte)
-				retarr = append(retarr, v.Byte)
-			case *sql.NullBool:
-				retrow[colnames[j]] = gopp.ToAny(v.Bool)
-				retarr = append(retarr, v.Bool)
-			case *sql.NullTime:
-				retrow[colnames[j]] = gopp.ToAny(v.Time)
-				retarr = append(retarr, v.Time)
-			case *sql.NullInt64:
-				retrow[colnames[j]] = gopp.ToAny(v.Int64)
-				retarr = append(retarr, v.Int64)
-			case *sql.NullInt32:
-				retrow[colnames[j]] = gopp.ToAny(v.Int32)
-				retarr = append(retarr, v.Int32)
-			case *sql.NullInt16:
-				retrow[colnames[j]] = gopp.ToAny(v.Int16)
-				retarr = append(retarr, v.Int16)
-			default:
-
-				log.Println("wtelse", i, j, reflect.TypeOf(vv))
-			}
+			tv := SqlField2Typed[gopp.Any](vv)
+			retrow[colnames[j]] = tv
+			retarr = append(retarr, tv.I)
 		}
 		// log.Println(i, retrow)
 		retrows = append(retrows, retrow)

@@ -276,3 +276,11 @@ func StrElideMid(s string, wtlen int) string {
 	ns := fmt.Sprintf("%s..%s", s[:wtlen/2], s[len(s)-wtlen/2:])
 	return ns
 }
+
+// todo
+func Camel2Snak(s string) string {
+	return s
+}
+func Snak2Camel(s string) string {
+	return s
+}

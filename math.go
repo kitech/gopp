@@ -199,6 +199,11 @@ func (me *Minmaxer[T]) Input(v T) {
 		me.Min, me.Max = v, v
 	}
 }
+func (me *Minmaxer[T]) Inputs(vs ...T) {
+	for _, v := range vs {
+		me.Input(v)
+	}
+}
 
 func (me *Minmaxer[T]) Get() (T, T) {
 	return me.Min, me.Max
