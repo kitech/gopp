@@ -33,6 +33,16 @@ const (
 	PGSQL_FIELD_WRAP_CHAR = ""
 	PGSQL_VALUE_WRAP_CHAR = "'"
 )
+const (
+	// todo DDL
+	SQL_INSERT = "INSERT"
+	SQL_UPDATE = "UPDATE"
+	SQL_DELETE = "DELETE"
+
+	SQLOP_AND     = "AND"
+	SQLOP_OR      = "OR"
+	SQLOP_BETWEEN = "BETWEEN"
+)
 
 var lastsqlitefile string = os.Getenv("HOME") + "/fedyui.db3"
 var lastsqlitecon *sql.DB
@@ -223,10 +233,13 @@ func Rows2Table(rows *sql.Rows) SqlRows {
 	// log.Println(retrows)
 	return retrows
 }
-func Rows2Each(rows *sql.Rows, f func(rc int, row map[string]any)) {
+func Rows2Each(rows *sql.Rows, f func(rc int, row map[string]any)) error {
 	var retrows = SqlRows{}
 
 	coltys, err := rows.ColumnTypes()
+	if err != nil {
+		return err
+	}
 	colnames, err := rows.Columns()
 	valvars := GenScanVars(coltys)
 
@@ -256,6 +269,7 @@ func Rows2Each(rows *sql.Rows, f func(rc int, row map[string]any)) {
 	}
 	// log.Println(retrows)
 
+	return nil
 }
 
 const (

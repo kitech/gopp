@@ -233,10 +233,17 @@ func InTest() bool {
 	return testing.Short()
 }
 
+// 好像 reflect.Value.IsZero等于这个函数要实现的功能，并且包括所有的类型包括结构体
 // string, int*, float*, pointer, map, slice, chan
+// struct == all empty
 func Empty(vx any) (bv bool) {
 	ty := reflect.TypeOf(vx)
 	val := reflect.ValueOf(vx)
+
+	if true {
+		// 试试，不支持的类型会panic
+		return val.IsZero()
+	}
 
 	switch ty.Kind() {
 	case reflect.Slice, reflect.Array:
@@ -249,6 +256,9 @@ func Empty(vx any) (bv bool) {
 		bv = val.Len() == 0
 	case reflect.Pointer, reflect.UnsafePointer:
 		bv = val.IsNil()
+	case reflect.Struct:
+		// todo
+		bv = val.IsZero()
 	default:
 		if Isnumtype(ty) {
 			bv = val.Equal(reflect.Zero(ty))
