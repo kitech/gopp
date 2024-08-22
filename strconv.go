@@ -52,7 +52,14 @@ func MustFloat32(s string) float32 {
 	return float32(v)
 }
 
-func ToStr(v interface{}) string { return fmt.Sprintf("%v", v) }
+func ToStr(v interface{}, verbose ...int) string {
+	if len(verbose) > 0 && verbose[0] >= 2 {
+		return fmt.Sprintf("%+#v", v)
+	} else if len(verbose) > 0 && verbose[0] == 1 {
+		return fmt.Sprintf("%+v", v)
+	}
+	return fmt.Sprintf("%v", v)
+}
 func ToStrs(args ...interface{}) (rets []string) {
 	for _, arg := range args {
 		rets = append(rets, ToStr(arg))

@@ -13,9 +13,10 @@ const (
 	ZB = PB * KB
 )
 
+// todo move to bytes package
 func Bytes2Hum[T int64 | uint64 | int | usize](bv T) string {
 	const units = "ZPTGMKB"
-	var values = [...]uint64{PB, TB, GB, MB, KB, 0}
+	var values = [...]uint64{ZB, PB, TB, GB, MB, KB, 0}
 
 	var rv string
 	for i, val := range values {
@@ -38,7 +39,7 @@ func Bytes2Hum[T int64 | uint64 | int | usize](bv T) string {
 // 简短格式， 23.123M
 func Bytes2Humz[T int64 | uint64 | int](bv T) string {
 	const units = "ZPTGMKB"
-	var values = [...]uint64{PB, TB, GB, MB, KB, 0}
+	var values = [...]uint64{ZB, PB, TB, GB, MB, KB, 0}
 
 	var rv string
 	for i, val := range values {

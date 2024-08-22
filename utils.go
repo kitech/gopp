@@ -242,7 +242,7 @@ func Empty(vx any) (bv bool) {
 
 	if true {
 		// 试试，不支持的类型会panic
-		return val.IsZero()
+		return vx == nil || reflect.ValueOf(vx).IsZero()
 	}
 
 	switch ty.Kind() {

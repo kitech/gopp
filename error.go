@@ -220,18 +220,19 @@ func ErrPrint(err error, args ...any) error {
 	}
 	return err
 }
-func ErrPrintExcept(err error, except error, args ...any) error {
-	if err == except {
-		return err
-	}
-	if err != nil {
-		log.Output(2, printq(err, args...))
-	}
-	return err
-}
-func ErrPrintExcept2(err error, except string, args ...any) error {
-	if ErrHave(err, except) {
-		return err
+
+// sofork!!!, error cannot used in union
+// func ErrPrintExcept[T string | error](err error, except T, args ...any) error {
+func ErrPrintExcept(err error, except any, args ...any) error {
+	switch v := except.(type) {
+	case error:
+		if err == v {
+			return err
+		}
+	case string:
+		if ErrHave(err, v) {
+			return err
+		}
 	}
 	if err != nil {
 		log.Output(2, printq(err, args...))
@@ -279,6 +280,14 @@ func Errtostr(err error) string {
 	}
 	return ""
 }
+func IsDBDupkey(err error) bool {
+	if err == nil {
+		return false
+	}
+	return ErrHave(err, DBUNIQKEYDUP)
+}
+
+const DBUNIQKEYDUP = "UNIQUE constraint failed"
 
 func ErrHuman(err error) string {
 	if err == nil {

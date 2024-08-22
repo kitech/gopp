@@ -44,6 +44,11 @@ const (
 	SQLOP_BETWEEN = "BETWEEN"
 )
 
+type IDBTableez interface {
+	Table() string
+	Keys() []string
+}
+
 var lastsqlitefile string = os.Getenv("HOME") + "/fedyui.db3"
 var lastsqlitecon *sql.DB
 
@@ -149,6 +154,11 @@ func Rows2Struct[T any](rows *sql.Rows) (res []*T, err error) {
 
 			vv := valvars[j]
 			tv := SqlField2Typed[reflect.Value](vv)
+			if !tv.IsValid() {
+				// ??? invalid val??? 13 18 Picurls string
+				log.Println("invalid val???", i, j, fname, fldo.Type())
+				continue
+			}
 			if tv.Type().AssignableTo(fldo.Type()) {
 				fldo.Set(tv)
 			} else if tv.Type().ConvertibleTo(fldo.Type()) {
@@ -187,6 +197,8 @@ func SqlField2Typed[T gopp.Any | reflect.Value | *spjson.Json](vv any) (rv T) {
 	case *sql.NullInt16:
 		tv = v.Int16
 	default:
+		// todo **interface{} ???
+		log.Println("wtelse", vv)
 		log.Println("wtelse", reflect.TypeOf(vv))
 	}
 
@@ -272,6 +284,8 @@ func Rows2Each(rows *sql.Rows, f func(rc int, row map[string]any)) error {
 	return nil
 }
 
+////////////
+
 const (
 	DBTY_NONE   = 0
 	DBTY_MYSQL  = 1
@@ -283,8 +297,9 @@ const (
 type SqlBuilder struct {
 	strings.Builder
 
-	dbtype int
-	more   bool
+	dbtype  int
+	useprep bool
+	more    bool
 }
 
 type MysqlBuilder struct {
@@ -339,7 +354,7 @@ func (sb *SqlBuilder) Star() *SqlBuilder {
 	return sb
 }
 func (sb *SqlBuilder) Dh() *SqlBuilder {
-	sb.WriteString("*")
+	sb.WriteString(",")
 	return sb
 }
 func (sb *SqlBuilder) Eq() *SqlBuilder {
@@ -347,7 +362,7 @@ func (sb *SqlBuilder) Eq() *SqlBuilder {
 	return sb
 }
 func (sb *SqlBuilder) Neq() *SqlBuilder {
-	sb.WriteString("=")
+	sb.WriteString("!=")
 	return sb
 }
 
@@ -481,6 +496,7 @@ func (sb *SqlBuilder) And(lft string, op string, rgt any) *SqlBuilder {
 }
 func (sb *SqlBuilder) Andx(cond string) *SqlBuilder {
 	sb.WriteString("AND")
+	sb.Sp()
 	sb.WriteString(cond)
 	sb.Sp()
 	return sb

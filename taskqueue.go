@@ -223,7 +223,7 @@ func (me *CallMerger) runit(key string, no int) {
 	me.mu.Unlock()
 
 	if okri != nil {
-		log.Println("run ...", key, no, totcnt, "=>", 1)
+		log.Println("runmrg ...", key, no, totcnt, "=>", 1)
 		if okri.async {
 			go okri.fn()
 		} else {
