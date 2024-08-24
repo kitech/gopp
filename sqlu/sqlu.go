@@ -44,11 +44,6 @@ const (
 	SQLOP_BETWEEN = "BETWEEN"
 )
 
-type IDBTableez interface {
-	Table() string
-	Keys() []string
-}
-
 var lastsqlitefile string = os.Getenv("HOME") + "/fedyui.db3"
 var lastsqlitecon *sql.DB
 

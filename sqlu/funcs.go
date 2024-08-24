@@ -1,6 +1,10 @@
 package sqlu
 
-import "github.com/kitech/gopp"
+import (
+	"database/sql"
+
+	"github.com/kitech/gopp"
+)
 
 func IsDupkey(err error) bool {
 	if err == nil {
@@ -10,4 +14,12 @@ func IsDupkey(err error) bool {
 		return true
 	}
 	return false
+}
+
+func DBSetExtraOpts(db *sql.DB) {
+
+}
+
+func SqliteDBSetExtraOpts(db *sql.DB) {
+
 }
