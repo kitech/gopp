@@ -30,6 +30,8 @@ type Jweak = usize
 type JfieldID = usize
 type JmethodID = usize
 
+var MobSus = []string{"/system/xbin/su", "/system/bin/su"}
+
 // jni没有查看类型的函数！！！
 // jvalue 类型?
 type Jany usize
@@ -101,8 +103,11 @@ func Goargs2JvSignature(rv any, args ...any) string {
 	return sb.String()
 }
 
+// todo ; or not???
 // full: true, java type name
 // full: false, java sig name
+// String,作为参数，必须带L前缀和;后缀
+// String,作为返回值，？？？
 func Goarg2Jvtype(full bool, ret bool, argx any) (rv string) {
 	rv = "???"
 

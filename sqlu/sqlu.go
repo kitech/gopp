@@ -47,7 +47,7 @@ const (
 var lastsqlitefile string = os.Getenv("HOME") + "/fedyui.db3"
 var lastsqlitecon *sql.DB
 
-func GenScanVars(coltys []*sql.ColumnType) []any {
+func GenScanVars(coltys []*sql.ColumnType, dbgvals ...any) []any {
 	var valvars = make([]any, len(coltys))
 
 	for j := 0; j < len(coltys); j++ {
@@ -56,6 +56,7 @@ func GenScanVars(coltys []*sql.ColumnType) []any {
 		rv := ValuepByColumnType(colty)
 		// log.Println(i, j, colname, rv)
 		valvars[j] = rv.Interface()
+		// log.Println(j, rv, colty.ScanType(), rv.Type(), dbgvals)
 	}
 
 	return valvars
@@ -148,7 +149,7 @@ func Rows2Struct[T any](rows *sql.Rows) (res []*T, err error) {
 			}
 
 			vv := valvars[j]
-			tv := SqlField2Typed[reflect.Value](vv)
+			tv := SqlField2Typed[reflect.Value](vv, j, fname)
 			if !tv.IsValid() {
 				// ??? invalid val??? 13 18 Picurls string
 				log.Println("invalid val???", i, j, fname, fldo.Type())
@@ -170,7 +171,7 @@ func Rows2Struct[T any](rows *sql.Rows) (res []*T, err error) {
 }
 
 // vv *sql.Nullxxx
-func SqlField2Typed[T gopp.Any | reflect.Value | *spjson.Json](vv any) (rv T) {
+func SqlField2Typed[T gopp.Any | reflect.Value | *spjson.Json](vv any, dbgvals ...any) (rv T) {
 	var tv any
 
 	switch v := vv.(type) {
@@ -191,10 +192,14 @@ func SqlField2Typed[T gopp.Any | reflect.Value | *spjson.Json](vv any) (rv T) {
 		tv = v.Int32
 	case *sql.NullInt16:
 		tv = v.Int16
+	case **interface{}: // maybe NULL
+		gopp.Warn("Maybe NULL???", vv, dbgvals)
 	default:
+		// if reflect
 		// todo **interface{} ???
-		log.Println("wtelse", vv)
+		log.Println("wtelse", vv, dbgvals)
 		log.Println("wtelse", reflect.TypeOf(vv))
+		panic("wtelse") // debug
 	}
 
 	switch any(rv).(type) {

@@ -119,4 +119,4 @@ func Lenv(v interface{}) int {
 	return 0
 }
 
-func Unreachable() { panic("unreachable") }
+func Unreachable(vx ...any) { panic("unreachable: " + ToStr(vx)) }

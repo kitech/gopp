@@ -214,7 +214,7 @@ func JNIEnvCallStaticMethod[RTY any](je JNIEnv, clsid, mthid usize, args ...any)
 	case usize:
 		// rvp := FfiCall[voidptr](je.fnCallStaticObjectMethod(), argv...)
 		rvx = FfiCall[RTY](jmf.CallObjectMethod, argv...)
-	case int, uint: // go的int是变长类型，要按照java的类型调用
+	case int, uint, int32, uint32: // go的int是变长类型，要按照java的类型调用
 		// log.Println(rvx, clsid, mthid, len(argv), argv)
 		rvx = FfiCall[RTY](jmf.CallStaticIntMethod, argv...)
 
@@ -225,9 +225,13 @@ func JNIEnvCallStaticMethod[RTY any](je JNIEnv, clsid, mthid usize, args ...any)
 
 	case float64:
 		rvx = FfiCall[RTY](jmf.CallStaticDoubleMethod, argv...)
+	case float32:
+		rvx = FfiCall[RTY](jmf.CallStaticFloatMethod, argv...)
 	case Void:
 		// log.Println(rvx, clsid, mthid, len(argv), argv)
 		rvx = FfiCall[RTY](jmf.CallStaticVoidMethod, argv...)
+	case bool:
+		rvx = FfiCall[RTY](jmf.CallStaticBooleanMethod, argv...)
 	default:
 		log.Println("Nocat", reflect.TypeOf(any(rvx)))
 	}

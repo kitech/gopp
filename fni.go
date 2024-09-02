@@ -64,12 +64,23 @@ func CallFuncx(fx any, args ...any) {
 	GOUSED(outs)
 }
 
-func MyFuncName() string {
+// pkg.(*class).name
+// pkg.name
+// bare_ for bare name only
+func MyFuncName(bare_ ...bool) string {
+
 	pc, _, _, _ := runtime.Caller(1)
 	name := runtime.FuncForPC(pc).Name()
 
 	if pos := strings.LastIndex(name, "/"); pos != -1 {
 		name = name[pos+1:]
+	}
+
+	bare := FirstofGv(bare_)
+	if bare {
+		if pos := strings.LastIndex(name, "."); pos != -1 {
+			name = name[pos+1:]
+		}
 	}
 
 	return name

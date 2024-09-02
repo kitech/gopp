@@ -1,7 +1,8 @@
 package cgopp
 
 /*
-#include <cxxabi.h>
+// cxxabi.h是gcc特有的？根据这个修一下。
+// #include <cxxabi.h>
 #include <dlfcn.h>
 #include <mach-o/dyld_images.h>
 #include <mach-o/loader.h>

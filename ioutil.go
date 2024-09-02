@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 )
 
 // SafeWriteFile is a drop-in replacement for ioutil.WriteFile;
@@ -60,3 +61,43 @@ func PauseAk() {
 	n, err := os.Stdin.Read(c[:])
 	ErrPrint(err, n)
 }
+
+// ///
+type HtrespTeer struct {
+	urd    io.ReadCloser
+	teefns []func([]byte) (int, error)
+	outrd  io.Reader
+}
+
+var _ io.ReadCloser = (*HtrespTeer)(nil)
+
+func HtrespTeerNew(urdx io.ReadCloser, fns ...func([]byte) (int, error)) *HtrespTeer {
+	var urd io.ReadCloser
+	switch v := urdx.(type) {
+	case io.ReadCloser:
+		urd = v
+	case io.Reader:
+		urd = io.NopCloser(v)
+	default:
+		Warn(reflect.TypeOf(urdx))
+	}
+	me := &HtrespTeer{urd, fns, nil}
+	me.outrd = io.TeeReader(me.urd, me)
+	return me
+}
+func (me *HtrespTeer) Read(b []byte) (int, error) {
+	return me.outrd.Read(b)
+}
+func (me *HtrespTeer) Write(b []byte) (int, error) {
+	for _, teefn := range me.teefns {
+		if teefn == nil {
+			continue
+		}
+		n, err := teefn(b)
+		ErrPrint(err, n)
+	}
+	return len(b), nil
+}
+func (me *HtrespTeer) Close() error { return me.urd.Close() }
+
+/////

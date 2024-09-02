@@ -6,6 +6,7 @@ import (
 	"log"
 	"reflect"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/kitech/gopp"
@@ -196,22 +197,34 @@ func DBUprowez(db *sql.DB, tbl string, vx any, keys ...string) (sql.Result, erro
 	return res, err
 }
 
+var prepedstmts sync.Map // string => sql.Stmt
+
 // todo return affect rows, insertid
-func DBExec(db *sql.DB, sql string, binds ...any) (sql.Result, error) {
-	tx, err := db.Begin()
-	gopp.ErrPrint(err)
-	stmt, err := db.Prepare(sql)
-	gopp.ErrPrint(err, sql)
-	if err != nil {
-		return nil, err
+func DBExec(db *sql.DB, sqltpl string, binds ...any) (sql.Result, error) {
+	// tx, err := db.Begin()
+	// gopp.ErrPrint(err)
+
+	var stmt *sql.Stmt
+	if stmtx, ok := prepedstmts.Load(sqltpl); ok {
+		stmt = stmtx.(*sql.Stmt)
+	} else {
+		stmt2, err := db.Prepare(sqltpl)
+		gopp.ErrPrint(err, sqltpl)
+		if err != nil {
+			return nil, err
+		}
+		// defer stmt.Close()
+		prepedstmts.Store(sqltpl, stmt2)
+		stmt = stmt2
 	}
+
 	res, err := stmt.Exec(binds...)
 	_ = res
 	// gopp.ErrPrint(err, res == nil, sql)
 	if err == nil {
-		tx.Commit()
+		// tx.Commit()
 	} else {
-		tx.Rollback()
+		// tx.Rollback()
 	}
 
 	return res, err

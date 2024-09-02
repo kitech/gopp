@@ -88,11 +88,19 @@ func calcmemlen_test() {
 	log.Println(CalcMemlen(567.890))
 }
 
-func AssignNotempty[T comparable](p *T, v T) bool {
+func AssignNotempty[T comparable](p *T, vx ...T) bool {
 	var vz T
-	if v != vz && p != nil && v != *p {
-		*p = v
-		return true
+	for _, v := range vx {
+		if p != nil && v != vz && v != *p {
+			*p = v
+			return true
+		}
 	}
 	return false
+}
+
+func ZeroStfields[T any](vx *T) *T {
+	var tv T
+	*vx = tv
+	return vx
 }
