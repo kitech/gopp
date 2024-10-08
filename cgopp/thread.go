@@ -24,7 +24,8 @@ static uintptr_t MyTid() { return (uintptr_t)pthread_self(); }
 */
 import "C"
 
-// TODO unix/linux only
+// TODO unix/linux/mingw only
+// todo 还有一种数字小些的线程号，和pid对应的那种。
 func MyTid() usize {
 	return usize(C.MyTid())
 }

@@ -167,7 +167,7 @@ func DBAddrowez(db *sql.DB, tbl string, dup2up bool, vx any, keys ...string) (sq
 	if IsDupkey(err) {
 		if dup2up && len(keys) > 0 {
 			// 现在的实现方式可以直接更新，会过滤掉新row vx中的空值
-			log.Println("DB: Add => update", tbl, keys)
+			// gopp.Trace("DB: Add => update", tbl, keys)
 			res, err = DBUprowez(db, tbl, vx, keys...)
 		}
 	}

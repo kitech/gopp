@@ -1,7 +1,12 @@
 package gopp
 
 import (
+	"crypto/md5"
+	"crypto/sha256"
+	"crypto/sha512"
 	"fmt"
+	"hash"
+	"hash/crc64"
 	"log"
 	"sync"
 	"sync/atomic"
@@ -123,20 +128,78 @@ func (me *Logdeduper) Check2(logstr string) (string, bool) {
 
 // /// Deduper
 type Deduper struct {
+	bits     int
+	hser     hash.Hash
 	onlylast bool
 	saveval  bool
 	vals     sync.Map
 }
 
-func NewDeduper() *Deduper {
+type nophash struct {
+	d []byte
+}
+
+var _ hash.Hash = (*nophash)(nil)
+
+func (me *nophash) Reset() {
+	if me.d != nil {
+		me.d = me.d[:0]
+	}
+}
+func (me *nophash) Size() int      { return len(me.d) }
+func (me *nophash) BlockSize() int { return 128000 }
+func (me *nophash) Sum(b []byte) []byte {
+	if b == nil {
+		return me.d
+	}
+	return append(me.d, b...)
+}
+func (me *nophash) Write(b []byte) (int, error) {
+	if b == nil {
+		return 0, nil
+	}
+	me.d = append(me.d, b...)
+	return len(b), nil
+}
+
+// bits 0, 40(sha1), 64(crc64), 128(md5), 256(sha256), 512(sha512)
+func NewDeduper(bits int) *Deduper {
 	me := &Deduper{}
+	me.bits = bits
+
+	switch bits {
+	case 512:
+		me.hser = sha512.New()
+	case 256:
+		me.hser = sha256.New()
+	case 128:
+		me.hser = md5.New()
+	case 64:
+		me.hser = crc64.New(crc64htiso)
+	default:
+		me.hser = &nophash{}
+	}
+
 	return me
 }
 
 func (me *Deduper) Isdup(vx any) bool {
-	_, ok := me.vals.Load(vx)
+	var hser = me.hser
+	defer hser.Reset()
+
+	switch v := vx.(type) {
+	case string:
+		hser.Write([]byte(v))
+	case []byte:
+		hser.Write(v)
+	default:
+		hser.Write([]byte(ToStr(vx)))
+	}
+	hsval := string(hser.Sum(nil))
+
+	_, ok := me.vals.Load(hsval)
 	if !ok {
-		me.vals.Store(vx, true)
+		me.vals.Store(hsval, true)
 	}
 	return ok
 }

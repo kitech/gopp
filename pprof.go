@@ -11,7 +11,14 @@ import (
 usage: go tool pprof http://localhost:port/debug/pprof/profile
 */
 
+const PprofPortDefault = 3860
+
+var PprofPort = PprofPortDefault
+var PprofUrl = fmt.Sprintf("http://%s:%d/debug/pprof", "127.0.0.1", PprofPortDefault)
+
 func PprofEnable(port int, allip bool) {
+	PprofPort = IfElseInt(port <= 0, PprofPortDefault, port)
+	PprofUrl = fmt.Sprintf("http://%s:%d/debug/pprof", "127.0.0.1", PprofPort)
 	go func() {
 		addr := fmt.Sprintf("%s:%d", IfElse2(allip, "0.0.0.0", "127.0.0.1"), port)
 		hturl := fmt.Sprintf("http://%s", addr)
