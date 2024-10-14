@@ -254,17 +254,36 @@ func ErrPanic(err error, args ...any) {
 	}
 }
 
-func ErrHave(err error, s string) bool {
-	return err != nil && strings.Contains(err.Error(), s)
+func ErrHave(err error, ss ...string) bool {
+	if err == nil {
+		return false
+	}
+	for _, s := range ss {
+		if strings.Contains(strings.ToLower(err.Error()), strings.ToLower(s)) {
+			return true
+		}
+	}
+	return false
 }
 func ErrEqual(err error, s string) bool {
-	return err != nil && err.Error() == s
+	if err == nil {
+		return false
+	}
+	return err != nil && strings.ToLower(err.Error()) == strings.ToLower(s)
 }
 func ErrPrefix(err error, s string) bool {
-	return err != nil && strings.HasPrefix(err.Error(), s)
+	if err == nil {
+		return false
+	}
+	return err != nil &&
+		strings.HasPrefix(strings.ToLower(err.Error()), strings.ToLower(s))
 }
 func ErrSuffix(err error, s string) bool {
-	return err != nil && strings.HasSuffix(err.Error(), s)
+	if err == nil {
+		return false
+	}
+	return err != nil &&
+		strings.HasSuffix(strings.ToLower(err.Error()), strings.ToLower(s))
 }
 func ErrBegin(err error, s string) bool {
 	return ErrPrefix(err, s)

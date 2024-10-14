@@ -61,11 +61,24 @@ func GenScanVars(coltys []*sql.ColumnType, dbgvals ...any) []any {
 
 	return valvars
 }
-func ValuepByColumnType(cty *sql.ColumnType) reflect.Value {
+func ValuepByColumnType(cty *sql.ColumnType) (rv reflect.Value) {
 	rtype := cty.ScanType()
-	// log.Println(rtype, rtype.String())
-	rv := reflect.New(rtype)
+	if rtype == nil { // for mordenc.org/sqlite
+		switch cty.DatabaseTypeName() {
+		case "INTEGER", "INT":
+			// rv = reflect.New(gopp.Int64Ty)
+			rv = reflect.ValueOf(&sql.NullInt64{})
+		case "TEXT":
+			// rv = reflect.New(gopp.StrTy)
+			rv = reflect.ValueOf(&sql.NullString{})
+		default:
+			log.Println("not impl", cty.DatabaseTypeName(), cty.Name(), gopp.Retn(cty.Length()), gopp.Retn(cty.DecimalSize()), sql.Drivers())
+		}
+		return
+	}
 
+	// log.Println(rtype, rtype.String())
+	rv = reflect.New(rtype)
 	return rv
 }
 
@@ -134,6 +147,8 @@ func Rows2Struct[T any](rows *sql.Rows) (res []*T, err error) {
 	for i := 0; rows.Next(); i++ {
 		// log.Println(i)
 
+		// converting NULL to string is unsupported
+		// using pointers or sql.NullString for nullable field
 		err = rows.Scan(valvars...)
 		gopp.ErrPrint(err, i, valvars)
 		// log.Println(i, valvars, reflect.TypeOf(valvars[0]))
@@ -194,6 +209,12 @@ func SqlField2Typed[T gopp.Any | reflect.Value | *spjson.Json](vv any, dbgvals .
 		tv = v.Int16
 	case **interface{}: // maybe NULL
 		gopp.Warn("Maybe NULL???", vv, dbgvals)
+		// for mordenc.org/sqlite??? begin
+	case *string:
+		tv = *v
+	case *int64:
+		tv = *v
+		// for mordenc.org/sqlite??? end
 	default:
 		// if reflect
 		// todo **interface{} ???

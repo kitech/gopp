@@ -119,6 +119,36 @@ func (me *HttpClient) Do() (*http.Response, error) {
 	return resp, err
 }
 
+func (me *HttpClient) DoReadStr() (string, error) {
+	bcc, err := me.DoReadRaw()
+	return string(bcc), err
+
+}
+func (me *HttpClient) DoReadRaw() ([]byte, error) {
+	resp, err := me.Client.Do(me.Req)
+	me.Resp = resp
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	bcc, err := io.ReadAll(resp.Body)
+	return bcc, err
+}
+func (me *HttpClient) DoSave(f string) (int64, error) {
+	resp, err := me.Client.Do(me.Req)
+	me.Resp = resp
+	if err != nil {
+		return -1, err
+	}
+	defer resp.Body.Close()
+	fo, err := os.OpenFile(f, os.O_CREATE|os.O_TRUNC|os.O_RDWR, os.ModePerm)
+	if err != nil {
+		return -1, err
+	}
+	defer fo.Close()
+	return io.Copy(fo, resp.Body)
+}
+
 func (me *HttpClient) ensurereq() {
 	if me.Req == nil {
 		req, err := http.NewRequest(http.MethodGet, "", nil)
