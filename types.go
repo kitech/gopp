@@ -34,12 +34,6 @@ type Usize = uintptr
 type Fatptr = U128st
 type Fatany = U128st
 
-type GoSlice struct {
-	Data voidptr
-	Len  int
-	Cap  int
-}
-
 func FatptrAs[T any](v Fatptr) (rv T) {
 	p := (*T)(voidptr(&v))
 	rv = *p
@@ -242,7 +236,27 @@ var RefKindTys = map[reflect.Kind]reflect.Type{
 	reflect.Int64: Int64Ty, reflect.Uint64: Uint64Ty,
 	reflect.Float32: Float32Ty, reflect.Float64: Float64Ty,
 	reflect.Bool: BoolTy, reflect.String: StrTy,
+	reflect.Uintptr:       UintptrTy,
 	reflect.UnsafePointer: VoidpTy,
+}
+var RefKindVals = map[reflect.Kind]reflect.Value{
+	reflect.Invalid:       reflect.ValueOf(nil),
+	reflect.Int8:          reflect.ValueOf(vInt8Ty),
+	reflect.Uint8:         reflect.ValueOf(vUintTy),
+	reflect.Int:           reflect.ValueOf(vIntTy),
+	reflect.Uint:          reflect.ValueOf(vUintTy),
+	reflect.Int16:         reflect.ValueOf(vInt16Ty),
+	reflect.Uint16:        reflect.ValueOf(vUint16Ty),
+	reflect.Int32:         reflect.ValueOf(Int32Ty),
+	reflect.Uint32:        reflect.ValueOf(Uint32Ty),
+	reflect.Int64:         reflect.ValueOf(Int64Ty),
+	reflect.Uint64:        reflect.ValueOf(Uint64Ty),
+	reflect.Float32:       reflect.ValueOf(Float32Ty),
+	reflect.Float64:       reflect.ValueOf(Float64Ty),
+	reflect.Bool:          reflect.ValueOf(vBoolTy),
+	reflect.String:        reflect.ValueOf(ZeroStr),
+	reflect.Uintptr:       reflect.ValueOf(vUintptrTy),
+	reflect.UnsafePointer: reflect.ValueOf(vVoidptrTy),
 }
 
 var Int8PtrTy = reflect.TypeOf(&vInt8Ty)

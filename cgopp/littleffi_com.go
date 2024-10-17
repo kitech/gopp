@@ -130,7 +130,7 @@ func (me *FfiCif[T]) Prep(fnptrx any, args ...any) error {
 	me.fnv = reflect.New(me.fnty)
 	me.invals = make([]reflect.Value, len(args)) // 这个分配内存影响10%的效率差不多
 
-	var ifv = (*GoIface)((voidptr)(&fnptrx))
+	var ifv = (*gopp.GoIface)((voidptr)(&fnptrx))
 	var fnptr = usize(*((*voidptr)(ifv.Data)))
 	// var fnptr = reflect.ValueOf(fnptrx).Convert(gopp.UsizeTy).Interface().(usize)
 	// switch fn := fnptrx.(type) {

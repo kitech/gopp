@@ -26,11 +26,6 @@ import (
 */
 import "C"
 
-type GoIface struct {
-	Type voidptr
-	Data voidptr
-}
-
 // std c library functions
 // 这么封装一次，引用的包不需要再显式的引入"C"包。让CGO代码转换不传播到引用的代码中
 func Cmemcpy(dst voidptr, src voidptr, n usize) voidptr {
@@ -65,7 +60,7 @@ func Cfree(ptrx any) {
 			cfree_voidptr(p)
 		} else if ty.Kind() == reflect.Pointer &&
 			strings.HasSuffix(ty.String(), "._Ctype_char") {
-			var addr = (*GoIface)(voidptr(&ptrx))
+			var addr = (*gopp.GoIface)(voidptr(&ptrx))
 			cfree_voidptr(addr.Data)
 		} else {
 			panic("unimpl " + ty.String() + " " + ty.Kind().String())
@@ -125,7 +120,7 @@ func Mallocpg(n int) voidptr {
 func Cfreepg(ptr voidptr) { cfreefn(ptr) }
 
 func RttypeOf(v any) voidptr {
-	var typtr voidptr = ((*GoIface)(voidptr(&v))).Type
+	var typtr voidptr = ((*gopp.GoIface)(voidptr(&v))).Type
 	return typtr
 }
 
@@ -180,7 +175,7 @@ func CStringaf(s string) voidptr {
 func CStringgc(s string) voidptr {
 	ptr := Mallocgc(len(s) + 1)
 
-	slc := GoSlice{ptr, len(s) + 1, len(s) + 1}
+	slc := gopp.GoSlice{ptr, len(s) + 1, len(s) + 1}
 	b := *(*[]byte)(unsafe.Pointer(&slc))
 	copy(b, s)
 	b[len(s)] = 0
@@ -191,7 +186,7 @@ func CStringgc(s string) voidptr {
 // using go's mallocgc version. C memcpy version
 func CStringgc2(s string) voidptr {
 	ptr := Mallocgc(len(s) + 1)
-	o := (*GoStringIn)((voidptr)(&s))
+	o := (*gopp.GoStringIn)((voidptr)(&s))
 	Cmemcpy(ptr, o.Ptr, o.Len)
 
 	return ptr
@@ -204,26 +199,11 @@ func Gostrdup(s string) string {
 	}
 	ptr := CStringgc(s)
 	var rv string
-	o := ((*GoStringIn)((voidptr)(&rv)))
+	o := ((*gopp.GoStringIn)((voidptr)(&rv)))
 	o.Ptr = ptr
 	o.Len = usize(len(s))
 
 	return rv
-}
-
-// typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
-
-type GoSlice struct {
-	Data voidptr
-	Len  int
-	Cap  int
-}
-
-// typedef struct { const char *p; ptrdiff_t n; } _GoString_;
-
-type GoStringIn struct {
-	Ptr voidptr // charptr
-	Len usize
 }
 
 type GortType struct {
