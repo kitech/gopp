@@ -200,6 +200,8 @@ var vInt8Ty int8
 var vUint8Ty uint8
 var vIntTy int
 var vUintTy uint
+var vInt16Ty int16
+var vUint16Ty uint16
 var vInt32Ty int32
 var vUint32Ty uint32
 var vInt64Ty int64
@@ -210,11 +212,15 @@ var vFloat64Ty float64
 var vBoolTy bool
 var vStrTy string
 var vUintptrTy uintptr
+var vVoidptrTy unsafe.Pointer
 
+var InvalidTy = reflect.TypeOf(nil)
 var Int8Ty = reflect.TypeOf(vInt8Ty)
 var Uint8Ty = reflect.TypeOf(vUint8Ty)
 var IntTy = reflect.TypeOf(vIntTy)
 var UintTy = reflect.TypeOf(vUintTy)
+var Int16Ty = reflect.TypeOf(vInt16Ty)
+var Uint16Ty = reflect.TypeOf(vUint16Ty)
 var Int32Ty = reflect.TypeOf(vInt32Ty)
 var Uint32Ty = reflect.TypeOf(vUint32Ty)
 var Int64Ty = reflect.TypeOf(vInt64Ty)
@@ -225,14 +231,18 @@ var Float64Ty = reflect.TypeOf(vFloat64Ty)
 var BoolTy = reflect.TypeOf(vBoolTy)
 var StrTy = reflect.TypeOf(vStrTy)
 var UsizeTy = reflect.TypeOf(vUintptrTy)
+var VoidpTy = reflect.TypeOf(vVoidptrTy)
 
 var RefKindTys = map[reflect.Kind]reflect.Type{
-	reflect.Int8: Int8Ty, reflect.Uint8: Uint8Ty,
+	reflect.Invalid: InvalidTy,
+	reflect.Int8:    Int8Ty, reflect.Uint8: Uint8Ty,
 	reflect.Int: IntTy, reflect.Uint: UintTy,
+	reflect.Int16: Int16Ty, reflect.Uint16: Uint16Ty,
 	reflect.Int32: Int32Ty, reflect.Uint32: Uint32Ty,
 	reflect.Int64: Int64Ty, reflect.Uint64: Uint64Ty,
 	reflect.Float32: Float32Ty, reflect.Float64: Float64Ty,
 	reflect.Bool: BoolTy, reflect.String: StrTy,
+	reflect.UnsafePointer: VoidpTy,
 }
 
 var Int8PtrTy = reflect.TypeOf(&vInt8Ty)

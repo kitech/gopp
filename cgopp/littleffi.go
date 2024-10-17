@@ -130,7 +130,7 @@ func Litfficallg[FT voidptr | uintptr | *[0]byte](fnptrx FT, argsx ...any) voidp
 			argv[i] = voidptr(usize(gopp.IfElse2(vx, 1, 0)))
 		default:
 			// try reflect convert
-			var voidptrty = gopp.VoidpTy()
+			var voidptrty = gopp.VoidpTy
 			var argty = reflect.TypeOf(argx)
 			if argty.Kind() == reflect.Pointer {
 				var refval = reflect.ValueOf(argx)
@@ -138,7 +138,7 @@ func Litfficallg[FT voidptr | uintptr | *[0]byte](fnptrx FT, argsx ...any) voidp
 			} else if argty.ConvertibleTo(voidptrty) {
 				var refval = reflect.ValueOf(argx).Convert(voidptrty)
 				argv[i] = refval.UnsafePointer()
-			} else if argty.Size() == gopp.VoidpTy().Size() {
+			} else if argty.Size() == gopp.VoidpTy.Size() {
 				log.Println("maybe convable", argty.Size(), argty.String())
 			} else {
 				log.Println("ffiarg cannot convto voidptr", i, reflect.TypeOf(argx))

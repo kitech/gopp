@@ -419,7 +419,7 @@ func NilPrint(v any, args ...any) any {
 	}
 	vref := reflect.ValueOf(v)
 	vty := vref.Type() // panic: reflect: call of reflect.Value.Type on zero Value
-	if v == nil || ((vty.ConvertibleTo(VoidpTy()) ||
+	if v == nil || ((vty.ConvertibleTo(VoidpTy) ||
 		vty.Kind() == reflect.Slice || vty.Kind() == reflect.Map ||
 		vty.Kind() == reflect.Chan || vty.Kind() == reflect.Func) && vref.IsNil()) {
 		s := printq("Nil", args...)
@@ -450,7 +450,7 @@ func NilThen(v any, fx any, args ...any) any {
 	isnil := v == nil
 	vref := reflect.ValueOf(v)
 	vty := vref.Type() // panic: reflect: call of reflect.Value.Type on zero Value
-	if v == nil || ((vty.ConvertibleTo(VoidpTy()) ||
+	if v == nil || ((vty.ConvertibleTo(VoidpTy) ||
 		vty.Kind() == reflect.Slice || vty.Kind() == reflect.Map ||
 		vty.Kind() == reflect.Chan || vty.Kind() == reflect.Func) && vref.IsNil()) {
 		isnil = true

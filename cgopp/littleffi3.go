@@ -142,7 +142,7 @@ func fntypebyargs(rety reflect.Type, args ...any) (reflect.Type, []reflect.Type)
 		intys[i] = reflect.TypeOf(argx)
 		if argx == nil {
 			// log.Println("nilarg", i)
-			intys[i] = gopp.VoidpTy()
+			intys[i] = gopp.VoidpTy
 		}
 	}
 

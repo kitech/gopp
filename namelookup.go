@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
-	"unsafe"
 
 	"github.com/emirpasic/gods/sets/hashset"
 )
@@ -241,7 +240,7 @@ func ErrorResolve(class, method string, args []interface{}) {
 	fmt.Println(rtf.Name(), file, line, "Unresolved VT", class, method, args)
 }
 
-/////////
+// ///////
 // runtime.SetFinalizer(x, UniverseFree)
 func UniverseFree(this interface{}) {
 	oty := reflect.TypeOf(this)
@@ -258,7 +257,7 @@ func UniverseFree(this interface{}) {
 	}
 }
 
-/////////
+// ///////
 func getFuncTypes(f interface{}) map[int]reflect.Type {
 	if f == nil {
 		return nil
@@ -287,59 +286,59 @@ func getArgsValues(args []interface{}) (argv []reflect.Value) {
 
 /////////
 
-func StringTy(pointer bool) reflect.Type {
-	var s = "foo"
-	if pointer {
-		return reflect.TypeOf(&s)
-	}
-	return reflect.TypeOf(s)
-}
+// func StringTy(pointer bool) reflect.Type {
+// 	var s = "foo"
+// 	if pointer {
+// 		return reflect.TypeOf(&s)
+// 	}
+// 	return reflect.TypeOf(s)
+// }
 
-func RuneTy(pointer bool) reflect.Type {
-	var s rune = '\000'
-	if pointer {
-		return reflect.TypeOf(&s)
-	}
-	return reflect.TypeOf(s)
-}
+// func RuneTy(pointer bool) reflect.Type {
+// 	var s rune = '\000'
+// 	if pointer {
+// 		return reflect.TypeOf(&s)
+// 	}
+// 	return reflect.TypeOf(s)
+// }
 
-func Int16Ty(pointer bool) reflect.Type {
-	if pointer {
-		var v = int16(0)
-		return reflect.TypeOf(&v)
-	}
-	return reflect.TypeOf(int16(0))
-}
+// func Int16Ty(pointer bool) reflect.Type {
+// 	if pointer {
+// 		var v = int16(0)
+// 		return reflect.TypeOf(&v)
+// 	}
+// 	return reflect.TypeOf(int16(0))
+// }
 
-func UInt16Ty(pointer bool) reflect.Type {
-	if pointer {
-		var v = uint16(0)
-		return reflect.TypeOf(&v)
-	}
-	return reflect.TypeOf(uint16(0))
-}
+// func UInt16Ty(pointer bool) reflect.Type {
+// 	if pointer {
+// 		var v = uint16(0)
+// 		return reflect.TypeOf(&v)
+// 	}
+// 	return reflect.TypeOf(uint16(0))
+// }
 
-func FloatTy(pointer bool) reflect.Type {
-	if pointer {
-		var v = float32(0.0)
-		return reflect.TypeOf(&v)
-	}
-	return reflect.TypeOf(float32(0.0))
-}
-func DoubleTy(pointer bool) reflect.Type {
-	if pointer {
-		var v = float64(0.0)
-		return reflect.TypeOf(&v)
-	}
-	return reflect.TypeOf(float64(0.0))
-}
+// func FloatTy(pointer bool) reflect.Type {
+// 	if pointer {
+// 		var v = float32(0.0)
+// 		return reflect.TypeOf(&v)
+// 	}
+// 	return reflect.TypeOf(float32(0.0))
+// }
+// func DoubleTy(pointer bool) reflect.Type {
+// 	if pointer {
+// 		var v = float64(0.0)
+// 		return reflect.TypeOf(&v)
+// 	}
+// 	return reflect.TypeOf(float64(0.0))
+// }
 
-func VoidpTy() reflect.Type {
-	var v unsafe.Pointer = nil
-	return reflect.TypeOf(v)
-}
+// func VoidpTy() reflect.Type {
+// 	var v unsafe.Pointer = nil
+// 	return reflect.TypeOf(v)
+// }
 
-/// overload helper function
+// / overload helper function
 func convArgsForFunc(args []interface{}, fn interface{}) (argv []reflect.Value) {
 	argv = make([]reflect.Value, len(args))
 

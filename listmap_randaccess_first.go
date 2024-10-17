@@ -105,6 +105,7 @@ func (me *ListMap0[KT, VT]) putnolock(key KT, val VT) (exist, ok bool) {
 
 	kv, exist := me.m0[hkey]
 	if exist {
+		TruePrint(kv.Key != key, "hashval dup", hkey, key, kv.Key)
 		kv.Val = val
 		// 25530 ns/op
 		// 应该是slice index 效率差

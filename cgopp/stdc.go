@@ -13,6 +13,10 @@ import (
 )
 
 /*
+// fix macos nix clang16.0 cgo CoreFoundation and libobjc.A.dylib not found
+#cgo darwin LDFLAGS: -F/Library/Developer/CommandLineTools/SDKs/MacOSX11.sdk/System/Library/Frameworks -L/Library/Developer/CommandLineTools//SDKs/MacOSX11.sdk/usr/lib
+#cgo CFLAGS: -O0
+
 #include <string.h>
 #include <stdlib.h>
 // macos not found
@@ -55,9 +59,9 @@ func Cfree(ptrx any) {
 		cfree_voidptr(p)
 	default:
 		ty := reflect.TypeOf(ptrx)
-		if ty.ConvertibleTo(gopp.VoidpTy()) {
+		if ty.ConvertibleTo(gopp.VoidpTy) {
 			tv := reflect.ValueOf(ptrx)
-			p := tv.Convert(gopp.VoidpTy()).Interface().(voidptr)
+			p := tv.Convert(gopp.VoidpTy).Interface().(voidptr)
 			cfree_voidptr(p)
 		} else if ty.Kind() == reflect.Pointer &&
 			strings.HasSuffix(ty.String(), "._Ctype_char") {
