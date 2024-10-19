@@ -26,8 +26,10 @@ type wcharptr = *uint16
 var Cmalloc func(sizet) voidptr
 var Ccalloc func(sizet, sizet) voidptr
 var Crealloc func(voidptr, sizet) voidptr
-var Cfree func(voidptr)
+var cfreefn func(voidptr)
 var Cmemset func(voidptr, cint, sizet) voidptr
+
+func Cfree[T uintptr | voidptr](ptr T) { cfreefn(voidptr(ptr)) }
 
 // var Cmemcpy func(voidptr, voidptr, sizet) voidptr
 // var Cmemdup func(voidptr, sizet) voidptr
@@ -51,7 +53,7 @@ func init() {
 	{
 		fnadr, err := Dlsym(purego.RTLD_DEFAULT, "free")
 		ErrPrint(err)
-		purego.RegisterFunc(&Cfree, fnadr)
+		purego.RegisterFunc(&cfreefn, fnadr)
 	}
 	{
 		fnadr, err := Dlsym(purego.RTLD_DEFAULT, "memset")

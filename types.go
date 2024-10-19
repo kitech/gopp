@@ -16,6 +16,8 @@ type u8 = uint8
 type i16 = int16
 type u16 = uint16
 type f80 = [10]byte
+type cfnadrty = *[0]byte
+type Cfnadrty = *[0]byte
 
 // type i128 = [16]uint8
 // type u128 = [16]byte
@@ -25,7 +27,8 @@ type Fatf64 struct{ H, L f64 }
 // exported
 type Vptr = unsafe.Pointer
 type Usize = uintptr
-type Fatptr = U128st
+type Fatptr struct{ H, L usize }
+type Quadptr struct{ H0, H1, L0, L1 usize }
 type Fatany = U128st
 
 func FatptrAs[T any](v Fatptr) (rv T) {

@@ -35,37 +35,35 @@ func Cmemcpy(dst voidptr, src voidptr, n isize) voidptr {
 }
 func cfree_voidptr(ptr voidptr) { C.free(ptr) }
 func Cfree(ptrx any) {
+	var ptr0 voidptr
 	switch ptr := ptrx.(type) {
 	case unsafe.Pointer:
-		cfree_voidptr(ptr)
+		ptr0 = ptr
 	case uintptr:
-		p := (voidptr(ptr))
-		cfree_voidptr(p)
+		ptr0 = voidptr(ptr)
 	case *C.char:
-		p := (voidptr(ptr))
-		cfree_voidptr(p)
+		ptr0 = voidptr(ptr)
 	case *C.schar:
-		p := (voidptr(ptr))
-		cfree_voidptr(p)
+		ptr0 = voidptr(ptr)
 	case *C.uchar:
-		p := (voidptr(ptr))
-		cfree_voidptr(p)
+		ptr0 = voidptr(ptr)
 	case C.uintptr_t:
-		p := (voidptr(usize(ptr)))
-		cfree_voidptr(p)
+		ptr0 = voidptr(usize(ptr))
 	default:
 		ty := reflect.TypeOf(ptrx)
 		if ty.ConvertibleTo(gopp.VoidpTy) {
 			tv := reflect.ValueOf(ptrx)
-			p := tv.Convert(gopp.VoidpTy).Interface().(voidptr)
-			cfree_voidptr(p)
+			ptr0 = tv.Convert(gopp.VoidpTy).Interface().(voidptr)
 		} else if ty.Kind() == reflect.Pointer &&
 			strings.HasSuffix(ty.String(), "._Ctype_char") {
 			var addr = (*gopp.GoIface)(voidptr(&ptrx))
-			cfree_voidptr(addr.Data)
+			ptr0 = addr.Data
 		} else {
 			panic("unimpl " + ty.String() + " " + ty.Kind().String())
 		}
+	}
+	if ptr0 != nil {
+		gopp.Cfree(ptr0)
 	}
 }
 

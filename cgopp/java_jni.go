@@ -1,5 +1,5 @@
 // //goddd:build usejni
-// // +buildddd usejni
+// // +-buildddd usejni
 
 package cgopp
 

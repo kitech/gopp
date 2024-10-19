@@ -107,19 +107,29 @@ func irgo_ffi_call2(funcname string, ins []reflect.Value, out []reflect.Value) {
 	// log.Println(fno, fno.Type())
 	// o2 := fno.Call(ins)
 	// log.Println(o2)
+	var out2 []reflect.Value
 	fnx, ok := irgocbfns.Load(funcname)
-	gopp.FalsePrint(ok, "irgofn 404", funcname, &irgocbfns)
+	// gopp.FalsePrint(ok, "irgofn 404 in", irgocbfnscnt, funcname, "Try Dlsymgo mode...")
 	if !ok {
-		return
+		pc := Dlsymgo(funcname)
+		gopp.ZeroPrint(pc, "cannot get symbol:", funcname, "in", irgocbfnscnt)
+		if pc == 0 {
+			return
+		}
+		fnv := MakeFuncByargs(pc, ins, out)
+		IrgoRegistFunc(funcname, fnv.Elem().Interface())
+		out2 = fnv.Elem().Call(ins)
+	} else {
+		fno := fnx.(reflect.Value)
+		out2 = fno.Call(ins)
 	}
-	fno := fnx.(reflect.Value)
-	out2 := fno.Call(ins)
 	for i, o := range out2 {
 		out[i] = o
 	}
 }
 
 var irgocbfns = sync.Map{} // string => func value
+var irgocbfnscnt = 0
 
 func init() { IrgoRegistFunc("demoffifn", demoffifn) }
 func demoffifn(a0 int32, a1 string, a2 float64) {
@@ -132,9 +142,65 @@ func IrgoRegistFunc(funcname string, fno any) bool {
 		return false
 	}
 	irgocbfns.Store(funcname, reflect.ValueOf(fno))
+	irgocbfnscnt += 1
+	gopp.TruePrint(irgocbfnscnt > 9999, "so many!!!", irgocbfnscnt)
 	return true
 }
 func IrgoUnregFunc(funcname string) bool {
 	irgocbfns.Delete(funcname)
 	return true
+}
+func IrgoRegistCount() int { return irgocbfnscnt }
+
+func MakeFuncByargs(pc usize, ins []reflect.Value, out []reflect.Value) reflect.Value {
+	// reflect.FuncOf()
+	//reflect.MakeFunc()
+
+	intys := make([]reflect.Type, len(ins))
+	outys := make([]reflect.Type, len(out))
+	for i, tv := range ins {
+		intys[i] = tv.Type()
+		// log.Println(i, tv.Type(), tv)
+	}
+	for i, tv := range out {
+		if !tv.IsValid() {
+			outys = outys[:i]
+			break
+		}
+		outys[i] = tv.Type()
+	}
+
+	fnty := reflect.FuncOf(intys, outys, false)
+	fnv := reflect.New(fnty)
+	CreateFuncForCodePtr(fnv.Interface(), pc)
+	return fnv
+}
+
+// Convenience struct for modifying the underlying code pointer of a function
+// value. The actual struct has other values, but always starts with a code
+// pointer.
+type Func struct {
+	codePtr uintptr
+}
+
+// CreateFuncForCodePtr is given a code pointer and creates a function value
+// that uses that pointer. The outFun argument should be a pointer to a function
+// of the proper type (e.g. the address of a local variable), and will be set to
+// the result function value.
+func CreateFuncForCodePtr(outFuncPtr interface{}, codePtr uintptr) {
+	outFuncVal := reflect.ValueOf(outFuncPtr).Elem()
+	// Use reflect.MakeFunc to create a well-formed function value that's
+	// guaranteed to be of the right type and guaranteed to be on the heap
+	// (so that we can modify it). We give a nil delegate function because
+	// it will never actually be called.
+	newFuncVal := reflect.MakeFunc(outFuncVal.Type(), nil)
+	// Use reflection on the reflect.Value (yep!) to grab the underling
+	// function value pointer. Trying to call newFuncVal.Pointer() wouldn't
+	// work because it gives the code pointer rather than the function value
+	// pointer. The function value is a struct that starts with its code
+	// pointer, so we can swap out the code pointer with our desired value.
+	funcValuePtr := reflect.ValueOf(newFuncVal).FieldByName("ptr").Pointer()
+	funcPtr := (*Func)(unsafe.Pointer(funcValuePtr))
+	funcPtr.codePtr = codePtr
+	outFuncVal.Set(newFuncVal)
 }
