@@ -28,9 +28,10 @@ import "C"
 
 // std c library functions
 // 这么封装一次，引用的包不需要再显式的引入"C"包。让CGO代码转换不传播到引用的代码中
-func Cmemcpy(dst voidptr, src voidptr, n usize) voidptr {
-	rv := C.memcpy(dst, src, C.size_t(n))
-	return rv
+func Cmemcpy(dst voidptr, src voidptr, n isize) voidptr {
+	return gopp.Cmemcpy(dst, src, n)
+	// rv := C.memcpy(dst, src, C.size_t(n))
+	// return rv
 }
 func cfree_voidptr(ptr voidptr) { C.free(ptr) }
 func Cfree(ptrx any) {
@@ -77,8 +78,6 @@ func Memset(ptr voidptr, c, n int) voidptr {
 func MemZero(ptr voidptr, n int) voidptr {
 	return C.memset(ptr, 0, csizet(n))
 }
-func Strcpy() {}
-func Strdup() {}
 
 func Malloc(n int) voidptr {
 	rv := C.malloc(csizet(n))
@@ -153,13 +152,17 @@ const CppBoolTySz = gopp.Int8TySz
 // func MallocTrim() int { return int(C.malloc_trim(0)) }
 
 func GoString[T voidptr | charptr](ptr T) string {
-	return C.GoString((*C.char)(ptr))
+	return gopp.GoString(voidptr(ptr))
+	// return C.GoString((*C.char)(ptr))
 }
-func GoStringN[T voidptr | charptr](ptr T, len usize) string {
-	return C.GoStringN((*C.char)(ptr), (C.int)(len))
+
+func GoStringN[T voidptr | charptr](ptr T, len isize) string {
+	return gopp.GoStringN(voidptr(ptr), len)
+	// return C.GoStringN((*C.char)(ptr), (C.int)(len))
 }
 func CString(s string) voidptr {
-	return voidptr(C.CString(s))
+	return gopp.CString(s)
+	// return voidptr(C.CString(s))
 }
 
 // too slow, 480ns/op, C.CString不过 100ns/op
@@ -174,13 +177,14 @@ func CStringaf(s string) voidptr {
 // using go's mallocgc version. go memcpy version.
 func CStringgc(s string) voidptr {
 	ptr := Mallocgc(len(s) + 1)
+	return gopp.Cmemcpy(ptr, (voidptr((*gopp.GoStringIn)(voidptr(&s)))), len(s))
 
-	slc := gopp.GoSlice{ptr, len(s) + 1, len(s) + 1}
-	b := *(*[]byte)(unsafe.Pointer(&slc))
-	copy(b, s)
-	b[len(s)] = 0
+	// slc := gopp.GoSlice{ptr, len(s) + 1, len(s) + 1}
+	// b := *(*[]byte)(unsafe.Pointer(&slc))
+	// copy(b, s)
+	// b[len(s)] = 0
 
-	return ptr
+	// return ptr
 }
 
 // using go's mallocgc version. C memcpy version
@@ -194,16 +198,15 @@ func CStringgc2(s string) voidptr {
 
 // \see strings.Clone
 func Gostrdup(s string) string {
-	if true {
-		return strings.Clone(s)
-	}
-	ptr := CStringgc(s)
-	var rv string
-	o := ((*gopp.GoStringIn)((voidptr)(&rv)))
-	o.Ptr = ptr
-	o.Len = usize(len(s))
+	return strings.Clone(s)
 
-	return rv
+	// ptr := CStringgc(s)
+	// var rv string
+	// o := ((*gopp.GoStringIn)((voidptr)(&rv)))
+	// o.Ptr = ptr
+	// o.Len = usize(len(s))
+
+	// return rv
 }
 
 type GortType struct {

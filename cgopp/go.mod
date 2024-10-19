@@ -2,11 +2,9 @@ module cgopp
 
 go 1.22.1
 
-require github.com/kitech/gopp v0.0.0
-
 require (
-	github.com/orcaman/concurrent-map/v2 v2.0.1 // indirect
-	golang.org/x/sys v0.19.0 // indirect
+	github.com/kitech/gopp v0.0.0
+	github.com/orcaman/concurrent-map/v2 v2.0.1
 )
 
 replace github.com/kitech/gopp => ../
@@ -16,7 +14,7 @@ require (
 	github.com/bitly/go-simplejson v0.5.1 // indirect
 	github.com/cheekybits/genny v1.0.0 // indirect
 	github.com/dolthub/maphash v0.1.0 // indirect
-	github.com/ebitengine/purego v0.7.1
+	github.com/ebitengine/purego v0.8.0
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/huandu/xstrings v1.4.0 // indirect

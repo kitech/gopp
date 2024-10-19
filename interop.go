@@ -18,7 +18,7 @@ type GoSlice struct {
 // typedef struct { const char *p; ptrdiff_t n; } _GoString_;
 type GoStringIn struct {
 	Ptr voidptr // charptr
-	Len usize
+	Len isize
 }
 
 // src/internal/abi

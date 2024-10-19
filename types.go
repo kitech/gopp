@@ -16,17 +16,11 @@ type u8 = uint8
 type i16 = int16
 type u16 = uint16
 type f80 = [10]byte
-type i128 = [16]uint8
-type u128 = [16]byte
-type U128st struct {
-	H u64
-	L u64
-}
 
-type Fatf64 struct {
-	H f64
-	L f64
-}
+// type i128 = [16]uint8
+// type u128 = [16]byte
+type U128st struct{ H, L u64 }
+type Fatf64 struct{ H, L f64 }
 
 // exported
 type Vptr = unsafe.Pointer

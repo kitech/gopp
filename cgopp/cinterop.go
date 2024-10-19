@@ -3,6 +3,7 @@ package cgopp
 import (
 	"log"
 	"reflect"
+	"sync"
 	"unsafe"
 
 	"github.com/kitech/gopp"
@@ -54,6 +55,7 @@ func GoirGetPasvCbfn[T string | int](name T) voidptr {
 
 // irgo type funcs
 
+// called by c like other lang
 //
 //export irgo_get_gotype_object
 func irgo_get_gotype_object(i int32, more *int32) uintptr {
@@ -87,22 +89,52 @@ func irgo_get_gotype_object(i int32, more *int32) uintptr {
 
 //export irgo_ffi_call
 func irgo_ffi_call(funcname *string, ins voidptr, out voidptr) {
-	log.Println(*funcname) //, ins, out)
+	if true {
+		// return
+	}
+	// log.Println(*funcname) //, ins, out)
 	ins2 := *(*[]reflect.Value)(ins)
 	out2 := *(*[]reflect.Value)(out)
 
 	irgo_ffi_call2(*funcname, ins2, out2)
 }
 
-func demoffifn(a0, a1 int32, a2 float64) {
-	log.Println(a0, a1, a2)
-}
 func irgo_ffi_call2(funcname string, ins []reflect.Value, out []reflect.Value) {
-	log.Println(len(ins), cap(ins), unsafe.Sizeof(reflect.Value{}))
-	log.Println(ins[0].Type())
-	// log.Println(ins)
-	fno := reflect.ValueOf(demoffifn)
-	log.Println(fno, fno.Type())
-	o2 := fno.Call(ins)
-	log.Println(o2)
+	// log.Println(len(ins), cap(ins), unsafe.Sizeof(reflect.Value{}))
+	// log.Println(ins[0].Type())
+	// // log.Println(ins)
+	// fno := reflect.ValueOf(demoffifn)
+	// log.Println(fno, fno.Type())
+	// o2 := fno.Call(ins)
+	// log.Println(o2)
+	fnx, ok := irgocbfns.Load(funcname)
+	gopp.FalsePrint(ok, "irgofn 404", funcname, &irgocbfns)
+	if !ok {
+		return
+	}
+	fno := fnx.(reflect.Value)
+	out2 := fno.Call(ins)
+	for i, o := range out2 {
+		out[i] = o
+	}
+}
+
+var irgocbfns = sync.Map{} // string => func value
+
+func init() { IrgoRegistFunc("demoffifn", demoffifn) }
+func demoffifn(a0 int32, a1 string, a2 float64) {
+	// log.Println(a0, a1, a2)
+}
+
+func IrgoRegistFunc(funcname string, fno any) bool {
+	if vx, ok := irgocbfns.Load(funcname); ok {
+		log.Println("Exist?", funcname, vx)
+		return false
+	}
+	irgocbfns.Store(funcname, reflect.ValueOf(fno))
+	return true
+}
+func IrgoUnregFunc(funcname string) bool {
+	irgocbfns.Delete(funcname)
+	return true
 }

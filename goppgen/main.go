@@ -101,6 +101,8 @@ func mainx() {
 	sb.WriteString("type f32 = float32" + "\n")
 	sb.WriteString("type f64 = float64" + "\n")
 
+	sb.WriteString("type sizet = int" + "\n")
+	sb.WriteString("type isize = int" + "\n")
 	sb.WriteString("type usize = uintptr" + "\n")
 	sb.WriteString("type voidptr = unsafe.Pointer" + "\n")
 
