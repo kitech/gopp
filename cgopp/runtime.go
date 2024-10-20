@@ -26,6 +26,9 @@ func mynewobject(rttypeptr voidptr) voidptr
 // 这个函数只负责固定指针地址不移动，但是并不负责持有指针引用
 // 如果需要持有引用，直接使用runtime.Pinner.Pin
 
+// go:linkname not need cgo enabled
+// only allowed in Go files that import "unsafe"
+//
 //go:linkname setPinned runtime.setPinned
 func setPinned(ptr voidptr, pin bool) bool
 

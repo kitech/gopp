@@ -1,6 +1,9 @@
 package gopp
 
 import (
+	"log"
+	"unsafe"
+
 	"github.com/ebitengine/purego"
 )
 
@@ -62,7 +65,11 @@ func init() {
 	}
 }
 
+func Cstrlen[T voidptr | charptr](ptr T) int { return cstrlen(ptr) }
 func cstrlen[T voidptr | charptr](ptr T) int {
+	if ptr == nil {
+		return 0
+	}
 	v := gosliceref[char](voidptr(ptr), 1<<20)
 
 	for i := 0; i < len(v); i++ {
@@ -136,7 +143,9 @@ func Mallocgc(n sizet) voidptr {
 		return nil
 	}
 	tmp := make([]byte, 0, n)
-	return (*GoSlice)(voidptr(&tmp)).Data
+	rv := (*GoSlice)(voidptr(&tmp)).Data
+	SetPin(rv, true)
+	return rv
 }
 
 // same as officical go
@@ -180,14 +189,107 @@ func CString(s string) voidptr {
 	return Cmemcpy(dst, sp.Ptr, sz)
 }
 
-// maybe not null terminate
+// maybe not null terminate when fake nil tail, but should be very rare
 func CStringRef(s string) (voidptr, sizet) {
-	sp := (*GoStringIn)(voidptr(&s))
-	return sp.Ptr, sp.Len
+	p := &s
+	if StrIsNilTail(p) {
+		sp := (*GoStringIn)(voidptr(p))
+		return (voidptr)(sp.Ptr), sp.Len
+	}
+	return CStringgc(*p), len(s) // still use go mem
+	// sp := (*GoStringIn)(voidptr(&s))
+	// return sp.Ptr, sp.Len
 }
 func CStringgc(s string) voidptr {
 	sz := len(s)
 	rp := Mallocgc(sz + 1)
 	sp := (*GoStringIn)(voidptr(&s))
 	return Cmemcpy(rp, sp.Ptr, sz)
+}
+
+func StringData(s string) voidptr    { return voidptr(unsafe.StringData(s)) }
+func SliceData[T any](s []T) voidptr { return voidptr(unsafe.SliceData(s)) }
+
+// note nocopy
+
+// 更安全的refc字符串.
+// 但是也还不够安全,有可能是临时变量,必须确保生命周期足够长.
+// 在调用C函数的时候使用,在返回值的时候最好不用.
+// 如果null结尾,则直接返回ref.
+// 如果不是null结尾的,则返回clone版本.但是使用方需要在3秒内使用,否则内存会被自动翻译.
+func StrtoRefc(s *string) voidptr {
+	if StrIsNilTail(s) {
+		sp := (*GoStringIn)(voidptr(s))
+		return (voidptr)(sp.Ptr)
+	}
+	return CStringgc(*s) // still use go mem
+	// underly C memory with auto free
+	// s4c := CStringaf(*s)
+	// return s4c
+}
+
+// note nocopy
+// 不可靠的，常量字符串失败
+func StrtoVptrRef(s *string) voidptr {
+	FalsePrint(StrIsNilTail(s), "not safe case, gostring not null terminated")
+	sp := (*GoStringIn)(voidptr(s))
+	return (voidptr)(sp.Ptr)
+}
+
+// 常量字符串失败
+func StrChkNilTail(s *string) {
+	v := StrIsNilTail(s)
+	if !v {
+		log.Println("gostr not nil tail", SubStr(*s, 32))
+	}
+}
+
+func StrIsNilTail(s *string) bool {
+	sp := (*GoStringIn)(voidptr(s))
+	if false {
+		// (*sp.ptr) = 0
+	}
+	idx := sp.Len
+	// log.Println(idx, ch, sp.ptr, AddrAdd(voidptr(sp.ptr), 1))
+	if sp.Ptr != nil {
+		p1 := (*[1 << 16]byte)(voidptr(sp.Ptr))[: sp.Len+1 : sp.Len+1]
+		// log.Println(1<<16, sp.len, reflect.TypeOf(p1), len(p1))
+		return p1[idx] == 0
+		// log.Println(p1)
+	}
+	return true
+}
+
+// note: 不能处理常量字符串。最大64KB
+func StrNilTail(s *string) {
+	sp := (*GoStringIn)(voidptr(s))
+	if false {
+		// (*sp.Ptr) = 0
+	}
+	idx := sp.Len
+	// log.Println(idx, ch, sp.ptr, AddrAdd(voidptr(sp.ptr), 1))
+	if sp.Ptr != nil {
+		p1 := (*[1 << 20]byte)(voidptr(sp.Ptr))[: sp.Len+1 : sp.Len+1]
+		// log.Println(1<<16, sp.len, reflect.TypeOf(p1), len(p1))
+		// log.Println(p1[idx])
+		if p1[idx] != 0 {
+			p1[idx] = 0
+		}
+		// log.Println(p1)
+	}
+}
+
+// note: 不能处理常量字符串。最大64KB
+func StrAltChar(s *string, idx int, ch byte) {
+	sp := (*GoStringIn)(voidptr(s))
+	if false {
+		// (*sp.Ptr) = 0
+	}
+	// log.Println(idx, ch, sp.ptr, AddrAdd(voidptr(sp.ptr), 1))
+	if sp.Ptr != nil {
+		p1 := (*[1 << 20]byte)(sp.Ptr)[:sp.Len:sp.Len]
+		// log.Println(1<<16, sp.len, reflect.TypeOf(p1), len(p1))
+		p1[idx] = ch
+		// log.Println(p1)
+	}
 }

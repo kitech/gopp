@@ -28,6 +28,8 @@ import "C"
 
 // std c library functions
 // 这么封装一次，引用的包不需要再显式的引入"C"包。让CGO代码转换不传播到引用的代码中
+//
+// Deprecated: Use gopp.Cmemcpy instead.
 func Cmemcpy(dst voidptr, src voidptr, n isize) voidptr {
 	return gopp.Cmemcpy(dst, src, n)
 	// rv := C.memcpy(dst, src, C.size_t(n))
@@ -149,15 +151,19 @@ const CppBoolTySz = gopp.Int8TySz
 // let freed memory really given back to OS
 // func MallocTrim() int { return int(C.malloc_trim(0)) }
 
+// Deprecated: Use gopp.GoString instead.
 func GoString[T voidptr | charptr](ptr T) string {
 	return gopp.GoString(voidptr(ptr))
 	// return C.GoString((*C.char)(ptr))
 }
 
+// Deprecated: Use gopp.GoStringN instead.
 func GoStringN[T voidptr | charptr](ptr T, len isize) string {
 	return gopp.GoStringN(voidptr(ptr), len)
 	// return C.GoStringN((*C.char)(ptr), (C.int)(len))
 }
+
+// Deprecated: Use gopp.CString instead.
 func CString(s string) voidptr {
 	return gopp.CString(s)
 	// return voidptr(C.CString(s))
@@ -173,19 +179,17 @@ func CStringaf(s string) voidptr {
 }
 
 // using go's mallocgc version. go memcpy version.
+//
+// dddDeprecated: Use gopp.CStringgc instead.
 func CStringgc(s string) voidptr {
 	ptr := Mallocgc(len(s) + 1)
-	return gopp.Cmemcpy(ptr, (voidptr((*gopp.GoStringIn)(voidptr(&s)))), len(s))
-
-	// slc := gopp.GoSlice{ptr, len(s) + 1, len(s) + 1}
-	// b := *(*[]byte)(unsafe.Pointer(&slc))
-	// copy(b, s)
-	// b[len(s)] = 0
-
-	// return ptr
+	return gopp.Cmemcpy(ptr, gopp.StringData(s), len(s))
+	// return gopp.Cmemcpy(ptr, (*gopp.GoStringIn)(voidptr(&s)).Ptr, len(s))
 }
 
 // using go's mallocgc version. C memcpy version
+//
+// dddDeprecated: Use gopp.Cmemcpy instead.
 func CStringgc2(s string) voidptr {
 	ptr := Mallocgc(len(s) + 1)
 	o := (*gopp.GoStringIn)((voidptr)(&s))
@@ -195,6 +199,8 @@ func CStringgc2(s string) voidptr {
 }
 
 // \see strings.Clone
+//
+// dddDeprecated: Use gopp.Cmemcpy instead.
 func Gostrdup(s string) string {
 	return strings.Clone(s)
 

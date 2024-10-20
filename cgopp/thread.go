@@ -46,6 +46,8 @@ import "C"
 
 // TODO unix/linux/mingw only
 // todo 还有一种数字小些的线程号，和pid对应的那种。
+//
+// Deprecated: Use Gettid instead.
 func MyTid() usize {
 	return usize(C.MyTid())
 }
@@ -66,6 +68,7 @@ var archs = map[int]uintptr{
 }
 
 // todo macos not work
+// Deprecated: Use Gettid instead.
 func MyTid3() usize {
 	r1, r2, err := syscall.Syscall(archs[PtrSize], 0, 0, 0)
 	if err != 0 && runtime.GOOS == "darwin" {

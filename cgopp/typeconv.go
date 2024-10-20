@@ -62,6 +62,8 @@ type Cgolong = int64
 */
 
 // => char**
+
+// Deprecated: Use gopp.gosliceref instead.
 type CStrArr struct {
 	carr  unsafe.Pointer
 	calen int
@@ -142,8 +144,8 @@ func AddrAdd(addr voidptr, n usize) voidptr {
 
 type gostrin struct {
 	ptr *C.char
-	len usize
-	cap usize
+	len isize
+	cap isize
 }
 
 // note nocopy
@@ -186,7 +188,7 @@ func StrIsNilTail(s *string) bool {
 	idx := sp.len
 	// log.Println(idx, ch, sp.ptr, AddrAdd(voidptr(sp.ptr), 1))
 	if sp.ptr != nil {
-		p1 := (*[1 << 16]byte)(voidptr(sp.ptr))[: sp.len+1 : sp.len+1]
+		p1 := (*[1 << 20]byte)(voidptr(sp.ptr))[: sp.len+1 : sp.len+1]
 		// log.Println(1<<16, sp.len, reflect.TypeOf(p1), len(p1))
 		return p1[idx] == 0
 		// log.Println(p1)

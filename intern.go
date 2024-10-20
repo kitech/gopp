@@ -3,6 +3,7 @@ package gopp
 import (
 	"os"
 	"time"
+	// _ "cmd/goinct"
 )
 
 // try export go internal struct

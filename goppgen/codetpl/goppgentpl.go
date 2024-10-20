@@ -21,6 +21,7 @@ type sizet = int
 type isize = int
 type usize = uintptr
 type voidptr = unsafe.Pointer
+type rawptr = unsafe.Pointer
 type u128 = struct{ H, L uint64 }
 type i128 = struct{ H, L int64 }
 type fatptr = struct{ H, L usize }
