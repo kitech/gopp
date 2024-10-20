@@ -164,14 +164,6 @@ func StrtoRefc(s *string) voidptr {
 	return s4c
 }
 
-// note nocopy
-// 不可靠的，常量字符串失败
-func StrtoVptrRef(s *string) voidptr {
-	gopp.FalsePrint(StrIsNilTail(s), "not safe case, gostring not null terminated")
-	sp := (*gostrin)(voidptr(s))
-	return (voidptr)(sp.ptr)
-}
-
 // 常量字符串失败
 func StrChkNilTail(s *string) {
 	v := StrIsNilTail(s)

@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"sync"
 
+	"runtime/rtin"
 	_ "unsafe"
 )
 
@@ -104,8 +105,7 @@ type moduledata struct {
 }
 
 // /// type moduledata deps
-type nih struct{}
-type NotInHeap struct{ _ nih }
+type NotInHeap = rtin.NotInHeap
 
 // Information from the compiler about the layout of stack frames.
 // Note: this type must agree with reflect.bitVector.

@@ -29,10 +29,13 @@ litffi3_test2(float a) {
 }
 
 */
-import "C"
 
-func TestLitffi3callz() {
-	sym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
+// import "C"
+
+func TestLitffi3callz(dlh ...usize) {
+	dlh0 := gopp.IfElse2(len(dlh) > 0, gopp.FirstofGv(dlh), purego.RTLD_DEFAULT)
+	sym, _ := purego.Dlsym(dlh0, "litffi3_test1")
+	// sym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
 	// sym2, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi_test2")
 	log.Println(sym, voidptr(sym))
 	// todo how let go not checkptr, 用 usize传递
@@ -61,8 +64,10 @@ func TestLitffi3callz() {
 	}
 }
 
-func BMLitffi3callz() {
-	fnsym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
+func BMLitffi3callz(dlh ...usize) {
+	dlh0 := gopp.IfElse2(len(dlh) > 0, gopp.FirstofGv(dlh), purego.RTLD_DEFAULT)
+	fnsym, _ := purego.Dlsym(dlh0, "litffi3_test1")
+	// fnsym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
 	argp0 := usize(3309)
 
 	gopp.Benchfn(func() {
@@ -70,8 +75,10 @@ func BMLitffi3callz() {
 		_ = x
 	}, 99999, gopp.MyFuncName())
 }
-func BMLitffi3callz2() {
-	fnsym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
+func BMLitffi3callz2(dlh ...usize) {
+	dlh0 := gopp.IfElse2(len(dlh) > 0, gopp.FirstofGv(dlh), purego.RTLD_DEFAULT)
+	fnsym, _ := purego.Dlsym(dlh0, "litffi3_test1")
+	// fnsym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
 	argp0 := usize(3309)
 
 	cif := FfiCifNew[float64]()

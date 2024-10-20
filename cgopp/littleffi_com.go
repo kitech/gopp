@@ -35,7 +35,7 @@ func SwitchFfiver(v int) {
 func TestLitfficallz() {
 	switch ffiver {
 	case 2:
-		TestLitffi2callz()
+		// TestLitffi2callz()
 	default:
 		TestLitffi3callz()
 	}
@@ -47,10 +47,11 @@ func TestLitfficallz() {
 func FfiCall[RETY any, FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) (rvx RETY) {
 	switch ffiver {
 	case 1:
-		// rv := Litfficallg(fnptrx, args...)
+		rv := Litfficallg(fnptrx, args...)
 		// rvx = RETY(rv)
+		rvx = *(*RETY)(voidptr(&rv))
 	case 2:
-		rvx = Ffi2Call[RETY](fnptrx, args...)
+		// rvx = Ffi2Call[RETY](fnptrx, args...)
 	default:
 		rvx = Ffi3Call[RETY](fnptrx, args...)
 	}
@@ -64,7 +65,7 @@ func fficallcpp() {}
 func FfiCallVoid[FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) {
 	switch ffiver {
 	case 2:
-		Ffi2Call[int](fnptrx, args...)
+		// Ffi2Call[int](fnptrx, args...)
 	default:
 		Ffi3Call[int](fnptrx, args...)
 	}
@@ -75,7 +76,7 @@ func FfiCall0[T any](name string, args ...any) (rvx T) {
 	gopp.NilPrint(fnsym, "symnil", name)
 	switch ffiver {
 	case 2:
-		rvx = Ffi2Call[T](fnsym, args...)
+		// rvx = Ffi2Call[T](fnsym, args...)
 	default:
 		rvx = Ffi3Call[T](fnsym, args...)
 	}
@@ -87,7 +88,7 @@ func FfiCallVoid0(name string, args ...any) {
 	gopp.NilPrint(fnsym, "symnil", name)
 	switch ffiver {
 	case 2:
-		Ffi2Call[int](fnsym, args...)
+		// Ffi2Call[int](fnsym, args...)
 	default:
 		Ffi3Call[int](fnsym, args...)
 	}
