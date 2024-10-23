@@ -274,7 +274,11 @@ func (me *CallMerger) runit(key string, no int) {
 		if nowt.UnixNano() > mm.Max {
 			delete(me.q2, key)
 			totcnt = len(olds)
-			okri = olds[no]
+			if no < totcnt {
+				okri = olds[no]
+			} else {
+				Warn("outoflen", no, totcnt, key)
+			}
 			// log.Println("canrun", key, no, totcnt)
 		} else {
 			// log.Println("notrun", key, no, totcnt, "left", time.Duration(mm.Max-nowt.UnixNano()))

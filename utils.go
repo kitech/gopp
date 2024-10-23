@@ -87,13 +87,12 @@ func ToSlice(v interface{}, reverse bool) []interface{} {
 	}
 }
 
+// v express of bool, string, pointer
 func Assertf(v interface{}, format string, args ...interface{}) {
 	Assert(v, fmt.Sprintf(format, args...))
 }
 
-/*
-v express of bool, string, pointer
-*/
+// v express of bool, string, pointer
 func Assert(v interface{}, info string, args ...interface{}) {
 	fmtv := fmt.Sprintf("%+v, %+v", v, info)
 	for _, arg := range args {
@@ -124,7 +123,7 @@ func Assert(v interface{}, info string, args ...interface{}) {
 	}
 }
 
-func AssertR() {
+func AssertT() {
 
 }
 
