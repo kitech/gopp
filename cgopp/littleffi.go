@@ -110,6 +110,7 @@ func Litfficallg[FT voidptr | uintptr | *[0]byte](fnptrx FT, argsx ...any) voidp
 	case *[0]byte:
 		fnptr = voidptr(ptrx)
 	}
+	gopp.SetPin(fnptr, true)
 
 	var argc = len(argsx)
 	var argv = [6]voidptr{}
@@ -144,9 +145,11 @@ func Litfficallg[FT voidptr | uintptr | *[0]byte](fnptrx FT, argsx ...any) voidp
 				log.Println("ffiarg cannot convto voidptr", i, reflect.TypeOf(argx))
 			}
 		}
+		gopp.SetPin(argv[i], true)
 	}
 
-	// rv := C.litfficall(fnptr, cint(argc), argv[0], argv[1], argv[2], argv[3], argv[4])
-	rv := litfficallfnc(fnptr, argc, argv[0], argv[1], argv[2], argv[3], argv[4], argv[5])
+	// todo panic: runtime error: cgo argument has Go pointer to unpinned Go pointer
+	rv := C.litfficall(fnptr, cint(argc), argv[0], argv[1], argv[2], argv[3], argv[4], argv[5])
+	// rv := litfficallfnc(fnptr, argc, argv[0], argv[1], argv[2], argv[3], argv[4], argv[5])
 	return rv
 }

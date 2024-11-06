@@ -104,6 +104,7 @@ func BMLitffi3callz2(dlh ...usize) {
 // Usage1: FfiCall[float64]()
 func Ffi3Call[RETY any, FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) (rvx RETY) {
 	fnty, argtys := fntypebyargs(reflect.TypeOf(rvx), args...)
+	panic("deppp")
 
 	invals := make([]reflect.Value, len(args))
 	for i, argty := range argtys {

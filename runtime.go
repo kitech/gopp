@@ -174,3 +174,30 @@ func Deferx(objx interface{}) {
 		log.Println("Unsupported:", objty.Kind().String())
 	}
 }
+
+// runtime.setCgoTrace
+// https://github.com/ianlancetaylor/cgosymbolizer
+// https://github.com/benesch/cgosymbolizer
+
+/*
+	added GOROOT/src/runtime/gettid.go
+	\\ see goinct.git/runtime/gettid.go
+
+package runtime
+
+// return os thread no, 0+, not really os thread id
+
+	func Gettno() int32 {
+		// struct runtime.p means process
+		return getg().m.p.ptr().id
+	}
+
+// this is really pthread_self() value
+
+	func Gettid() uint64 {
+		// struct runtime.p means process
+		return getg().m.procid
+	}
+*/
+func Gettid() uint64 { return runtime.Gettid() }
+func Gettno() int32  { return runtime.Gettno() }

@@ -22,7 +22,7 @@ const (
 	FFITY_USIZE
 )
 
-var ffiver = 3
+var ffiver = 1
 
 func SwitchFfiver(v int) {
 	if v == 2 || v == 3 {
