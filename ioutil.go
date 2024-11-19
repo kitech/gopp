@@ -50,13 +50,18 @@ func ReadFileMust(filename string) string {
 }
 
 // Enter works
-func PauseAk() {
+func PauseAk(msg ...string) {
 	// todo
 	// disable input buffering
 	// exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
 	// do not display entered characters on the screen
 	// exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
 
+	if len(msg) == 0 {
+		println("Press any key to continue...")
+	} else {
+		println(msg)
+	}
 	var c [1]byte
 	n, err := os.Stdin.Read(c[:])
 	ErrPrint(err, n)

@@ -19,6 +19,7 @@ import (
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 // macos not found
 // #include <malloc.h>
 // #include <memory.h>

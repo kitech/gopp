@@ -7,13 +7,21 @@ import (
 	"github.com/kitech/gopp"
 
 	"github.com/ebitengine/purego"
-	_ "github.com/ebitengine/purego"
+	// _ "github.com/ebitengine/purego"
 )
 
 /*
+#cgo LDFLAGS: -Wl,--export-dynamic
+
+#ifndef EXPORT_API
+#define EXPORT_API __attribute__ ((visibility("default")))
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <dlfcn.h>
 
+EXPORT_API
 void* litfficall(void* fnptr, int argc, void* arg0, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5) {
 	// printf("cgopp.C.%s: fnptr=%p,argc=%d,arg0=%p\n", __FUNCTION__, fnptr, argc, arg0);
 	typedef void* (*fnargc0)() ;
@@ -66,7 +74,11 @@ import "C"
 
 var litfficallfnc func(voidptr, int, voidptr, voidptr, voidptr, voidptr, voidptr, voidptr) voidptr
 
+//go:linkname gointernal_dlsym dlsym
+var gointernal_dlsym uintptr
+
 func init() {
+	gopp.ZeroPrint(gointernal_dlsym, "go:linkname not worked")
 	sym, err := purego.Dlsym(purego.RTLD_DEFAULT, "litfficall")
 	gopp.ErrPrint(err)
 	purego.RegisterFunc(&litfficallfnc, sym)

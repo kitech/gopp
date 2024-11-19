@@ -3,6 +3,8 @@ package cgopp
 import (
 	"runtime"
 	"time"
+	// "log"
+	"strings"
 
 	"github.com/kitech/gopp"
 )
@@ -16,8 +18,9 @@ func Dlsymgo(name string) usize {
 	var btime = time.Now()
 	GortWalkFuncs(func(fo *runtime.Func) bool {
 		cnt++
-		// log.Println(cnt, name, "??", fo.Name())
-		if fo.Name() == name {
+		// log.Println(cnt, "??", fo.Name())
+		if fo.Name() == name || (
+			strings.HasSuffix(fo.Name(), name) && strings.Contains(name, ".") ) {
 			fnptr = fo.Entry()
 			return true
 		}

@@ -12,10 +12,11 @@ import (
 
 /*
 
+#define _GNU_SOURCE
+#include <pthread.h>
 #include <unistd.h>
 #include <sys/syscall.h>
 #include <stdint.h>
-#include <pthread.h>
 #include <assert.h>
 
 static uint64_t gettidwp(int rdnum) {
@@ -41,6 +42,42 @@ static uintptr_t MyTid() { return (uintptr_t)pthread_self(); }
 // static uintptr_t MyTid2() { return syscall(sizeof(void*)==4?224:186); }
 // macos
 // static uintptr_t MyTid3() { return kdebug_signpost(SYS_kdebug_trace); }
+
+typedef struct CgoppThreadNoid {
+	uint64_t Handle;
+	uint32_t No;
+	uint32_t Seq;
+	uintptr_t Stksize;
+	void* Stkaddr;
+} CgoppThreadNoid;
+static CgoppThreadNoid CgoppThreadNoidInst;
+// first call in c, with np==NULL
+const CgoppThreadNoid* getCgoppThreadNoid(CgoppThreadNoid* np) {
+	CgoppThreadNoid* p0 = &CgoppThreadNoidInst;
+	pthread_attr_t attr;
+	size_t stksize = 0;
+	void* stkaddr = 0;
+	pthread_getattr_np(pthread_self(), &attr);
+	pthread_attr_getstacksize(&attr, &stksize);
+	// pthread_attr_getstackaddr(&attr, &stkaddr);
+	pthread_attr_getstack(&attr, &stkaddr, &stksize);
+
+	if (np != 0) {
+	np->Handle = (uint64_t)pthread_self();
+	np->No = (uint32_t)gettidwp(0);
+	np->Seq = np->No;
+	np->Stksize = stksize;
+	np->Stkaddr = stkaddr;
+	return np;
+	}else if (p0->Handle == 0){
+	p0->Handle = (uint64_t)pthread_self();
+	p0->No = (uint32_t)gettidwp(0);
+	p0->Seq = p0->No;
+	p0->Stksize = stksize;
+	p0->Stkaddr = stkaddr;
+	}
+	return p0;
+}
 */
 import "C"
 

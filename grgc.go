@@ -8,6 +8,7 @@ package gopp
 import (
 	// "log"
 	"math"
+	"reflect"
 	"sync/atomic"
 	"time"
 )
@@ -69,4 +70,34 @@ func (this *Prthread) IsStopped() bool {
 }
 
 type grpool struct {
+}
+
+// /
+var fakerefcnt = 0
+
+func FakeRef(x any) int {
+	if Absfalse() {
+		k := reflect.TypeOf(x).Kind()
+		return int(k)
+	}
+	fakerefcnt++
+	return fakerefcnt
+}
+
+func Reftimed(v any, dur time.Duration) {
+	time.AfterFunc(dur, func() {
+		if v != nil {
+		}
+	})
+}
+func ReftimedSec(v any, sec int) {
+	Reftimed(v, time.Duration(sec)*time.Second)
+}
+
+type ThreadNoid struct {
+	Handle  uint64 // pthread_self
+	No      uint32 // SYS_gettid
+	Seq     uint32
+	Stksize usize
+	Stkaddr voidptr
 }

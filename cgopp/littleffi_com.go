@@ -22,10 +22,27 @@ const (
 	FFITY_USIZE
 )
 
-var ffiver = 1
+var ffiver = FfiPurego
+
+const Ffinone = 0
+const FfiLita6 = 1
+const FfiPurego = 3
+const (
+	// maybe go native support is comming
+	// https://github.com/golang/go/issues/975
+	// https://github.com/golang/go/issues/16623
+	FfiVaarg = iota + 4
+	FfiVtcm  // vtmpl + cmacro
+)
 
 func SwitchFfiver(v int) {
+	if v == ffiver {
+		return
+	}
 	if v == 2 || v == 3 {
+		ffiver = v
+	} else if v == FfiLita6 {
+		gopp.Warn("Only voidptr param supported")
 		ffiver = v
 	} else {
 		gopp.Warn("Invalid ffiver[2, 3], but", v)
