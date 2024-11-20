@@ -122,22 +122,43 @@ func (this *CodePager) PrependUnique(name, code string) {
 	}
 }
 
-func (this *CodePager) AP(name, code string)  { this.Append(name, code) }
-func (this *CodePager) APU(name, code string) { this.AppendUnique(name, code) }
-func (this *CodePager) PP(name, code string)  { this.Prepend(name, code) }
-func (this *CodePager) PPU(name, code string) { this.PrependUnique(name, code) }
+func (this *CodePager) AP(name, code string) *CodePager {
+	this.Append(name, code)
+	return this
+}
+func (this *CodePager) APU(name, code string) *CodePager {
+	this.AppendUnique(name, code)
+	return this
+}
+func (this *CodePager) PP(name, code string) *CodePager {
+	this.Prepend(name, code)
+	return this
+}
+func (this *CodePager) PPU(name, code string) *CodePager {
+	this.PrependUnique(name, code)
+	return this
+}
 
-func (this *CodePager) APf(name, format string, args ...interface{}) {
+func (this *CodePager) APf(name, format string, args ...interface{}) *CodePager {
 	this.Append(name, fmt.Sprintf(format, args...))
+	return this
 }
-func (this *CodePager) APUf(name, format string, args ...interface{}) {
+func (this *CodePager) APUf(name, format string, args ...interface{}) *CodePager {
 	this.AppendUnique(name, fmt.Sprintf(format, args...))
+	return this
 }
-func (this *CodePager) PPf(name, format string, args ...interface{}) {
+func (this *CodePager) PPf(name, format string, args ...interface{}) *CodePager {
 	this.Prepend(name, fmt.Sprintf(format, args...))
+	return this
 }
-func (this *CodePager) PPUf(name, format string, args ...interface{}) {
+func (this *CodePager) PPUf(name, format string, args ...interface{}) *CodePager {
 	this.PrependUnique(name, fmt.Sprintf(format, args...))
+	return this
+}
+
+func (this *CodePager) Nlweb(name string) *CodePager {
+	this.Append(name, NLHtml)
+	return this
 }
 
 func (this *CodePager) GetPoint(name string) string {

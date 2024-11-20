@@ -75,7 +75,11 @@ type grpool struct {
 // /
 var fakerefcnt = 0
 
-func FakeRef(x any) int {
+func FakeRef(x any) int { return FakeSymref(x) }
+
+// we want some func in binary even not used when build
+// avoid go link omit unused func he think
+func FakeSymref(x any) int {
 	if Absfalse() {
 		k := reflect.TypeOf(x).Kind()
 		return int(k)
