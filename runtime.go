@@ -142,6 +142,7 @@ func Rtfuncfile(f FuncInfo, fileno int32) string
 // go:linkname getg runtime.getg
 // func getg() (gr voidptr)
 
+// dont move
 func SetPin(ptr voidptr, pin bool) { setPinned(ptr, pin) }
 
 func IsAndroid() bool { return runtime.GOOS == "android" }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/kitech/gopp"
 
-	"github.com/ebitengine/purego"
+	// "github.com/ebitengine/purego"
 	// _ "github.com/ebitengine/purego"
 )
 
@@ -74,14 +74,14 @@ import "C"
 
 var litfficallfnc func(voidptr, int, voidptr, voidptr, voidptr, voidptr, voidptr, voidptr) voidptr
 
-//go:linkname gointernal_dlsym dlsym
-var gointernal_dlsym uintptr
+// //go:linkname gointernal_dlsym dlsym
+// var gointernal_dlsym uintptr
 
 func init() {
-	gopp.ZeroPrint(gointernal_dlsym, "go:linkname not worked")
-	sym, err := purego.Dlsym(purego.RTLD_DEFAULT, "litfficall")
-	gopp.ErrPrint(err)
-	purego.RegisterFunc(&litfficallfnc, sym)
+	// gopp.ZeroPrint(gointernal_dlsym, "go:linkname not worked")
+	// sym, err := purego.Dlsym(purego.RTLD_DEFAULT, "litfficall")
+	// gopp.ErrPrint(err)
+	// purego.RegisterFunc(&litfficallfnc, sym)
 }
 
 // note: 所有参数必须全是指针类型

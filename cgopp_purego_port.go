@@ -138,6 +138,7 @@ func Cmemdupgc[T voidptr | charptr](ptr T, n sizet) voidptr {
 	return Cmemcpy(dst, voidptr(ptr), n)
 }
 
+// go.mallocgc and not move
 func Mallocgc(n sizet) voidptr {
 	if n < 0 {
 		return nil

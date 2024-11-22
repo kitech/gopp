@@ -2,8 +2,10 @@ package gopp
 
 import (
 	"fmt"
+	"math"
 	"net"
 	"net/http"
+	"os"
 
 	// "net/http/pprof"
 	_ "net/http/pprof"
@@ -41,22 +43,31 @@ var threadProfile *rtpprof.Profile // rtpprof.Lookup("threadcreate")
 func setupRuntimeMemoryGCTuner() {
 	cp := NewCodePager()
 	sec := "main"
+	// 好像这些参数作为动态库中时使用很奇怪?
 	http.HandleFunc("/tuner", func(w http.ResponseWriter, r *http.Request) {
 		maxosth := rtdbg.SetMaxThreads(128) // <=0 crash
-		maxmem := rtdbg.SetMemoryLimit(-1)
-		gcpcnt := rtdbg.SetGCPercent(100)
-
-		cp.APf(sec, "rcvars: [maxproc:0+, maxmem:MB, maxosth:0+, gcpercent:0-100").Nlweb(sec).Nlweb(sec)
-		cp.APf(sec, "Current rtvars:").Nlweb(sec)
-		cp.APf(sec, "MAXPROCS: %v", runtime.GOMAXPROCS(0)).Nlweb(sec)
-		cp.APf(sec, "Osth: curr/max: %v/%v", threadProfile.Count(), maxosth).Nlweb(sec)
-		cp.APf(sec, "MemLimit: %vM", maxmem/MB).Nlweb(sec)
-		cp.APf(sec, "GCPercent/GOGC: %v", gcpcnt).Nlweb(sec)
+		maxmem2 := os.Getenv("GOMEMLIMIT")
+		// SetGCPercent/SetMemoeryLimit会相互影响
+		// set -1, cause SetGCPercent return -1
+		// after SetMemoryLimit, need recall SetGCPercent always
+		maxmem := rtdbg.SetMemoryLimit(math.MaxInt64)
+		// maxmem := int64(math.MaxInt64)
+		gcpcnt2 := os.Getenv("GOGC")
+		// https://github.com/golang/go/issues/39419
+		gcpcnt := rtdbg.SetGCPercent(99) // 无论如何都有可能返回-1???
+		// gcpcnt := 100
 
 		// restore
 		rtdbg.SetMaxThreads(maxosth)
 		rtdbg.SetMemoryLimit(maxmem)
-		rtdbg.SetGCPercent(gcpcnt)
+		rtdbg.SetGCPercent(IfElseInt(gcpcnt==-1, 99, gcpcnt))
+
+		cp.APf(sec, "rcvars: [maxproc:0+, maxmem:MB, maxosth:0+, gcpercent:0-100").Nlweb(sec).Nlweb(sec)
+		cp.APf(sec, "Default/Env/Current rtvars:").Nlweb(sec)
+		cp.APf(sec, "MAXPROCS: %v/%v", runtime.NumCPU(), runtime.GOMAXPROCS(0)).Nlweb(sec)
+		cp.APf(sec, "Osth: dft/max/curr: %v/%v/%v", 10000, maxosth, threadProfile.Count()).Nlweb(sec)
+		cp.APf(sec, "MemLimit: %v/%v/%vM", "∞", maxmem2, maxmem/MB).Nlweb(sec)
+		cp.APf(sec, "dft/GOGC/curr: %v/%v/%v", 100, gcpcnt2, gcpcnt).Nlweb(sec)
 
 		res := cp.ExportAll()
 		w.Write([]byte(res))
@@ -83,6 +94,9 @@ func setupRuntimeMemoryGCTuner() {
 				oldval /= MB
 			case "gcpercent":
 				oldval = rtdbg.SetGCPercent(val)
+			case "gotrace":
+				// rtdbg.SetTraceback(val)
+			case "gctrace":
 			default:
 				Warn("nocat", key, vals, r.URL.String())
 			}
