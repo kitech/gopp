@@ -32,6 +32,22 @@ var getpkg = "github.com/kitech/gopp"
 var verbose bool
 var showhelp bool
 
+func init() {
+	if !gopp.FileExist2(moddir) {
+		outcc, err := gopp.RunCmdCout("go", "env")
+		gopp.ErrPrint(err,  )
+		lines := strings.Split(outcc, "\n")
+		for _, line := range lines {
+			kv := strings.Split(line, "=")
+			switch kv[0] {
+			case "GOMODCACHE":
+				moddir = kv[1][1:len(kv[1])-1]
+				moddldir = moddir + "/cache/download"
+			}
+		}
+	}
+}
+
 // cmd
 // get pkgpath, // like go get, but offline first, then online
 // list regexp, // only current workdir go.mod
@@ -92,6 +108,8 @@ func main() {
 	// todo 同步本地开发目录到 mod cache 目录的zip文件，完全离线
 	case "dltmp":
 		mcdltmpget(curpkg)
+	case "doc":
+		gopp.RunCmdSout(nil, dltmpdir , "go doc " + curpkg)
 	case "locsync":
 	case "fakelocalproxyserver": // todo
 	default:

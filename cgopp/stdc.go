@@ -142,8 +142,12 @@ func Mallocgc(n int) voidptr {
 	return ptr
 }
 
+// keep it, cpp need
+
 //export cgoppMallocgc
-func cgoppMallocgc(n cint) voidptr { return Mallocgc(int(n)) }
+func cgoppMallocgc(n cint) voidptr {
+	return Mallocgc(int(n))
+}
 
 const CBoolTySz = gopp.Int32TySz
 const CppBoolTySz = gopp.Int8TySz

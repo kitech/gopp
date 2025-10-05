@@ -8,16 +8,16 @@ package cgopp
 struct shlib_image_callback_data {
     int32_t idx;
 	int32_t cnt;
-	char** names;
+	const char** names;
 };
 
 int shlib_image_callback(struct dl_phdr_info* info, size_t size, void* data) {
-char* libpath = info->dlpi_name;
-struct shlib_image_callback_data* d = (struct shlib_image_callback_data*)data;
-if (d->idx < d->cnt) {
-	d->names[d->idx] = libpath;
-	d->idx += 1;
-}
+    const char* libpath = info->dlpi_name;
+    __auto_type d = (struct shlib_image_callback_data*)data;
+    if (d->idx < d->cnt) {
+	    d->names[d->idx] = libpath;
+	    d->idx += 1;
+    }
 return 0;
 }
 
