@@ -18,6 +18,6 @@ require (
 )
 
 require (
-	github.com/ebitengine/purego v0.8.1
+	github.com/ebitengine/purego v0.9.0
 	github.com/petermattis/goid v0.0.0-20180202154549-b0b1615b78e5 // indirect
 )

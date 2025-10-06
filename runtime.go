@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"sync"
 
-	"runtime/rtin"
+	// "runtime/rtin"
 	_ "unsafe"
 )
 
@@ -17,13 +17,13 @@ import (
 
 // voidptr is runtime._type, and can be nil
 
-//go:linkname mymallocgc runtime.mallocgc
-func mymallocgc(n usize, rttypeptr voidptr, zero bool) voidptr
+////go:linkname mymallocgc runtime.mallocgc
+//func mymallocgc(n usize, rttypeptr voidptr, zero bool) voidptr
 
 // rttypeptr cannot be nil
 
-//go:linkname mynewobject runtime.newobject
-func mynewobject(rttypeptr voidptr) voidptr
+////go:linkname mynewobject runtime.newobject
+//func mynewobject(rttypeptr voidptr) voidptr
 
 // 这个函数只负责固定指针地址不移动，但是并不负责持有指针引用
 // 如果需要持有引用，直接使用runtime.Pinner.Pin
@@ -31,20 +31,20 @@ func mynewobject(rttypeptr voidptr) voidptr
 // go:linkname not need cgo enabled
 // only allowed in Go files that import "unsafe"
 //
-//go:linkname setPinned runtime.setPinned
-func setPinned(ptr voidptr, pin bool) bool
+////go:linkname setPinned runtime.setPinned
+//func setPinned(ptr voidptr, pin bool) bool
 
-//go:linkname acquirem runtime.acquirem
-func acquirem() (mp voidptr)
+////go:linkname acquirem runtime.acquirem
+//func acquirem() (mp voidptr)
 
-//go:linkname releasem runtime.releasem
-func releasem(mp voidptr)
+////go:linkname releasem runtime.releasem
+//func releasem(mp voidptr)
 
-//go:linkname firstmoduledata runtime.firstmoduledata
-var firstmoduledata moduledata
+////go:linkname firstmoduledata runtime.firstmoduledata
+//var firstmoduledata moduledata
 
-//go:linkname lastmoduledatap runtime.lastmoduledatap
-var lastmoduledatap *moduledata
+////go:linkname lastmoduledatap runtime.lastmoduledatap
+//var lastmoduledatap *moduledata
 
 // go1.22.3
 // moduledata records information about the layout of the executable
@@ -53,7 +53,7 @@ var lastmoduledatap *moduledata
 // moduledata is stored in statically allocated non-pointer memory;
 // none of the pointers here are visible to the garbage collector.
 type moduledata struct {
-	NotInHeap // sys.NotInHeap // Only in static data
+	_ voidptr //sys.NotInHeap // NotInHeap // sys.NotInHeap // Only in static data
 
 	pcHeader     voidptr //  *pcHeader
 	funcnametab  []byte
@@ -105,7 +105,7 @@ type moduledata struct {
 }
 
 // /// type moduledata deps
-type NotInHeap = rtin.NotInHeap
+// type NotInHeap = rtin.NotInHeap
 
 // Information from the compiler about the layout of stack frames.
 // Note: this type must agree with reflect.bitVector.
@@ -143,7 +143,9 @@ func Rtfuncfile(f FuncInfo, fileno int32) string
 // func getg() (gr voidptr)
 
 // dont move
-func SetPin(ptr voidptr, pin bool) { setPinned(ptr, pin) }
+func SetPin(ptr voidptr, pin bool) {
+	//	setPinned(ptr, pin)
+}
 
 func IsAndroid() bool { return runtime.GOOS == "android" }
 func IsWindows() bool { return runtime.GOOS == "windows" }
@@ -200,5 +202,5 @@ package runtime
 		return getg().m.procid
 	}
 */
-func Gettid() uint64 { return runtime.Gettid() }
-func Gettno() int32  { return runtime.Gettno() }
+// func Gettid() uint64 { return runtime.Gettid() }
+// func Gettno() int32  { return runtime.Gettno() }

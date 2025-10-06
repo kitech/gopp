@@ -13,24 +13,36 @@ import (
 
 	_ "unsafe"
 
-	_ "github.com/pkg/errors"
+	"github.com/pkg/errors"
 )
 
 var (
 	// 这可以导出包里的私有变量,函数
 
-	//go:linkname ErrTimeout net.errTimeout
-	ErrTimeout error
-	//go:linkname CanceledError net.canceledError
-	CanceledError error
+	////go:linkname ErrTimeout net.errTimeout
+	// ErrTimeout error
+	////go:linkname CanceledError net.canceledError
+	// CanceledError error
 
-	//go:linkname ErrClosed os.ErrClosed
-	ErrClosed error
+	////go:linkname ErrClosed os.ErrClosed
+	// ErrClosed error
 
 	// is type
-	// go:linkname PlainError runtime.plainError
-	// PlainError error
+	//// go:linkname PlainError runtime.plainError
+	//// PlainError error
+
+	// 这可以导出包里的私有变量, fix 1.25+
+	// go build -ldflags=-checklinkname=0
+	// todo
+	////go:linkname ErrTimeout net.errTimeout
+	// ErrTimeout error
+	ErrTimeout = errors.New("i/o timeout")
+	////go:linkname CanceledError net.canceledError
+	//	CanceledError error
+	CanceledError = errors.New("operation was canceled")
 )
+
+var ErrClosed = os.ErrClosed
 
 func ErrAny(errs ...error) bool {
 	for _, err := range errs {
