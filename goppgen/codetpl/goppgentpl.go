@@ -27,6 +27,7 @@ type i128 = struct{ H, L int64 }
 type fatptr = struct{ H, L usize }
 type quadptr = struct{ H0, H1, L0, L1 usize }
 
+
 // type sword = int32
 // type dword = int64
 // type qword = struct{ H, L int64 }

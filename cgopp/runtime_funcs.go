@@ -30,11 +30,12 @@ func Dlsymgo(name string) usize {
 	return fnptr
 }
 
-func Gortmd0() *moduledata { return &firstmoduledata }
+// func Gortmd0() *moduledata { return &firstmoduledata }
 
 // cbfn return true stop
 // see https://github.com/alangpierce/go-forceexport/blob/master/forceexport.go
 func GortWalkFuncs(cbfn func(*runtime.Func) bool) {
+	/*
 	mod0 := &firstmoduledata
 	for md := mod0; md != nil; md = md.next {
 		for _, ftab := range md.ftab {
@@ -44,4 +45,5 @@ func GortWalkFuncs(cbfn func(*runtime.Func) bool) {
 			}
 		}
 	}
+	*/
 }

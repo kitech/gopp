@@ -65,6 +65,18 @@ func init() {
 	}
 }
 
+// dlsym self
+func Dlsym0(sym string) voidptr {
+	fnadr, err := Dlsym(purego.RTLD_DEFAULT, sym)
+	ErrPrint(err)
+	return voidptr(fnadr)
+}
+
+func FfiCall[RETY any, FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) (rvx RETY) {
+	panic("todo")
+	return
+}
+
 func Cstrlen[T voidptr | charptr](ptr T) int { return cstrlen(ptr) }
 func cstrlen[T voidptr | charptr](ptr T) int {
 	if ptr == nil {

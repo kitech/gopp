@@ -105,7 +105,14 @@ func mainx() {
 	sb.WriteString("type isize = int" + "\n")
 	sb.WriteString("type usize = uintptr" + "\n")
 	sb.WriteString("type voidptr = unsafe.Pointer" + "\n")
+	sb.WriteString("type byteptr = unsafe.Pointer" + "\n")
+	sb.WriteString("type charptr = unsafe.Pointer" + "\n")
+	//
+	sb.WriteString("type cint = int32" + "\n")
+	sb.WriteString("type ci64 = int64" + "\n")
 
+
+	// CGO
 	sbout(sb, cmtpfx, "type cusize = C.uintptr_t"+"\n")
 	sbout(sb, cmtpfx, "type cvoidptr = *C.void"+"\n")
 
@@ -122,7 +129,7 @@ func mainx() {
 		func anyptr2uptrc[T any](p *T) cuptr{
 			var pp = uintptr(vptr(p))
 			return cuptr(pp)
-		}		
+		}
 			`)
 
 	}

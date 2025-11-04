@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"runtime"
 	"sync"
+	"syscall"
 
 	// "runtime/rtin"
 	_ "unsafe"
@@ -204,3 +205,8 @@ package runtime
 */
 // func Gettid() uint64 { return runtime.Gettid() }
 // func Gettno() int32  { return runtime.Gettno() }
+
+func Gettid() int {
+	tid := syscall.Gettid()
+	return tid
+}

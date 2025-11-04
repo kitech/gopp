@@ -132,7 +132,7 @@ var gobyterttype = RttypeOf(byte(0))
 // 不可以用作存储C++对象，无法调用destructor
 func Mallocgc(n int) voidptr {
 	ptr := mymallocgc(usize(n), gobyterttype, true)
-	setPinned(ptr, true)
+	//	setPinned(ptr, true)
 	// must a type not unsafe.Pointer
 	runtime.SetFinalizer((*byte)(ptr), func(obj any) {
 		if false {
