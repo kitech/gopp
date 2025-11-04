@@ -3,6 +3,7 @@ package gopp
 import (
 	"log"
 	"unsafe"
+	"time"
 
 	"github.com/ebitengine/purego"
 )
@@ -70,11 +71,6 @@ func Dlsym0(sym string) voidptr {
 	fnadr, err := Dlsym(purego.RTLD_DEFAULT, sym)
 	ErrPrint(err)
 	return voidptr(fnadr)
-}
-
-func FfiCall[RETY any, FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) (rvx RETY) {
-	panic("todo")
-	return
 }
 
 func Cstrlen[T voidptr | charptr](ptr T) int { return cstrlen(ptr) }
@@ -239,6 +235,14 @@ func StrtoRefc(s *string) voidptr {
 	// underly C memory with auto free
 	// s4c := CStringaf(*s)
 	// return s4c
+}
+
+// auto free after timeout
+func CStringaf(s string) voidptr {
+	ptr := voidptr(CStringgc(s))
+
+	time.AfterFunc(DurandSec(3, 5), func() { GOUSED(ptr) })
+	return ptr
 }
 
 // 常量字符串失败

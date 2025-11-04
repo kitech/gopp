@@ -1,10 +1,10 @@
-package cgopp
+package gopp
 
 import (
 	"reflect"
 
 	"github.com/ebitengine/purego"
-	"github.com/kitech/gopp"
+	// "github.com/kitech/gopp"
 )
 
 // 不好，purego只支持arm64,amd64, 不支持arm32,amd32. see purego/func.go:416
@@ -42,10 +42,10 @@ func SwitchFfiver(v int) {
 	if v == 2 || v == 3 {
 		ffiver = v
 	} else if v == FfiLita6 {
-		gopp.Warn("Only voidptr param supported")
+		Warn("Only voidptr param supported")
 		ffiver = v
 	} else {
-		gopp.Warn("Invalid ffiver[2, 3], but", v)
+		Warn("Invalid ffiver[2, 3], but", v)
 	}
 }
 
@@ -54,7 +54,7 @@ func TestLitfficallz() {
 	case 2:
 		// TestLitffi2callz()
 	default:
-		TestLitffi3callz()
+		// TestLitffi3callz()
 	}
 }
 
@@ -64,13 +64,13 @@ func TestLitfficallz() {
 func FfiCall[RETY any, FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) (rvx RETY) {
 	switch ffiver {
 	case 1:
-		rv := Litfficallg(fnptrx, args...)
+		// rv := Litfficallg(fnptrx, args...)
 		// rvx = RETY(rv)
-		rvx = *(*RETY)(voidptr(&rv))
+		// rvx = *(*RETY)(voidptr(&rv))
 	case 2:
 		// rvx = Ffi2Call[RETY](fnptrx, args...)
 	default:
-		rvx = Ffi3Call[RETY](fnptrx, args...)
+		// rvx = Ffi3Call[RETY](fnptrx, args...)
 	}
 	return
 }
@@ -90,7 +90,7 @@ func FfiCallVoid[FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) {
 
 func FfiCall0[T any](name string, args ...any) (rvx T) {
 	fnsym := Dlsym0(name)
-	gopp.NilPrint(fnsym, "symnil", name)
+	NilPrint(fnsym, "symnil", name)
 	switch ffiver {
 	case 2:
 		// rvx = Ffi2Call[T](fnsym, args...)
@@ -102,7 +102,7 @@ func FfiCall0[T any](name string, args ...any) (rvx T) {
 
 func FfiCallVoid0(name string, args ...any) {
 	fnsym := Dlsym0(name)
-	gopp.NilPrint(fnsym, "symnil", name)
+	NilPrint(fnsym, "symnil", name)
 	switch ffiver {
 	case 2:
 		// Ffi2Call[int](fnsym, args...)
@@ -111,13 +111,13 @@ func FfiCallVoid0(name string, args ...any) {
 	}
 }
 
-func Dlsym0(name string) voidptr {
-	// name := name[1:] // for macos???
-	sym, err := purego.Dlsym(purego.RTLD_DEFAULT, name)
-	gopp.ErrPrint(err, name)
-	gopp.NilPrint(sym, name)
-	return voidptr(sym)
-}
+// func Dlsym0(name string) voidptr {
+// 	// name := name[1:] // for macos???
+// 	sym, err := purego.Dlsym(purego.RTLD_DEFAULT, name)
+// 	gopp.ErrPrint(err, name)
+// 	gopp.NilPrint(sym, name)
+// 	return voidptr(sym)
+// }
 
 // /// libffi like prepare method
 type FfiCif[RETY any] struct {
@@ -148,7 +148,7 @@ func (me *FfiCif[T]) Prep(fnptrx any, args ...any) error {
 	me.fnv = reflect.New(me.fnty)
 	me.invals = make([]reflect.Value, len(args)) // 这个分配内存影响10%的效率差不多
 
-	var ifv = (*gopp.GoIface)((voidptr)(&fnptrx))
+	var ifv = (*GoIface)((voidptr)(&fnptrx))
 	var fnptr = usize(*((*voidptr)(ifv.Data)))
 	// var fnptr = reflect.ValueOf(fnptrx).Convert(gopp.UsizeTy).Interface().(usize)
 	// switch fn := fnptrx.(type) {
@@ -163,13 +163,13 @@ func (me *FfiCif[T]) Prep(fnptrx any, args ...any) error {
 	// 这个调用对效率的影响挺大的，可能有20%的次序影响
 	var fnv = me.fnv
 	purego.RegisterFunc(fnv.Interface(), fnptr)
-	gopp.NilPrint(fnv.Interface(), "regfunc failed/nil", fnv, fnv.Interface(), me.fnty)
+	NilPrint(fnv.Interface(), "regfunc failed/nil", fnv, fnv.Interface(), me.fnty)
 
 	return nil
 }
 
 func (me *FfiCif[T]) Call(fnptrx any, args ...any) (rvx T) {
-	gopp.TruePrint(len(args) != len(me.argtys), "argc not match", len(args), len(me.argtys))
+	TruePrint(len(args) != len(me.argtys), "argc not match", len(args), len(me.argtys))
 
 	// invals := make([]reflect.Value, len(args))
 	invals := me.invals

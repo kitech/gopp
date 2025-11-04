@@ -1,11 +1,11 @@
-package cgopp
+package gopp
 
 import (
 	"log"
 	"reflect"
 
 	"github.com/ebitengine/purego"
-	"github.com/kitech/gopp"
+	// "github.com/kitech/gopp"
 )
 
 /*
@@ -33,7 +33,7 @@ litffi3_test2(float a) {
 // import "C"
 
 func TestLitffi3callz(dlh ...usize) {
-	dlh0 := gopp.IfElse2(len(dlh) > 0, gopp.FirstofGv(dlh), purego.RTLD_DEFAULT)
+	dlh0 := IfElse2(len(dlh) > 0, FirstofGv(dlh), purego.RTLD_DEFAULT)
 	sym, _ := purego.Dlsym(dlh0, "litffi3_test1")
 	// sym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
 	// sym2, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi_test2")
@@ -44,49 +44,49 @@ func TestLitffi3callz(dlh ...usize) {
 	// argp0 := voidptr(usize(0)) // ok
 	argp0 := usize(3309)
 	x := Ffi3Call[float64](sym, float64(123.2345), argp0, uint64(386))
-	log.Println("ret1", gopp.IfElse2(x == 123.2345, "OK", "unwant"), x)
+	log.Println("ret1", IfElse2(x == 123.2345, "OK", "unwant"), x)
 
 	// float**的参数和返回值类型一定要与C函数匹配
 	{
 		// 这个应该也是不支持的，不支持为什么结果正确
 		x := Ffi3Call0[float32]("litffi3_test1", float32(123.2345))
-		log.Println("ret2", gopp.IfElse2(x == 123.2345, "OK", "unwant"), x)
+		log.Println("ret2", IfElse2(x == 123.2345, "OK", "unwant"), x)
 	}
 	{
 		// 不支持的，返回结果未定义
 		x := Ffi3Call0[float64]("litffi3_test1", float32(123.2345))
-		log.Println("ret3", gopp.IfElse2(gopp.FloatIsZero(x), "OK", "unwant"), x)
+		log.Println("ret3", IfElse2(FloatIsZero(x), "OK", "unwant"), x)
 	}
 	{
 		v := float32(1.23)
 		x := Ffi3Call0[float32]("litffi3_test2", v)
-		log.Println("ret4", gopp.IfElse2(x == 2.23, "OK", "unwant"), x)
+		log.Println("ret4", IfElse2(x == 2.23, "OK", "unwant"), x)
 	}
 }
 
 func BMLitffi3callz(dlh ...usize) {
-	dlh0 := gopp.IfElse2(len(dlh) > 0, gopp.FirstofGv(dlh), purego.RTLD_DEFAULT)
+	dlh0 := IfElse2(len(dlh) > 0, FirstofGv(dlh), purego.RTLD_DEFAULT)
 	fnsym, _ := purego.Dlsym(dlh0, "litffi3_test1")
 	// fnsym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
 	argp0 := usize(3309)
 
-	gopp.Benchfn(func() {
+	Benchfn(func() {
 		x := Ffi3Call[float64](fnsym, float64(123.2345), argp0, uint64(386))
 		_ = x
-	}, 99999, gopp.MyFuncName())
+	}, 99999, MyFuncName())
 }
 func BMLitffi3callz2(dlh ...usize) {
-	dlh0 := gopp.IfElse2(len(dlh) > 0, gopp.FirstofGv(dlh), purego.RTLD_DEFAULT)
+	dlh0 := IfElse2(len(dlh) > 0, FirstofGv(dlh), purego.RTLD_DEFAULT)
 	fnsym, _ := purego.Dlsym(dlh0, "litffi3_test1")
 	// fnsym, _ := purego.Dlsym(purego.RTLD_DEFAULT, "litffi3_test1")
 	argp0 := usize(3309)
 
 	cif := FfiCifNew[float64]()
 	cif.Prep(fnsym, float64(123.2345), argp0, uint64(386))
-	gopp.Benchfn(func() {
+	Benchfn(func() {
 		x := cif.Call(fnsym, float64(123.2345), argp0, uint64(386))
 		_ = x
-	}, 99999, gopp.MyFuncName())
+	}, 99999, MyFuncName())
 }
 
 // //////////
@@ -128,7 +128,7 @@ func Ffi3Call[RETY any, FT voidptr | usize | *[0]byte](fnptrx FT, args ...any) (
 	// log.Println(fnv.UnsafeAddr()) // not works
 	// log.Println(fnv.UnsafePointer()) // works but useless
 	purego.RegisterFunc(fnv.Interface(), usize(voidptr(fnptrx)))
-	gopp.NilPrint(fnv.Interface(), "regfunc failed/nil", fnv, fnv.Interface(), fnty)
+	NilPrint(fnv.Interface(), "regfunc failed/nil", fnv, fnv.Interface(), fnty)
 
 	outvals := fnv.Elem().Call(invals)
 	// log.Println("ffi3calldone", outvals, outvals[0].Interface())
@@ -150,7 +150,7 @@ func fntypebyargs(rety reflect.Type, args ...any) (reflect.Type, []reflect.Type)
 		intys[i] = reflect.TypeOf(argx)
 		if argx == nil {
 			// log.Println("nilarg", i)
-			intys[i] = gopp.VoidpTy
+			intys[i] = VoidpTy
 		}
 	}
 
