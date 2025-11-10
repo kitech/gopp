@@ -35,6 +35,17 @@ var Cmemset func(voidptr, cint, sizet) voidptr
 
 func Cfree[T uintptr | voidptr](ptr T) { cfreefn(voidptr(ptr)) }
 
+type Allocator struct {
+	Malloc func(sizet) voidptr
+	Calloc func(sizet, sizet) voidptr
+	Realloc func(voidptr, sizet) voidptr
+	Free func(voidptr)
+	Memdup func(voidptr,sizet) voidptr
+}
+
+var Altrc *Allocator
+var Altgc *Allocator = &Allocator{Mallocgc, Callocgc, nil, Freegc, Cmemdupgc[voidptr]}
+
 // var Cmemcpy func(voidptr, voidptr, sizet) voidptr
 // var Cmemdup func(voidptr, sizet) voidptr
 
@@ -64,6 +75,8 @@ func init() {
 		ErrPrint(err)
 		purego.RegisterFunc(&Cmemset, fnadr)
 	}
+
+	Altrc = &Allocator{Cmalloc, Ccalloc, Crealloc, Cfree[voidptr], Cmemdup[voidptr]}
 }
 
 // dlsym self
@@ -72,6 +85,7 @@ func Dlsym0(sym string) voidptr {
 	ErrPrint(err)
 	return voidptr(fnadr)
 }
+
 
 func Cstrlen[T voidptr | charptr](ptr T) int { return cstrlen(ptr) }
 func cstrlen[T voidptr | charptr](ptr T) int {
@@ -156,6 +170,15 @@ func Mallocgc(n sizet) voidptr {
 	SetPin(rv, true)
 	return rv
 }
+func Callocgc(n sizet, cnt sizet) voidptr {
+	return Mallocgc(n*cnt)
+}
+func Reallocgc(ptr voidptr, n sizet) voidptr {
+	panic("Not impl")
+	// return ptr2
+}
+func Freegc(ptr voidptr) {}
+
 
 // same as officical go
 func GoString[T voidptr | charptr](ptr T) (rv string) {

@@ -1,6 +1,7 @@
 package gopp
 
 import (
+	// "log"
 	"fmt"
 	"math/rand"
 	"time"
@@ -33,7 +34,7 @@ func NewFixedBackOff() *FixedBackOff {
 	this.name = "Fixed"
 	return this
 }
-func (this *FixedBackOff) Reset() {}
+func (this *FixedBackOff) Reset() {this.ntimes = 0 }
 func (this *FixedBackOff) Next() (int, time.Duration) {
 	this.ntimes++
 	return this.ntimes, 100 * time.Millisecond
@@ -51,7 +52,9 @@ func NewNaturalBackOff() *NaturalBackOff {
 	this.name = "Natural"
 	return this
 }
-func (this *NaturalBackOff) Reset() {}
+func (this *NaturalBackOff) Reset() {
+	this.ntimes = 0
+}
 
 func (this *NaturalBackOff) Next() (int, time.Duration) {
 	this.ntimes++

@@ -9,6 +9,9 @@ import (
 	"runtime"
 	"sync"
 	"syscall"
+	"strings"
+	"strconv"
+	"fmt"
 
 	// "runtime/rtin"
 	_ "unsafe"
@@ -209,4 +212,22 @@ package runtime
 func Gettid() int {
 	tid := syscall.Gettid()
 	return tid
+}
+
+// 2024 https://leapcell.io/blog/how-to-get-the-goroutine-id
+
+func GetGoid() int64 {
+    var (
+        buf [64]byte
+        n   = runtime.Stack(buf[:], false)
+        stk = strings.TrimPrefix(string(buf[:n]), "goroutine")
+    )
+
+    idField := strings.Fields(stk)[0]
+    id, err := strconv.Atoi(idField)
+    if err!= nil {
+        panic(fmt.Errorf("can not get goroutine id: %v", err))
+    }
+
+    return int64(id)
 }

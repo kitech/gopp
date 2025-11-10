@@ -152,3 +152,14 @@ func MapRandVal[KT comparable, VT any](m map[KT]VT) VT {
 	_, v := MapRand(m)
 	return v
 }
+
+func MapMerge[KT comparable, VT any](m0 map[KT]VT, m1 map[KT]VT) map[KT]VT {
+	var res = make(map[KT]VT)
+	for k,v := range m1 {
+		res[k] = v
+	}
+	for k,v := range m0 {
+		res[k] = v
+	}
+	return res
+}

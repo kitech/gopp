@@ -424,6 +424,61 @@ func Debugp(args ...any) {
 	return
 }
 
+func Warnif(bv bool, args...any) {
+	if !bv { return }
+	s := printq("Warn", args...)
+	log.Output(2, s)
+	if justprintoutfn != nil {
+		if justprintoutfnasync {
+			go justprintoutfn(s)
+		} else {
+			justprintoutfn(s)
+		}
+
+	}
+
+}
+
+func Errorif(bv bool, args...any) {
+	if !bv { return }
+	s := printq("Error", args...)
+	log.Output(2, s)
+	if justprintoutfn != nil {
+		if justprintoutfnasync {
+			go justprintoutfn(s)
+		} else {
+			justprintoutfn(s)
+		}
+	}
+}
+
+func Infoif(bv bool, args...any) {
+	if !bv { return }
+	s := printq("Info", args...)
+	log.Output(2, s)
+	if justprintoutfn != nil {
+		if justprintoutfnasync {
+			go justprintoutfn(s)
+		} else {
+			justprintoutfn(s)
+		}
+	}
+}
+
+func Debugif(bv bool, args...any) {
+	if !bv { return }
+	s := printq("Debug", args...)
+	log.Output(2, s)
+	if justprintoutfn != nil {
+		if justprintoutfnasync {
+			go justprintoutfn(s)
+		} else {
+			justprintoutfn(s)
+		}
+
+	}
+}
+
 // BUG: panic: reflect: call of reflect.Value.IsNil on uint64 Value
 func NilPrint(v any, args ...any) any {
 	if v == nil {

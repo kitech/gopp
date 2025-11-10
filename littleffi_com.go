@@ -54,7 +54,7 @@ func TestLitfficallz() {
 	case 2:
 		// TestLitffi2callz()
 	default:
-		// TestLitffi3callz()
+		TestLitffi3callz()
 	}
 }
 
